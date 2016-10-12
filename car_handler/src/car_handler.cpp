@@ -21,17 +21,31 @@ int main(int argc, char **argv)
     ros::Subscriber command_sub = nh.subscribe<std_msgs::String>("command", 10, std::bind(commandCallback, std::placeholders::_1, &sc));
 
     bool isOpen = sc.openConnection();
-    std::string config = "!DAQ GRP 1 ~ALL=20 USF USL USR";
-    if(sc.isOpen()) sc.send(config);
-    ros::Duration(0.1).sleep();
-    config = "!DAQ START";
-    if(sc.isOpen()) sc.send(config);
-    ros::Duration(0.1).sleep();
+    if(sc.isOpen()) sc.setSensorGroup({SC::rangeSensorLeft, SC::rangeSensorRight, SC::rangeSensorFront});
+    ros::Duration(0.01).sleep();
+    if(sc.isOpen()) sc.startSensors();
+    ros::Duration(0.01).sleep();
+
+    if(sc.isOpen()) sc.setSteeringLevel(25);
+    ros::Duration(1.00).sleep();
+    if(sc.isOpen()) sc.setSteeringLevel(-25);
+    ros::Duration(1.00).sleep();
+    if(sc.isOpen()) sc.setSteeringLevel(0);
+    ros::Duration(1.00).sleep();
+
+    if(sc.isOpen()) sc.setMotorLevel(20);
+    ros::Duration(1.00).sleep();
+    if(sc.isOpen()) sc.setMotorLevel(0);
+    ros::Duration(1.00).sleep();
+    if(sc.isOpen()) sc.setMotorLevel(-20);
+    ros::Duration(1.00).sleep();
+    if(sc.isOpen()) sc.setMotorLevel(0);
+    ros::Duration(1.00).sleep();
 
 
     std::string out;
 
-    ros::Rate loop_rate(100);
+    ros::Rate loop_rate(400);
     while(ros::ok()) {
 
     bool received = sc.receive(out);
@@ -43,5 +57,8 @@ int main(int argc, char **argv)
     }
 
 ros::spin();
+
+if(sc.isOpen()) sc.stopSensors();
+ros::Duration(0.01).sleep();
 
 }
