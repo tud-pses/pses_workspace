@@ -6,6 +6,7 @@ int16 accelerometerZ
 int16 gyroscopeX
 int16 gyroscopeY
 int16 gyroscopeZ
+int16 hall_sensor_dt
 uint16 range_sensor_front
 uint16 range_sensor_left
 uint16 range_sensor_right

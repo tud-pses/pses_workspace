@@ -7,7 +7,7 @@
 
 void commandCallback(const pses_basis::Command::ConstPtr& cmd, SerialCommunication* sc) {
     bool sent = false;
-    //if(sc->isOpen()) sent = sc->send(*cmd);
+    if(sc->isOpen()) sent = sc->sendCommand(*cmd);
     //if (!sent) ROS_INFO_STREAM("Message: '" << *cmd << "' couldn't be sent to the microcontroller!");
 }
 

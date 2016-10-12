@@ -32,6 +32,7 @@ namespace SC{
 class SerialCommunication{
 public:
 	SerialCommunication(uint32_t baudRate, std::string deviceName) : baudRate(baudRate), deviceName(deviceName) {
+		kinectOn = false;
 	};
 	inline bool openConnection() {
 		 try{
@@ -53,16 +54,30 @@ public:
 		return false;
 	}
 
-	inline bool send(const std::string& cmd) {
-		std::string send = cmd + "\n";
-		ROS_INFO_STREAM("Sent: "<< send);
-		return serialConnection.write(send);
-	}
-
 	inline bool reset(){
 		std::string cmd = "!RESET NOW";
 		return send(cmd);
 	}
+
+	inline bool sendCommand(const pses_basis::Command& cmd) {
+		bool state = setSteeringLevel(cmd.steering_level) && setMotorLevel(cmd.motor_level) && (cmd.reset?reset():true);
+		if(!kinectOn && cmd.enable_kinect) {
+			kinectOn = true;
+			return state && setKinect(true);
+		}
+		else if(kinectOn && !cmd.enable_kinect) {
+			kinectOn = false;
+			return state && setKinect(false);
+		}
+		else {
+			return state;
+		}
+	}
+
+	inline bool setKinect(bool enable) {
+		std::string out = "!VOUT "+ (enable)?"ON":"OFF";
+		return send(out);
+	} 
 
 	inline bool setSteeringLevel(int level){
 		int steering = 0;
@@ -142,7 +157,13 @@ public:
 private:
 	uint32_t baudRate;
 	std::string deviceName;
+	bool kinectOn;
 	serial::Serial serialConnection;
+	inline bool send(const std::string& cmd) {
+		std::string send = cmd + "\n";
+		ROS_INFO_STREAM("Sent: "<< send);
+		return serialConnection.write(send);
+	}
 };
 
 #endif
