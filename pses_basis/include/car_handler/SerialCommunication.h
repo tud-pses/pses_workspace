@@ -139,13 +139,15 @@ public:
 		return send(cmd);
 	}
 
-	inline bool receive(std::string& data) {
-		if(serialConnection.available()){
-			serialConnection.readline(data, 65536, "\x03");
-			data.at(data.size()-1)='\n';
-			return true;
+	inline bool getSensorData(pses_basis::SensorData& data){
+		std::string rawData;
+		if(!receive(rawData)) return false;
+		int start = rawData.find("##1:");
+		int end = rawData.find("\x03");
+		if(start<0 || end<0){
+			return false;
 		}
-		return false;
+		
 	}
 	
 	inline bool isOpen() {
@@ -163,6 +165,15 @@ private:
 		std::string send = cmd + "\n";
 		ROS_INFO_STREAM("Sent: "<< send);
 		return serialConnection.write(send);
+	}
+
+	inline bool receive(std::string& data) {
+		if(serialConnection.available()){
+			serialConnection.readline(data, 65536, "\x03");
+			//data.at(data.size()-1)='\n';
+			return true;
+		}
+		return false;
 	}
 };
 
