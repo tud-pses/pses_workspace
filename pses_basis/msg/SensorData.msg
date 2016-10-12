@@ -1,0 +1,14 @@
+PsesHeader header
+int16 car_id
+int16 accelerometerX
+int16 accelerometerY
+int16 accelerometerZ
+int16 gyroscopeX
+int16 gyroscopeY
+int16 gyroscopeZ
+uint16 range_sensor_front
+uint16 range_sensor_left
+uint16 range_sensor_right
+uint16 system_battery_voltage
+uint16 motor_battery_voltage
+

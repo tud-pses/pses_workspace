@@ -1,0 +1,13 @@
+Header header
+std_msgs/Int16 accelerometerX
+std_msgs/Int16 accelerometerY
+std_msgs/Int16 accelerometerZ
+std_msgs/Int16 gyroscopeX
+std_msgs/Int16 gyroscopeY
+std_msgs/Int16 gyroscopeZ
+std_msgs/UInt16 rangeSensorFront
+std_msgs/UInt16 rangeSensorLeft
+std_msgs/UInt16 rangeSensorRight
+std_msgs/UInt16 systemBatteryVoltage
+std_msgs/UInt16 motorBatteryVoltage
+
