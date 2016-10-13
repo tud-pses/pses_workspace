@@ -6,9 +6,7 @@
 
 
 void commandCallback(const pses_basis::Command::ConstPtr& cmd, SerialCommunication* sc) {
-    bool sent = false;
-    if(sc->isOpen()) sent = sc->sendCommand(*cmd);
-    //if (!sent) ROS_INFO_STREAM("Message: '" << *cmd << "' couldn't be sent to the microcontroller!");
+    sc->sendCommand(*cmd);
 }
 
 int main(int argc, char **argv)
@@ -18,47 +16,25 @@ int main(int argc, char **argv)
 
     SerialCommunication sc(115200, "ttyS0");
 
-    ros::Subscriber command_sub = nh.subscribe<pses_basis::Command>("command", 10, std::bind(commandCallback, std::placeholders::_1, &sc));
+    ros::Subscriber command_sub = nh.subscribe<pses_basis::Command>("pses_basis/command", 10, std::bind(commandCallback, std::placeholders::_1, &sc));
+    ros::Publisher sensor_pub = nh.advertise<pses_basis::SensorData>("pses_basis/sensor_data", 10);
 
-    bool isOpen = sc.openConnection();
-    if(sc.isOpen()) sc.setSensorGroup({SC::rangeSensorLeft, SC::rangeSensorRight, SC::rangeSensorFront});
-    ros::Duration(0.01).sleep();
-    if(sc.isOpen()) sc.startSensors();
-    ros::Duration(0.01).sleep();
+    sc.initUCBoard();
 
-    if(sc.isOpen()) sc.setSteeringLevel(25);
-    ros::Duration(1.00).sleep();
-    if(sc.isOpen()) sc.setSteeringLevel(-25);
-    ros::Duration(1.00).sleep();
-    if(sc.isOpen()) sc.setSteeringLevel(0);
-    ros::Duration(1.00).sleep();
-
-    if(sc.isOpen()) sc.setMotorLevel(20);
-    ros::Duration(1.00).sleep();
-    if(sc.isOpen()) sc.setMotorLevel(0);
-    ros::Duration(1.00).sleep();
-    if(sc.isOpen()) sc.setMotorLevel(-20);
-    ros::Duration(1.00).sleep();
-    if(sc.isOpen()) sc.setMotorLevel(0);
-    ros::Duration(1.00).sleep();
-
-
-    pses_basis::SensorData out;
+    pses_basis::SensorData sensorValues;
 
     ros::Rate loop_rate(400);
     while(ros::ok()) {
 
-    //bool received = sc.receive(out);
-    //if(received) ROS_INFO_STREAM("Received: " << out);
+    if(sc.getSensorData(sensorValues)) sensor_pub.publish(sensorValues);
     
     ros::spinOnce();
     loop_rate.sleep();
 
     }
 
-ros::spin();
+    ros::spin();
 
-if(sc.isOpen()) sc.stopSensors();
-ros::Duration(0.01).sleep();
+    sc.deactivateUCBoard();
 
 }
