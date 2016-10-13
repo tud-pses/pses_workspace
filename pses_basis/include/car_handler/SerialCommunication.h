@@ -1,17 +1,14 @@
 #ifndef SerialCommunication_H
 #define SerialCommunication_H
 
-#include <termios.h>
 #include <ros/ros.h>
 #include <string>
 #include <sstream>
-#include <unistd.h>
-#include <sys/time.h>
 #include <serial/serial.h>
 #include <vector>
-#include <map>
 #include <pses_basis/SensorData.h>
 #include <pses_basis/Command.h>
+#include <limits>
 
 namespace SC{
 
@@ -45,18 +42,19 @@ public:
 	};
 
 	inline bool initUCBoard(){
+		std::string status;
 		//open serial communication
 		if(!openConnection()) return false;
-		
-		if(!isOpen()){
-			return false;
-		}
+		ros::Duration(0.1).sleep();
+
+		if(!isOpen()) return false;
 		//center steering
 		if(!setSteeringLevel(0)) return false;
-    	ros::Duration(0.01).sleep();
+    	if(!receiveAnswerOnRequest(status)) return false;
+    	if(!receiveAnswerOnRequest(status)) return false;
     	//activate motor controller
     	if(!setMotorLevel(0)) return false;
-    	ros::Duration(0.01).sleep();
+    	if(!receiveAnswerOnRequest(status)) return false;
 
     	//generate sensor groups
     	SC::SensorGroup sg;
@@ -66,74 +64,86 @@ public:
     	params = "~ALL=5";
     	sensorGroups.push_back(sg);
     	if(!setSensorGroup(sg, 1, params)) return false;
-    	ros::Duration(0.01).sleep();
+    	if(!receiveAnswerOnRequest(status)) return false;
     	//Accel-Sensor Group
     	sg = {SC::accelerometerX, SC::accelerometerY, SC::accelerometerZ};
     	params = "~SKIP=8";
     	sensorGroups.push_back(sg);
     	if(!setSensorGroup(sg, 2, params)) return false;
-    	ros::Duration(0.01).sleep();
+    	if(!receiveAnswerOnRequest(status)) return false;
     	//Gyro-Sensor Group
     	sg = {SC::gyroscopeX, SC::gyroscopeY, SC::gyroscopeZ};
     	params = "~SKIP=8";
     	sensorGroups.push_back(sg);
     	if(!setSensorGroup(sg, 3, params)) return false;
-    	ros::Duration(0.01).sleep();
+    	if(!receiveAnswerOnRequest(status)) return false;
     	//Hall-Sensor Group
     	sg = {SC::hallSensorDT, SC::hallSensorDTFull, SC::hallSensorCount};
     	params = "~ALL=5";
     	sensorGroups.push_back(sg);
     	if(!setSensorGroup(sg, 4, params)) return false;
-    	ros::Duration(0.01).sleep();
+    	if(!receiveAnswerOnRequest(status)) return false;
     	//Misc Group
     	sg = {SC::batteryVoltageSystem, SC::batteryVoltageMotor};
     	params = "~ALL=500";
     	sensorGroups.push_back(sg);
     	if(!setSensorGroup(sg, 5, params)) return false;
-    	ros::Duration(0.01).sleep();
+    	if(!receiveAnswerOnRequest(status)) return false;
+
+    	//get car id
+    	if(!getCarID()) return false;
+    	if(!receiveAnswerOnRequest(status)) return false;
 
     	//start sending sensor information
     	if(!startSensors()) return false;
-    	ros::Duration(0.01).sleep();
+    	if(!receiveAnswerOnRequest(status)) return false;
+
 
 	}
 
 	inline bool deactivateUCBoard(){
-		if(!isOpen()){
-			return false;
-		}
+		if(!isOpen()) return false;
+		std::string status;
 		//stop sending sensor information
     	if(!stopSensors()) return false;
-    	ros::Duration(0.01).sleep();
+    	if(!receiveAnswerOnRequest(status)) return false;
     	//reset to initial state
     	if(!reset()) return false;
-    	ros::Duration(0.01).sleep();
+    	if(!receiveAnswerOnRequest(status)) return false;
 	}
 
 	inline bool sendCommand(const pses_basis::Command& cmd) {
-		if(!isOpen()){
-			return false;
-		}
-		bool state = setSteeringLevel(cmd.steering_level) && setMotorLevel(cmd.motor_level) && (cmd.reset?reset():true);
-		if(!kinectOn && cmd.enable_kinect) {
+		if(!isOpen()) return false;
+		std::string debug;
+
+		if(!stopSensors()) return false;
+		receiveAnswerOnRequest(debug);
+		
+		if(!setSteeringLevel(cmd.steering_level)) return false;
+		receiveAnswerOnRequest(debug);
+		if(!setMotorLevel(cmd.motor_level)) return false;
+		receiveAnswerOnRequest(debug);
+		if(!kinectOn && cmd.enable_kinect){
 			kinectOn = true;
-			return state && setKinect(true);
-		}
-		else if(kinectOn && !cmd.enable_kinect) {
+			if(!setKinect(true)) return false;
+			receiveAnswerOnRequest(debug);
+		}else if(kinectOn && !cmd.enable_kinect){
 			kinectOn = false;
-			return state && setKinect(false);
+			if(!setKinect(false)) return false;
+			receiveAnswerOnRequest(debug);
 		}
-		else {
-			return state;
-		}
+
+		if(!startSensors()) return false;
+    	if(!receiveAnswerOnRequest(debug)) return false;
+
+		return true;
 	}
 
 	inline bool getSensorData(pses_basis::SensorData& data){
-		if(!isOpen()){
-			return false;
-		}
+		if(!isOpen()) return false;
 		std::string rawData;
 		if(!receive(rawData)) return false;
+
 		//string must identify as vaild sensor group
 		int start = rawData.find("##");
 		int end = rawData.find("\x03");
@@ -157,10 +167,8 @@ public:
 		sensorMessage.header.stamp = ros::Time::now();
 		sensorMessage.header.frame_id = "ucBoard";
 		//reset wheel measurements
-		sensorMessage.hall_sensor_dt = -1;
-		sensorMessage.hall_sensor_dt_full = -1;
-
-		//ROS_INFO_STREAM("Group: "<< groupID << " String://"<<rawData <<"//");
+		sensorMessage.hall_sensor_dt = std::numeric_limits<float>::quiet_NaN();
+		sensorMessage.hall_sensor_dt_full = std::numeric_limits<float>::quiet_NaN();
 
 		//parse sensor values
 		int sensorCount = 0;
@@ -212,7 +220,6 @@ private:
 			serialConnection.setPort("/dev/" + deviceName);
 			serialConnection.setBaudrate(baudRate);
 			serial::Timeout timeout = serial::Timeout::simpleTimeout(10);
-			//timeout.inter_byte_timeout = serial::Timeout::max();
 			serialConnection.setTimeout(timeout);
 			serialConnection.open();
 		}
@@ -243,6 +250,16 @@ private:
 			return true;
 		}
 		return false;
+	}
+
+	inline bool receiveAnswerOnRequest(std::string& answer){
+		std::string msg;
+		serialConnection.waitReadable();
+		if(!receive(msg)) return false;
+		if(msg.size()>0){
+			ROS_INFO_STREAM("Answer on request: "<<msg.substr(0,msg.size()-1));
+		}
+    	answer = msg;
 	}
 
 	inline bool reset(){
@@ -288,9 +305,38 @@ private:
 	}
 
 	inline bool setKinect(bool enable) {
-		std::string out = "!VOUT "+ (enable)?"ON":"OFF";
+		std::string out = "!VOUT ";
+		if(enable){
+			out+="ON";
+		}else{
+			out+="OFF";
+		}
 		return send(out);
 	} 
+
+	inline bool getCarID(){
+		//send request
+		std::string giveID = "?ID";
+		if(!send(giveID)) return false;
+		//read answer
+		std::string rawData;
+		if(!receiveAnswerOnRequest(rawData)) return false;
+		//string must identify as vaild sensor group
+		int start = rawData.find(":");
+		int end = rawData.find("\x03");
+		if(start<0 || end<0){
+			return false;
+		}
+
+		try{
+			sensorMessage.header.car_id = std::stoi(rawData.substr(start+1, end-1));
+		}catch(std::exception& e){
+			return false;
+		}
+
+		return true;
+
+	}
 
 	inline bool setSensorGroup(const std::vector<SC::SensorObject>& sensors, const int numOfGroup, const std::string& parameter){
 		if(sensors.size()==0){
@@ -341,7 +387,7 @@ private:
 				data.range_sensor_front = value/1000.0;
 				break;
 			case SC::rangeSensorRight : 
-				data.range_sensor_right = value/1000.0;
+				data.range_sensor_right = value/10000.0;
 				break;
 			case SC::hallSensorDT : 
 				data.hall_sensor_dt = value/1000.0;
