@@ -100,13 +100,11 @@ ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a cpp library
-add_library(ARDUINO src/cArduino.cpp)
-add_library(SPEED src/Speedometer.cpp)
 add_library(FWD_KIN src/ForwardKinematics.cpp)
 
 ## Declare a cpp executable
 add_executable(car_handler src/car_handler.cpp)
-add_executable(car_arduino src/car_arduino.cpp)
+add_executable(car_odometry src/car_odometry.cpp)
 add_executable(position_estimation src/PositionEstimation.cpp)
 
 ## Add cmake target dependencies of the executable/library
@@ -121,10 +119,9 @@ add_dependencies(car_handler ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORT
 ## Specify libraries to link a library or executable target against
 target_link_libraries(car_handler
  	${catkin_LIBRARIES}
-	ARDUINO
  )
 target_link_libraries(position_estimation ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
-target_link_libraries(car_arduino ${catkin_LIBRARIES} ARDUINO SPEED FWD_KIN)
+target_link_libraries(car_odometry ${catkin_LIBRARIES} FWD_KIN)
 
 #############
 ## Install ##

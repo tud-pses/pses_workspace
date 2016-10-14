@@ -2,9 +2,9 @@ PsesHeader header
 float32 accelerometer_x
 float32 accelerometer_y
 float32 accelerometer_z
-float32 gyroscope_x
-float32 gyroscope_y
-float32 gyroscope_z
+float32 angular_velocity_x
+float32 angular_velocity_y
+float32 angular_velocity_z
 float32 hall_sensor_dt
 float32 hall_sensor_dt_full
 uint32 hall_sensor_count
