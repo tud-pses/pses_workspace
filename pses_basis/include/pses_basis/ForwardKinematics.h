@@ -3,8 +3,6 @@
  *
  *      Authors: Sebastian Ehmes
  *				 Nicolas Acero
- *				 Huynh-Tan Truong
- *				 Li Zhao
  */
 
 #ifndef FORWARDKINEMATICS_H_
@@ -12,12 +10,16 @@
 
 #include <utility>
 #include <vector>
-#include <car_handler/Eigen/Eigen/Dense>
+#include <pses_basis/Eigen/Eigen/Dense>
 #include <cmath>
 
 class ForwardKinematics {
 public:
+	inline ForwardKinematics(){};
 	ForwardKinematics(double k);
+	inline void setK(double k) {
+		this->k = k;
+	}
 	double flattenZeros(double value);
 	std::pair<double, double> calcICC(double alpha);
 	double calcRadius(std::pair<double, double> ICC);

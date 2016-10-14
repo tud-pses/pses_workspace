@@ -372,13 +372,13 @@ private:
 				data.accelerometer_z = value*8.0/std::pow(2,16)*9.81;
 				break;
 			case SC::gyroscopeX : 
-				data.gyroscope_x = value*1000.0/std::pow(2,16);
+				data.angular_velocity_x = value*1000.0/std::pow(2,16);
 				break;
 			case SC::gyroscopeY : 
-				data.gyroscope_y = value*1000.0/std::pow(2,16);
+				data.angular_velocity_y = value*1000.0/std::pow(2,16);
 				break;
 			case SC::gyroscopeZ : 
-				data.gyroscope_z = value*1000.0/std::pow(2,16);
+				data.angular_velocity_z = value*1000.0/std::pow(2,16);
 				break;
 			case SC::rangeSensorLeft : 
 				data.range_sensor_left = value/1000.0;
