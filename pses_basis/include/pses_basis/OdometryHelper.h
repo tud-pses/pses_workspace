@@ -6,8 +6,8 @@
 #include <pses_basis/SensorData.h>
 #include <pses_basis/Command.h>
 #include <pses_basis/ForwardKinematics.h>
+#include <math.h>
 
-#define PI  3.1415926535897932384626433832795
 #define WHEEL_RADIUS 0.032
 #define RAD_PER_TICK 0.7853981634 // 2*PI/8
 #define DRIVEN_DISTANCE_PER_TICK 0.0251327412 // RAD_PER_TICK * WHEEL_RADIUS 
@@ -24,17 +24,19 @@ public:
 		odometric.setK(0.25); // set distance between front axis and back axis (in meters)	
 	}
 	inline void updateSensorData(const pses_basis::SensorData& sensorData) {
-		this->sensorData = &sensorData;
+		this->sensorData = sensorData;
 		dt = calcDt(sensorData.header.stamp, oldTimeStamp);
 		oldTimeStamp = sensorData.header.stamp;
 		speed = calcSpeed();
 		yaw = calcYaw();
+		deltaDistance = calcDeltaDistance();
+		drivenDistance = calcDrivenDistance();
 		position = calcPosition();
 	}
 	inline void updateCommand(const pses_basis::Command& cmd) {
-		command = &cmd;
-		if(command->motor_level < 0) drivingDirection = -1;
-		else if(command->motor_level > 0) drivingDirection = 1;
+		command = cmd;
+		if(command.motor_level < 0) drivingDirection = -1;
+		else if(command.motor_level > 0) drivingDirection = 1;
 		else drivingDirection = 0;
 	}
 	inline double getYaw() {
@@ -43,42 +45,42 @@ public:
 	inline float getSpeed() {
 		return speed;
 	}
+	inline float getDrivenDistance() {
+		return drivenDistance;
+	}
 	inline geometry_msgs::Point getPosition() {
 		return position;
-	}
-	inline float getDrivenDistance() {
-		drivenDistance = drivenDistance + calcDeltaDistance();
-	}
-	inline ~OdometryHelper() {
-		delete sensorData;
-		delete command;
 	}
 private:
 	double yaw;
 	double dt;
 	float speed;
 	float drivenDistance;
+	float deltaDistance;
 	int drivingDirection; // -1 = backwards; 0 = stop; 1 = forwards
 	ros::Time oldTimeStamp;
 	geometry_msgs::Point position;
 	ForwardKinematics odometric; // object needed for odometric calculations
-	const pses_basis::SensorData* sensorData;
-	const pses_basis::Command* command;
+	pses_basis::SensorData sensorData;
+	pses_basis::Command command;
 	inline double calcDt(const ros::Time& currentTimeStamp, const ros::Time& oldTimeStamp) const{
 		return (currentTimeStamp - oldTimeStamp).toSec();
 	}
 	inline float calcSpeed() {
-		float hall_sensor_dt = sensorData->hall_sensor_dt;
-		return drivingDirection * DRIVEN_DISTANCE_PER_TICK / hall_sensor_dt;
+		float hall_sensor_dt = sensorData.hall_sensor_dt;
+		return isnan(hall_sensor_dt)? 0.0 : drivingDirection * DRIVEN_DISTANCE_PER_TICK / hall_sensor_dt;
 	}
 	inline double calcYaw() {
-		return yaw + degToRad(sensorData->angular_velocity_z*dt);
+		return yaw + degToRad(sensorData.angular_velocity_z*dt);
 	}
 	inline float calcDeltaDistance() { 
 		return speed*dt; 
 	}
+	inline float calcDrivenDistance() {
+		return drivenDistance + deltaDistance;
+	}
 	inline geometry_msgs::Point calcPosition() {
-		std::vector<double> pos = odometric.getUpdateWithGyro(yaw, calcDeltaDistance());
+		std::vector<double> pos = odometric.getUpdateWithGyro(yaw, deltaDistance);
 		geometry_msgs::Point currentPosition;
 		currentPosition.x = pos.at(1);
 		currentPosition.y = -pos.at(0);
@@ -86,7 +88,7 @@ private:
 		return currentPosition;
 	}
 	inline float degToRad(const float value) {
-		return value*PI/180;
+		return value*M_PI/180;
 	}
 };
 

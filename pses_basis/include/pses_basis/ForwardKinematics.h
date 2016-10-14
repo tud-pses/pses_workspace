@@ -15,7 +15,7 @@
 
 class ForwardKinematics {
 public:
-	inline ForwardKinematics(){};
+	ForwardKinematics();
 	ForwardKinematics(double k);
 	inline void setK(double k) {
 		this->k = k;

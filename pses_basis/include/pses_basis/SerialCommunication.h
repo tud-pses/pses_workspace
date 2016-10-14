@@ -390,10 +390,10 @@ private:
 				data.range_sensor_right = value/10000.0;
 				break;
 			case SC::hallSensorDT : 
-				data.hall_sensor_dt = value/1000.0;
+				data.hall_sensor_dt = value/10000.0;
 				break;
 			case SC::hallSensorDTFull : 
-				data.hall_sensor_dt_full = value/1000.0;
+				data.hall_sensor_dt_full = value/10000.0;
 				break;
 			case SC::hallSensorCount : 
 				data.hall_sensor_count = value;

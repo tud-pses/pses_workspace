@@ -6,7 +6,19 @@
  */
 
 #include <pses_basis/ForwardKinematics.h>
-/*	The standard constructor for ForwardKinematics only requries the distance
+
+/*	This empty constructor for ForwardKinematics requries to call setK() to set distance
+ *	between front and back axis als input arguments. That means the starting
+ *	postion is always (0 ,0 ,0) and orientation theta = 0.
+ */
+ForwardKinematics::ForwardKinematics() {
+	PI = std::acos(-1);
+	initT = Eigen::Matrix4d::Identity();
+	T.push_back(Eigen::Matrix4d::Identity());
+	prevT = initT;
+	currentPosition=std::vector<double>(3,0);
+}
+/*	This constructor for ForwardKinematics only requries the distance
  *	between front and back axis als input arguments. That means the starting
  *	postion is always (0 ,0 ,0) and orientation theta = 0.
  */

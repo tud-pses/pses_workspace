@@ -60,6 +60,8 @@ void dataCallback(const pses_basis::SensorData::ConstPtr& sensorData, tf::Transf
 	odomBroadcaster->sendTransform(odomTransform);
 	// publish the odometry message
 	odom_pub->publish(odom);
+	//ROS_INFO_STREAM(odomHelper->getDrivenDistance());
+	ROS_INFO_STREAM("Yaw" << odomHelper->getYaw()*180.0/3.141516);
 }
 
 int main(int argc, char **argv)
