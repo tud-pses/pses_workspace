@@ -16,6 +16,8 @@ class OdometryHelper{
 public:
 	OdometryHelper() {
 		yaw = 0.0;
+		pitch = 0.0;
+		roll = 0.0;
 		dt = 0.0;
 		drivenDistance = 0.0;
 		speed = 0.0;
@@ -29,6 +31,8 @@ public:
 		oldTimeStamp = sensorData.header.stamp;
 		speed = calcSpeed();
 		yaw = calcYaw();
+		pitch = calcPitch();
+		roll = calcRoll();
 		deltaDistance = calcDeltaDistance();
 		drivenDistance = calcDrivenDistance();
 		position = calcPosition();
@@ -42,6 +46,12 @@ public:
 	inline double getYaw() {
 		return yaw;
 	}
+	inline double getRoll() {
+		return roll;
+	}
+	inline double getPitch() {
+		return pitch;
+	}
 	inline float getSpeed() {
 		return speed;
 	}
@@ -53,6 +63,8 @@ public:
 	}
 private:
 	double yaw;
+	double roll;
+	double pitch;
 	double dt;
 	float speed;
 	float drivenDistance;
@@ -72,6 +84,12 @@ private:
 	}
 	inline double calcYaw() {
 		return yaw + degToRad(sensorData.angular_velocity_z*dt);
+	}
+	inline double calcRoll() {
+		return roll + degToRad(sensorData.angular_velocity_x*dt);
+	}
+	inline double calcPitch() {
+		return pitch + degToRad(sensorData.angular_velocity_y*dt);
 	}
 	inline float calcDeltaDistance() { 
 		return speed*dt; 

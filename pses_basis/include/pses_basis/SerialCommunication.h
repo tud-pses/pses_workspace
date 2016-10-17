@@ -219,7 +219,7 @@ private:
 		 try{
 			serialConnection.setPort("/dev/" + deviceName);
 			serialConnection.setBaudrate(baudRate);
-			serial::Timeout timeout = serial::Timeout::simpleTimeout(10);
+			serial::Timeout timeout = serial::Timeout::simpleTimeout(4);
 			serialConnection.setTimeout(timeout);
 			serialConnection.open();
 		}
@@ -257,7 +257,7 @@ private:
 		serialConnection.waitReadable();
 		if(!receive(msg)) return false;
 		if(msg.size()>0){
-			ROS_INFO_STREAM("Answer on request: "<<msg.substr(0,msg.size()-1));
+			//ROS_INFO_STREAM("Answer on request: "<<msg.substr(0,msg.size()-1));
 		}
     	answer = msg;
 	}
@@ -372,10 +372,10 @@ private:
 				data.accelerometer_z = value*8.0/std::pow(2,16)*9.81;
 				break;
 			case SC::gyroscopeX : 
-				data.angular_velocity_x = value*1000.0/std::pow(2,16);
+				data.angular_velocity_x = value*10000.0/std::pow(2,16);
 				break;
 			case SC::gyroscopeY : 
-				data.angular_velocity_y = value*1000.0/std::pow(2,16);
+				data.angular_velocity_y = value*10000.0/std::pow(2,16);
 				break;
 			case SC::gyroscopeZ : 
 				data.angular_velocity_z = value*1000.0/std::pow(2,16);

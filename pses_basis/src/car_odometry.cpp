@@ -61,7 +61,7 @@ void dataCallback(const pses_basis::SensorData::ConstPtr& sensorData, tf::Transf
 	// publish the odometry message
 	odom_pub->publish(odom);
 	//ROS_INFO_STREAM(odomHelper->getDrivenDistance());
-	ROS_INFO_STREAM("Yaw" << odomHelper->getYaw()*180.0/3.141516);
+	ROS_INFO_STREAM("Yaw: " << odomHelper->getYaw()*180.0/3.141516 << " Pitch: " << odomHelper->getPitch()*180.0/3.141516 << " Roll: " << odomHelper->getRoll()*180.0/3.141516);
 }
 
 int main(int argc, char **argv)
