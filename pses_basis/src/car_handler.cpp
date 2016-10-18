@@ -1,9 +1,7 @@
 #include <ros/ros.h>
-#include <std_msgs/String.h>
 #include <pses_basis/SerialCommunication.h>
 #include <pses_basis/SensorData.h>
 #include <pses_basis/Command.h>
-
 
 void commandCallback(const pses_basis::Command::ConstPtr& cmd, SerialCommunication* sc) {
     sc->sendCommand(*cmd);
@@ -27,7 +25,7 @@ int main(int argc, char **argv)
     while(ros::ok()) {
 
     if(sc.getSensorData(sensorValues)) sensor_pub.publish(sensorValues);
-    
+
     ros::spinOnce();
     loop_rate.sleep();
 
