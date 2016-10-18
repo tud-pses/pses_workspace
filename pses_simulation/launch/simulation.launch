@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<launch>
+	<master auto="start"/>
+
+	<arg name="dashboard" default="true"/>
+	<arg name="rviz" default="true"/>
+
+	<!-- Set static tf transformations -->
+	<node pkg="tf" type="static_transform_publisher" name="map_broadcaster" args="0 0 0 0 0 0 1 map odom 10"/>
+	<param name="robot_description" textfile="$(find pses_simulation)/data/urdf_model/apollo_13.urdf"/>
+	<node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher"/>
+	<node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher"/>
+	<!-- Run the necessary nodes to bring up the car -->
+	<node pkg="pses_simulation" type="simulation_node" name="simulation" />
+	<node pkg="pses_simulation" type="scan_node" name="scan_simulation" />
+	<node pkg="pses_simulation" type="usrange_node" name="usrange_simulation"/>
+	<!-- Run the map server -->
+	<node name="map_server" pkg="map_server" type="map_server" args="$(find pses_simulation)/data/map/map.yaml"/>
+	<!-- Show the Rviz visualization 	-->
+	<group if="$(arg rviz)">
+		<node pkg="rviz" type="rviz" name="rviz" args="-d $(find pses_simulation)/data/viewer/viewer.rviz"/>
+	</group>
+	<!-- Run the Dashboard Application -->
+	<group if="$(arg dashboard)">
+		<node pkg="pses_simulation" type="dashboard_node" name="dashboard_simulation" output="screen"/>
+	</group>
+</launch>
