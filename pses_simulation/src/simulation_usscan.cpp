@@ -12,6 +12,7 @@
 #include <pses_simulation/RangeSensor.h>
 #include <dynamic_reconfigure/server.h>
 #include <pses_simulation/RangeSensorConfig.h>
+#include <pses_basis/SensorData.h>
 
 typedef std::shared_ptr<sensor_msgs::Range> scan_msg_ptr;
 typedef std::shared_ptr<geometry_msgs::Pose> pose_msg_ptr;
@@ -105,8 +106,10 @@ int main(int argc, char **argv){
         ros::Publisher front_us_range = nh.advertise<sensor_msgs::Range>("front_us_range", 10);
         ros::Publisher left_us_range = nh.advertise<sensor_msgs::Range>("left_us_range", 10);
         ros::Publisher right_us_range = nh.advertise<sensor_msgs::Range>("right_us_range", 10);
+        ros::Publisher sensorPub = nh.advertise<pses_basis::SensorData>("pses_basis/sensor_data", 10);
 
         sensor_msgs::Range front_range, left_range, right_range;
+        pses_basis::SensorData sensors;
 
         // get "god" map meta info
         nav_msgs::MapMetaData mapInfo;
@@ -182,10 +185,18 @@ int main(int argc, char **argv){
                 gridPose = setGridPosition(position, mapInfo);
                 right_range.range = rs_sonar.getUSScan(gridPose, rs::radToDeg(rpy[2]));
 
+                //fake sensor data
+                sensors.header.stamp = currentTime;
+                sensors.header.seq++;
+                sensors.range_sensor_left = left_range.range;
+                sensors.range_sensor_right = right_range.range;
+                sensors.range_sensor_front = front_range.range;
+
                 //publish sensor msgs
                 front_us_range.publish(front_range);
                 right_us_range.publish(right_range);
                 left_us_range.publish(left_range);
+                sensorPub.publish(sensors);
 
                 ros::spinOnce();
                 loop_rate.sleep();
