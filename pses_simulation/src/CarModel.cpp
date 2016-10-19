@@ -143,15 +143,16 @@ void CarModel::setSteering(const int steering){
 
 
 void CarModel::steeringToAngle(){
-								steeringAngle = angleArray[steering+50];
+								//steeringAngle = angleArray[steering+50];
+								steeringAngle = (steering/50.0)*22.5;
 }
 
 void CarModel::setVelocityComponents(const double velocity, const double yaw){
-							  v_x = velocity*std::cos(yaw);
+							  	v_x = velocity*std::cos(yaw);
 								v_y = velocity*std::sin(yaw);
 }
 
 void CarModel::setAccelerationComponents(const double prevVx, const double prevVy, const double yaw, const double dT){
-							  a_x = (prevVx-v_x)/dT;
+							  	a_x = (prevVx-v_x)/dT;
 								a_y = (prevVy-v_y)/dT;
 }
