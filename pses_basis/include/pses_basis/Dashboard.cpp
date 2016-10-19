@@ -8,6 +8,7 @@ Dashboard::Dashboard(ros::NodeHandle* nh, QWidget *parent) :
         robotCommand = nh->advertise<command_data>("pses_basis/command", 10);
         robotOdometry = nh->subscribe<odometry_data>("odom", 10, boost::bind(odometryCallback, _1, ui));
         robotSensors = nh->subscribe<sensor_data>("pses_basis/sensor_data", 10, boost::bind(sensorCallback, _1, ui));
+        carInfo = nh->subscribe<info_data>("pses_basis/car_info", 10, boost::bind(infoCallback, _1, ui));
 
         connect(ui->speedSlider, SIGNAL(valueChanged(int)), this, SLOT(valueChangedSpeed(int)));
         connect(ui->steeringSlider, SIGNAL(valueChanged(int)), this, SLOT(valueChangedSteering(int)));
@@ -30,8 +31,6 @@ Dashboard::~Dashboard()
 }
 
 void odometryCallback(const odometry_data::ConstPtr& odom, Ui::Dashboard* ui){
-        // relative velocity of robot (velocity on current trajectory)
-        ui->odom_v_all->display(odom->twist.twist.linear.z);
         // absolute velocity components of robot
         ui->odom_v_x->display(odom->twist.twist.linear.x);
         ui->odom_v_y->display(odom->twist.twist.linear.y);
@@ -40,8 +39,6 @@ void odometryCallback(const odometry_data::ConstPtr& odom, Ui::Dashboard* ui){
         // absolute position components of robot
         ui->odom_p_x->display(odom->pose.pose.position.x);
         ui->odom_p_y->display(odom->pose.pose.position.y);
-        // over all driven distance
-        ui->odom_d_all->display(odom->pose.pose.position.z);
         ros::spinOnce();
 }
 
@@ -66,6 +63,17 @@ void sensorCallback(const sensor_data::ConstPtr& sensor, Ui::Dashboard* ui){
         ui->sensor_wy->display(sensor->angular_velocity_y);
         ui->sensor_wz->display(sensor->angular_velocity_z);
         ros::spinOnce();
+}
+
+void infoCallback(const info_data::ConstPtr& info, Ui::Dashboard* ui){
+        // relative velocity of robot (velocity on current trajectory)
+        ui->info_v_all->display(info->speed);
+        // over all driven distance
+        ui->info_d_all->display(info->driven_distance);
+        // rpy-Info
+        ui->info_roll->display(info->roll);
+        ui->info_pitch->display(info->pitch);
+        ui->info_yaw->display(info->yaw);
 }
 
 void Dashboard::keyPressEvent(QKeyEvent *event){

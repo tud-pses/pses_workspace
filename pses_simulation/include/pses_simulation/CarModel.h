@@ -44,6 +44,10 @@ public:
 								const double getVelocity() const;
 								const double getAngularVelocity() const;
 								const double getDistance() const;
+								const double getVx() const;
+								const double getVy() const;
+								const double getAx() const;
+								const double getAy() const;
 private:
 								ForwardKinematics fwdKin;
 								ros::Time lastUpdate;
@@ -54,13 +58,18 @@ private:
 								double distance;
 								std::vector<double> pose;
 								double angularVelocity;
-
+								double v_x;
+								double v_y;
+								double a_x;
+								double a_y;
 
 								void steeringToAngle();
 								void angleToSteering(const double alpha);
 								void setSteering(const int steering);
 								void speedToVelocity(const int speed);
 								void setAngularVelocity(const double yaw0, const double yaw1);
+								void setVelocityComponents(const double velocity, const double yaw);
+								void setAccelerationComponents(const double prevVx, const double prevVy, const double yaw, const double dT);
 };
 
 #endif /* CARMODEL_H_ */

@@ -63,6 +63,7 @@ add_message_files(
  SensorData.msg
  PsesHeader.msg
  Command.msg
+ CarInfo.msg
 )
 
 ## Generate services in the 'srv' folder

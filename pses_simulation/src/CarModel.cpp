@@ -33,6 +33,10 @@ const pose_ptr CarModel::getUpdate(const int newSteering, const int newSpeed, co
 								speedToVelocity(newSpeed);
 								setAngularVelocity(oldYaw, pose[2]);
 								setSteering(newSteering);
+								double prevVx = v_x;
+								double prevVy = v_y;
+								setVelocityComponents(velocity, pose[2]);
+								setAccelerationComponents(prevVx, prevVy, pose[2], timeStep);
 								return std::make_shared<std::vector<double> >(pose);
 }
 
@@ -46,8 +50,10 @@ const pose_ptr CarModel::getUpdateTwist(const twist_msg cmdVel, const ros::Time&
 								velocity = cmdVel.linear.x;
 								setAngularVelocity(oldYaw, pose[2]);
 								angleToSteering(fwdKin.radToDeg(cmdVel.angular.z));
-								//steeringAngle = fwdKin.radToDeg(cmdVel.angular.z);
-								//ROS_INFO("x: %lf / y: %lf / th: %lf / cmdVelx: %lf/ cmdAngz: %lf", pose[0], pose[1], pose[2], cmdVel.linear.x, cmdVel.angular.z);
+								double prevVx = v_x;
+								double prevVy = v_y;
+								setVelocityComponents(velocity, pose[2]);
+								setAccelerationComponents(prevVx, prevVy, pose[2], timeStep);
 								return std::make_shared<std::vector<double> >(pose);
 }
 
@@ -68,6 +74,19 @@ const double CarModel::getSteeringAngle() const {
 
 const double CarModel::getAngularVelocity() const {
 								return angularVelocity;
+}
+
+const double CarModel::getVx() const{
+								return v_x;
+}
+const double CarModel::getVy() const{
+								return v_y;
+}
+const double CarModel::getAx() const{
+								return a_x;
+}
+const double CarModel::getAy() const{
+								return a_y;
 }
 
 void CarModel::angleToSteering(const double alpha){
@@ -125,4 +144,14 @@ void CarModel::setSteering(const int steering){
 
 void CarModel::steeringToAngle(){
 								steeringAngle = angleArray[steering+50];
+}
+
+void CarModel::setVelocityComponents(const double velocity, const double yaw){
+							  v_x = velocity*std::cos(yaw);
+								v_y = velocity*std::sin(yaw);
+}
+
+void CarModel::setAccelerationComponents(const double prevVx, const double prevVy, const double yaw, const double dT){
+							  a_x = (prevVx-v_x)/dT;
+								a_y = (prevVy-v_y)/dT;
 }
