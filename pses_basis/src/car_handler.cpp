@@ -12,7 +12,7 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "car_handler");
     ros::NodeHandle nh;
 
-    SerialCommunication sc(230400, "ttyUSB0");
+    SerialCommunication sc(921600, "ttyUSB0");
 
     ros::Subscriber command_sub = nh.subscribe<pses_basis::Command>("pses_basis/command", 10, std::bind(commandCallback, std::placeholders::_1, &sc));
     ros::Publisher sensor_pub = nh.advertise<pses_basis::SensorData>("pses_basis/sensor_data", 10);
