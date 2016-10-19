@@ -99,16 +99,16 @@ void Dashboard::keyPressEvent(QKeyEvent *event){
 
 
         case  Qt::Key_A: {
-                if(steering > -50) {
-                        cmd.steering_level = steering - 5;
+                if(steering < 50) {
+                        cmd.steering_level = steering + 5;
                 }
                 break;
         }
 
 
         case Qt::Key_D: {
-                if(steering < 50) {
-                        cmd.steering_level  = steering + 5;
+                if(steering > -50) {
+                        cmd.steering_level  = steering - 5;
                 }
                 break;
         }

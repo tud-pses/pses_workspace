@@ -24,10 +24,10 @@
      </rect>
     </property>
     <property name="minimum">
-     <number>-10</number>
+     <number>-20</number>
     </property>
     <property name="maximum">
-     <number>10</number>
+     <number>20</number>
     </property>
     <property name="orientation">
      <enum>Qt::Vertical</enum>
@@ -80,7 +80,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>10</string>
+     <string>20</string>
     </property>
    </widget>
    <widget class="QPushButton" name="minSpeed">
@@ -93,7 +93,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>-10</string>
+     <string>-20</string>
     </property>
    </widget>
    <widget class="QPushButton" name="zeroSpeed">

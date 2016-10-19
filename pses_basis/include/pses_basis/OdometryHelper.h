@@ -92,7 +92,8 @@ private:
 		return pitch + degToRad(sensorData.angular_velocity_y*dt);
 	}
 	inline float calcDeltaDistance() { 
-		return speed*dt; 
+		//return speed*dt;
+		return isnan(sensorData.hall_sensor_dt)?0.0 : drivingDirection*DRIVEN_DISTANCE_PER_TICK;
 	}
 	inline float calcDrivenDistance() {
 		return drivenDistance + deltaDistance;

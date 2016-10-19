@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<launch>
+	<master auto="start"/>
+
+	<arg name="dashboard" default="true"/>
+	<!-- Run the necessary nodes to bring up the car -->
+	<node pkg="pses_basis" type="car_handler" name="car_handler" output="screen"/>
+	<node pkg="pses_basis" type="car_odometry" name="car_odometry" output="screen"/>
+	<!-- Run the Dashboard Application -->
+	<group if="$(arg dashboard)">
+		<node pkg="pses_basis" type="car_dashboard" name="car_dashboard" output="screen"/>
+	</group>
+</launch>
