@@ -109,7 +109,7 @@ int main(int argc, char **argv){
                 // set rpy-Angles
                 info.roll=0;
                 info.pitch=0;
-                info.yaw=simPose[2];
+                info.yaw=simPose[2]*180.0/M_PI; // In deg
                 // set driven distance
                 info.driven_distance = car.getDistance();
                 // set speed
