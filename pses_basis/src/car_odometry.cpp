@@ -47,9 +47,9 @@ void buildInfoMessage(pses_basis::CarInfo& info, const pses_basis::SensorData& s
 	info.header.seq++;
 	info.header.car_id = sensorData.header.car_id;
 	// set rpy-Angles
-	info.roll = odomHelper.getRoll()*180.0/M_PI;
-	info.pitch = odomHelper.getPitch()*180.0/M_PI;
-	info.yaw = odomHelper.getYaw()*180.0/M_PI;
+	info.roll = odomHelper.getRoll();//*180.0/M_PI;
+	info.pitch = odomHelper.getPitch();//*180.0/M_PI;
+	info.yaw = odomHelper.getYaw();//*180.0/M_PI;
 	// set driven distance
 	info.driven_distance = odomHelper.getDrivenDistance();
 	// set speed
@@ -62,9 +62,10 @@ void commandCallback(const pses_basis::Command::ConstPtr& cmd, OdometryHelper* o
 }
 
 void dataCallback(const pses_basis::SensorData::ConstPtr& sensorData, tf::TransformBroadcaster* odomBroadcaster,
-								ros::Publisher* odom_pub, OdometryHelper* odomHelper, ros::Publisher* carInfo_pub) {
+								ros::Publisher* odom_pub, OdometryHelper* odomHelper, OdometryHelperAlt* ohA, ros::Publisher* carInfo_pub) {
 	// update sensor data for later odometric calculations
 	odomHelper->updateSensorData(*sensorData);
+	ohA->updateSensorData(*sensorData);
 	// objects to store the odometry and its transform
 	geometry_msgs::TransformStamped odomTransform;
 	nav_msgs::Odometry odom;
@@ -83,7 +84,7 @@ void dataCallback(const pses_basis::SensorData::ConstPtr& sensorData, tf::Transf
 	odom_pub->publish(odom);
 	carInfo_pub->publish(info);
 	//ROS_INFO_STREAM(odomHelper->getDrivenDistance());
-	//ROS_INFO_STREAM("Yaw: " << odomHelper->getYaw()*180.0/3.141516 << " Pitch: " << odomHelper->getPitch()*180.0/3.141516 << " Roll: " << odomHelper->getRoll()*180.0/3.141516);
+	ROS_INFO_STREAM("Yaw: " << ohA->getYaw() << " Pitch: " << ohA->getPitch() << " Roll: " << ohA->getRoll());
 }
 
 int main(int argc, char **argv)
@@ -98,12 +99,13 @@ int main(int argc, char **argv)
 	pses_basis::Command cmd;
 	// objects needed for odometric calculations
 	OdometryHelper odomHelper;
+	OdometryHelperAlt ohA;
 	// Publishes the results of the odometry calculations to other ros nodes
 	ros::Publisher odom_pub = nh.advertise<nav_msgs::Odometry>("odom", 50);
 	ros::Publisher carInfo_pub = nh.advertise<pses_basis::CarInfo>("pses_basis/car_info", 50);
 	// Here we subscribe to the sensor_data and command topics
 	ros::Subscriber sensor_data_sub = nh.subscribe<pses_basis::SensorData>("pses_basis/sensor_data", 1,
-							std::bind(dataCallback, std::placeholders::_1, &odomBroadcaster, &odom_pub, &odomHelper, &carInfo_pub));
+							std::bind(dataCallback, std::placeholders::_1, &odomBroadcaster, &odom_pub, &odomHelper, &ohA, &carInfo_pub));
 	ros::Subscriber command_sub = nh.subscribe<pses_basis::Command>("pses_basis/command", 1, std::bind(commandCallback, std::placeholders::_1, &odomHelper));
 
 	ros::spin();

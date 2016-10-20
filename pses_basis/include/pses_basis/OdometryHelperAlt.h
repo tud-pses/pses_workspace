@@ -24,7 +24,7 @@ public:
 		drivingDirection = 0;
 		oldTimeStamp = ros::Time::now();
 		odometric.setK(0.25); // set distance between front axis and back axis (in meters)
-		gyroFilter = cv::KalmanFilter( 9, 3, 0 );
+		gyroFilter = cv::KalmanFilter( 6, 3, 0 );
 		setIdentity(gyroFilter.processNoiseCov, cv::Scalar::all(.05));
 		cv::setIdentity(gyroFilter.measurementMatrix);
 		gyroFilter.measurementMatrix = (cv::Mat_<float>(3, 6) << 0, 0, 0, 1, 0, 0,
@@ -54,9 +54,9 @@ public:
 		calcSpeed();
 		updateGyroMeasurements();
 		updateGyroFilter();
-		roll = measurement.at<float>(0);
-		pitch = measurement.at<float>(1);
-		yaw = measurement.at<float>(2);
+		roll = estimatedGyro.at<float>(0);
+		pitch = estimatedGyro.at<float>(1);
+		yaw = estimatedGyro.at<float>(2);
 		calcDeltaDistance();
 	  calcDrivenDistance();
 		calcPosition();
@@ -111,8 +111,8 @@ private:
 	}
 	inline void updateGyroMeasurements(){
 		measurement.at<float>(0) = degToRad(sensorData.angular_velocity_x);
-    measurement.at<float>(1) = degToRad(sensorData.angular_velocity_y);
-    measurement.at<float>(2) = degToRad(sensorData.angular_velocity_z);
+    	measurement.at<float>(1) = degToRad(sensorData.angular_velocity_y);
+    	measurement.at<float>(2) = degToRad(sensorData.angular_velocity_z);
 	}
 	inline void updateGyroFilter(){
 		gyroFilter.transitionMatrix.at<float>(0,3) = dt;
