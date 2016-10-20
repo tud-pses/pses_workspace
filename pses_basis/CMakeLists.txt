@@ -118,7 +118,6 @@ add_library(DASHBOARD include/pses_basis/Dashboard.cpp ${UIS_HDRS})
 ## Declare a cpp executable
 add_executable(car_handler src/car_handler.cpp)
 add_executable(car_odometry src/car_odometry.cpp)
-add_executable(position_estimation src/PositionEstimation.cpp)
 add_executable(car_dashboard src/car_dashboard.cpp)
 
 ## Add cmake target dependencies of the executable/library
@@ -133,8 +132,7 @@ add_dependencies(car_handler ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORT
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(car_handler ${catkin_LIBRARIES})
-target_link_libraries(position_estimation ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
-target_link_libraries(car_odometry ${catkin_LIBRARIES} FWD_KIN)
+target_link_libraries(car_odometry ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} FWD_KIN)
 target_link_libraries(DASHBOARD Qt5::Widgets Qt5::Core Qt5::Gui)
 target_link_libraries(car_dashboard ${catkin_LIBRARIES} DASHBOARD)
 

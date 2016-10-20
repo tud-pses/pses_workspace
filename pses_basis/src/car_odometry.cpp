@@ -5,6 +5,8 @@
 #include <pses_basis/SensorData.h>
 #include <pses_basis/Command.h>
 #include <pses_basis/OdometryHelper.h>
+#include <pses_basis/OdometryHelperAlt.h>
+
 #include <pses_basis/CarInfo.h>
 
 
