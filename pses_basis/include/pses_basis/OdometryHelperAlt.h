@@ -25,25 +25,33 @@ public:
 		oldTimeStamp = ros::Time::now();
 		odometric.setK(0.25); // set distance between front axis and back axis (in meters)
 		gyroFilter = cv::KalmanFilter( 6, 3, 0 );
-		setIdentity(gyroFilter.processNoiseCov, cv::Scalar::all(.05));
+		setIdentity(gyroFilter.processNoiseCov, cv::Scalar::all(10));
+		/*
+		gyroFilter.processNoiseCov = (cv::Mat_<float>(6, 6) << 0.001, 0, 0, 0, 0, 0,
+	                                                           0, 0.001, 0, 0, 0, 0,
+	                                                           0, 0, 0.001, 0, 0, 0,
+	                                                           0, 0, 0, 0.003, 0, 0,
+	                                                           0, 0, 0, 0, 0.003, 0,
+	                                                           0, 0, 0, 0, 0, 0.003);
+	    */                                                       
 		cv::setIdentity(gyroFilter.measurementMatrix);
 		gyroFilter.measurementMatrix = (cv::Mat_<float>(3, 6) << 0, 0, 0, 1, 0, 0,
 	                                                            0, 0, 0, 0, 1, 0,
 	                                                            0, 0, 0, 0, 0, 1);
-		setIdentity(gyroFilter.measurementNoiseCov, cv::Scalar::all(0.001));
-	  setIdentity(gyroFilter.errorCovPost, cv::Scalar::all(.1));
+		setIdentity(gyroFilter.measurementNoiseCov, cv::Scalar::all(10));
+	    setIdentity(gyroFilter.errorCovPost, cv::Scalar::all(1000));
 		gyroFilter.transitionMatrix = (cv::Mat_<float>(6, 6) << 1, 0, 0, dt, 0, 0,
 	                                                           0, 1, 0, 0, dt, 0,
 	                                                           0, 0, 1, 0, 0, dt,
 	                                                           0, 0, 0, 1, 0, 0,
 	                                                           0, 0, 0, 0, 1, 0,
 	                                                           0, 0, 0, 0, 0, 1);
-		gyroFilter.statePre.at<float>(0) = 0;
-		gyroFilter.statePre.at<float>(1) = 0;
-		gyroFilter.statePre.at<float>(2) = 0;
-		gyroFilter.statePre.at<float>(3) = 0;
-		gyroFilter.statePre.at<float>(4) = 0;
-		gyroFilter.statePre.at<float>(5) = 0;
+		gyroFilter.statePost.at<float>(0) = 0;
+		gyroFilter.statePost.at<float>(1) = 0;
+		gyroFilter.statePost.at<float>(2) = 0;
+		gyroFilter.statePost.at<float>(3) = 0;
+		gyroFilter.statePost.at<float>(4) = 0;
+		gyroFilter.statePost.at<float>(5) = 0;
 		measurement = cv::Mat(3, 1, CV_32FC(1));
 
 	}
@@ -58,7 +66,7 @@ public:
 		pitch = estimatedGyro.at<float>(1);
 		yaw = estimatedGyro.at<float>(2);
 		calcDeltaDistance();
-	  calcDrivenDistance();
+	  	calcDrivenDistance();
 		calcPosition();
 	}
 	inline void updateCommand(const pses_basis::Command& cmd) {

@@ -67,13 +67,13 @@ public:
     	if(!receiveAnswerOnRequest(status)) return false;
     	//Accel-Sensor Group
     	sg = {SC::accelerometerX, SC::accelerometerY, SC::accelerometerZ};
-    	params = "~SKIP=8";
+    	params = "~TS=5 ~AVG=1";
     	sensorGroups.push_back(sg);
     	if(!setSensorGroup(sg, 2, params)) return false;
     	if(!receiveAnswerOnRequest(status)) return false;
     	//Gyro-Sensor Group
     	sg = {SC::gyroscopeX, SC::gyroscopeY, SC::gyroscopeZ};
-    	params = "~SKIP=8";
+    	params = "~TS=5 ~AVG=1";
     	sensorGroups.push_back(sg);
     	if(!setSensorGroup(sg, 3, params)) return false;
     	if(!receiveAnswerOnRequest(status)) return false;
@@ -153,14 +153,16 @@ public:
 		//get group ID
 		int groupID = 0;
 		int idBegin = start+2;
-		int idEnd = rawData.find(":")-1;
+		int idLength = rawData.find(":")-idBegin;
 		try{
-				groupID = std::stoi(rawData.substr(idBegin, idEnd));
+				groupID = std::stoi(rawData.substr(idBegin, idLength));
 				}catch(std::exception& e){
 					return false;
 				}
-		//remove preamble and trail
-		rawData = rawData.substr(idEnd+2, end-1);
+		//remove preamble and trails
+		start = idBegin+idLength+1;
+		int substrLength = end-start;
+		rawData = rawData.substr(idBegin+idLength+1, substrLength);
 
 		//set message meta data
 		sensorMessage.header.seq++;
@@ -186,10 +188,12 @@ public:
 				
 			}else{
 				try{
-					sensorValue = std::stoi(rawData.substr(0, nextSensor-1));
+					sensorValue = std::stoi(rawData.substr(0, nextSensor));
 					assignSensorValue(sensorMessage, sensorValue, sensorGroups[groupID-1][sensorCount]);
 					sensorCount++;
-					rawData = rawData.substr(nextSensor+3, rawData.size()-1);
+					start = nextSensor+3;
+					substrLength = rawData.size();
+					rawData = rawData.substr(start, substrLength);
 				}catch(std::exception& e){
 					return false;
 				}
@@ -372,19 +376,19 @@ private:
 				data.accelerometer_z = value*8.0/std::pow(2,16)*9.81;
 				break;
 			case SC::gyroscopeX : 
-				data.angular_velocity_x = value*10000.0/std::pow(2,16);
+				data.angular_velocity_x = value*1000.0/std::pow(2,16);
 				break;
 			case SC::gyroscopeY : 
-				data.angular_velocity_y = value*10000.0/std::pow(2,16);
+				data.angular_velocity_y = value*1000.0/std::pow(2,16);
 				break;
 			case SC::gyroscopeZ : 
 				data.angular_velocity_z = value*1000.0/std::pow(2,16);
 				break;
 			case SC::rangeSensorLeft : 
-				data.range_sensor_left = value/1000.0;
+				data.range_sensor_left = value/10000.0;
 				break;
 			case SC::rangeSensorFront : 
-				data.range_sensor_front = value/1000.0;
+				data.range_sensor_front = value/10000.0;
 				break;
 			case SC::rangeSensorRight : 
 				data.range_sensor_right = value/10000.0;
@@ -393,13 +397,13 @@ private:
 				data.hall_sensor_dt = value/10000.0;
 				break;
 			case SC::hallSensorDTFull : 
-				data.hall_sensor_dt_full = value/10000.0;
+				data.hall_sensor_dt_full = value/1000.0;
 				break;
 			case SC::hallSensorCount : 
 				data.hall_sensor_count = value;
 				break;
 			case SC::batteryVoltageSystem : 
-				data.system_battery_voltage = value/100.0;
+				data.system_battery_voltage = value/1000.0;
 				break;
 			case SC::batteryVoltageMotor : 
 				data.motor_battery_voltage = value/1000.0;

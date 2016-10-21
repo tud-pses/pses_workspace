@@ -112,8 +112,9 @@ include_directories(include ${OpenCV_INCLUDE_DIRS})
 QT5_WRAP_UI(UIS_HDRS include/pses_basis/Dashboard.ui)
 
 ## Declare a cpp library
-add_library(FWD_KIN src/ForwardKinematics.cpp)
-add_library(DASHBOARD include/pses_basis/Dashboard.cpp ${UIS_HDRS})
+add_library(forward_kinematics src/ForwardKinematics.cpp)
+add_library(dashboard_ui include/pses_basis/Dashboard.cpp ${UIS_HDRS})
+add_library(ucboard src/PsesUcBoard.cpp)
 
 ## Declare a cpp executable
 add_executable(car_handler src/car_handler.cpp)
@@ -124,17 +125,18 @@ add_executable(car_dashboard src/car_dashboard.cpp)
 ## as an example, message headers may need to be generated before nodes
 ## either from message generation or dynamic reconfigure
 add_dependencies(car_handler ${PROJECT_NAME}_gencfg)
-add_dependencies(DASHBOARD ${PROJECT_NAME}_gencpp)
+add_dependencies(dashboard_ui ${PROJECT_NAME}_gencpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 add_dependencies(car_handler ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(car_handler ${catkin_LIBRARIES})
-target_link_libraries(car_odometry ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} FWD_KIN)
-target_link_libraries(DASHBOARD Qt5::Widgets Qt5::Core Qt5::Gui)
-target_link_libraries(car_dashboard ${catkin_LIBRARIES} DASHBOARD)
+target_link_libraries(ucboard ${catkin_LIBRARIES})
+target_link_libraries(car_handler ${catkin_LIBRARIES} ucboard)
+target_link_libraries(car_odometry ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} forward_kinematics)
+target_link_libraries(dashboard_ui Qt5::Widgets Qt5::Core Qt5::Gui)
+target_link_libraries(car_dashboard ${catkin_LIBRARIES} dashboard_ui)
 
 #############
 ## Install ##

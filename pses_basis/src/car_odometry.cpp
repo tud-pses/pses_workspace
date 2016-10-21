@@ -84,7 +84,7 @@ void dataCallback(const pses_basis::SensorData::ConstPtr& sensorData, tf::Transf
 	odom_pub->publish(odom);
 	carInfo_pub->publish(info);
 	//ROS_INFO_STREAM(odomHelper->getDrivenDistance());
-	ROS_INFO_STREAM("Yaw: " << ohA->getYaw() << " Pitch: " << ohA->getPitch() << " Roll: " << ohA->getRoll());
+	//ROS_INFO_STREAM("Yaw: " << ohA->getYaw() << " Pitch: " << ohA->getPitch() << " Roll: " << ohA->getRoll());
 }
 
 int main(int argc, char **argv)
