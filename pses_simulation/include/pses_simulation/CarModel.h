@@ -41,6 +41,7 @@ public:
 
 								const int getSteering() const;
 								const double getSteeringAngle() const;
+								const double getTimeStep() const;
 								const double getVelocity() const;
 								const double getAngularVelocity() const;
 								const double getDistance() const;

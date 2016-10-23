@@ -11,9 +11,9 @@
 	<node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher"/>
 	<node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher"/>
 	<!-- Run the necessary nodes to bring up the car -->
-	<node pkg="pses_simulation" type="simulation_node" name="simulation" />
-	<node pkg="pses_simulation" type="scan_node" name="scan_simulation" />
-	<node pkg="pses_simulation" type="usrange_node" name="usrange_simulation"/>
+        <node pkg="pses_simulation" type="simulation_node" name="simulation_control" output="screen"/>
+	<node pkg="pses_simulation" type="scan_node" name="simulation_scan" />
+	<node pkg="pses_simulation" type="usrange_node" name="simulation_us"/>
 	<!-- Run the map server -->
 	<node name="map_server" pkg="map_server" type="map_server" args="$(find pses_simulation)/data/map/map.yaml"/>
 	<!-- Show the Rviz visualization 	-->
@@ -22,6 +22,6 @@
 	</group>
 	<!-- Run the Dashboard Application -->
 	<group if="$(arg dashboard)">
-		<node pkg="pses_simulation" type="dashboard_node" name="dashboard_simulation" output="screen"/>
+		<node pkg="pses_simulation" type="dashboard_node" name="simulation_dashboard" output="screen"/>
 	</group>
 </launch>

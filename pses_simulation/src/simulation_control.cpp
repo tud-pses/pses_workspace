@@ -9,7 +9,9 @@
 #include <pses_basis/Command.h>
 #include <pses_basis/CarInfo.h>
 #include <pses_basis/SensorData.h>
+#include <random>
 #include <math.h>
+#include <pses_simulation/Kalman.h>
 
 void motionCommands(const geometry_msgs::Twist::ConstPtr& motionIn, geometry_msgs::Twist* motionOut, bool* flag){
         *motionOut = *motionIn;
@@ -60,6 +62,18 @@ int main(int argc, char **argv){
         ros::Publisher carInfoPub = nh.advertise<pses_basis::CarInfo>("pses_basis/car_info", 10);
         ros::Publisher sensorPub = nh.advertise<pses_basis::SensorData>("pses_basis/sensor_data", 10);
 
+        //spielwiese:
+        /*
+        Kalman k;
+        k.setAngle(0);
+        k.setQangle(0.99);
+        //k.setQbias(0.0003);
+        //k.setRmeasure(0.03);
+        std::random_device generator;
+        std::normal_distribution<double> distribution(0.0, M_PI/10.0);
+        double filtered = 0;
+        */
+
         // Loop starts here:
         ros::Rate loop_rate(100);
         while(ros::ok()) {
@@ -109,7 +123,7 @@ int main(int argc, char **argv){
                 // set rpy-Angles
                 info.roll=0;
                 info.pitch=0;
-                info.yaw=simPose[2]*180.0/M_PI; // In deg
+                info.yaw=simPose[2];
                 // set driven distance
                 info.driven_distance = car.getDistance();
                 // set speed
@@ -121,10 +135,30 @@ int main(int argc, char **argv){
                 sensors.header.seq++;
                 sensors.header.car_id = 0;
                 // set gyro data (deg/s)
-                sensors.angular_velocity_z = car.getAngularVelocity()/M_PI*180.0;
+                sensors.angular_velocity_z = car.getAngularVelocity();
                 // set accelerometer data
                 sensors.accelerometer_x = car.getAx();
                 sensors.accelerometer_y = car.getAy();
+
+                //Spielwiese
+                /*
+                double noisyWZ = car.getAngularVelocity() + distribution(generator);
+
+                filtered = k.getAngle(filtered*180.0/M_PI, noisyWZ*180.0/M_PI, car.getTimeStep())*M_PI/180.0;
+                double val = 0;
+                if(std::fabs(filtered/M_PI)>1.0){
+                  double multiple = filtered / M_PI;
+                  double sign = multiple / std::fabs(multiple);
+                  multiple = std::floor(std::fabs(multiple));
+                  val = filtered - sign*multiple*M_PI;
+                }else{
+                  val = filtered;
+                }
+
+
+                //noisyYaw = noisyYaw + noisyWZ * car.getTimeStep();
+                ROS_INFO("Perfect Yaw: %lf // Filtered Yaw: %lf", simPose[2],val);
+                */
 
                 // publish the messages over ROS
                 odomPub.publish(odom);

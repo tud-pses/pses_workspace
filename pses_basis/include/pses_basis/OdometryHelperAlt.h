@@ -33,7 +33,7 @@ public:
 	                                                           0, 0, 0, 0.003, 0, 0,
 	                                                           0, 0, 0, 0, 0.003, 0,
 	                                                           0, 0, 0, 0, 0, 0.003);
-	    */                                                       
+	    */
 		cv::setIdentity(gyroFilter.measurementMatrix);
 		gyroFilter.measurementMatrix = (cv::Mat_<float>(3, 6) << 0, 0, 0, 1, 0, 0,
 	                                                            0, 0, 0, 0, 1, 0,
@@ -118,9 +118,9 @@ private:
 		speed =  isnan(sensorData.hall_sensor_dt)? 0.0 : drivingDirection * DRIVEN_DISTANCE_PER_TICK / sensorData.hall_sensor_dt;
 	}
 	inline void updateGyroMeasurements(){
-		measurement.at<float>(0) = degToRad(sensorData.angular_velocity_x);
-    	measurement.at<float>(1) = degToRad(sensorData.angular_velocity_y);
-    	measurement.at<float>(2) = degToRad(sensorData.angular_velocity_z);
+		measurement.at<float>(0) = sensorData.angular_velocity_x;
+    measurement.at<float>(1) = sensorData.angular_velocity_y;
+    measurement.at<float>(2) = sensorData.angular_velocity_z;
 	}
 	inline void updateGyroFilter(){
 		gyroFilter.transitionMatrix.at<float>(0,3) = dt;

@@ -47,9 +47,9 @@ void buildInfoMessage(pses_basis::CarInfo& info, const pses_basis::SensorData& s
 	info.header.seq++;
 	info.header.car_id = sensorData.header.car_id;
 	// set rpy-Angles
-	info.roll = odomHelper.getRoll();//*180.0/M_PI;
-	info.pitch = odomHelper.getPitch();//*180.0/M_PI;
-	info.yaw = odomHelper.getYaw();//*180.0/M_PI;
+    info.roll = odomHelper.getRoll();
+    info.pitch = odomHelper.getPitch();
+    info.yaw = odomHelper.getYaw();
 	// set driven distance
 	info.driven_distance = odomHelper.getDrivenDistance();
 	// set speed

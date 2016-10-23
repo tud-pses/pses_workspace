@@ -551,7 +551,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>deg/s</string>
+     <string>rad/s</string>
     </property>
    </widget>
    <widget class="QLCDNumber" name="sensor_wz">
@@ -606,7 +606,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>deg/s</string>
+     <string>rad/s</string>
     </property>
    </widget>
    <widget class="QLCDNumber" name="sensor_wx">
@@ -640,7 +640,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>deg/s</string>
+     <string>rad/s</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_20">

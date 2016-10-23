@@ -9,6 +9,7 @@
 #include <pses_basis/SensorData.h>
 #include <pses_basis/Command.h>
 #include <limits>
+#include <math.h>
 
 namespace SC{
 
@@ -364,6 +365,10 @@ private:
 		return send(cmd);
 	}
 
+    inline float degToRad(const float value) {
+        return value*M_PI/180;
+    }
+
 	inline void assignSensorValue(pses_basis::SensorData& data, const int value , const SC::SensorObject& sensor){
 		switch(sensor){
 			case SC::accelerometerX : 
@@ -376,13 +381,13 @@ private:
 				data.accelerometer_z = value*8.0/std::pow(2,16)*9.81;
 				break;
 			case SC::gyroscopeX : 
-				data.angular_velocity_x = value*1000.0/std::pow(2,16);
+                data.angular_velocity_x = degToRad(value*1000.0/std::pow(2,16));
 				break;
 			case SC::gyroscopeY : 
-				data.angular_velocity_y = value*1000.0/std::pow(2,16);
+                data.angular_velocity_y = degToRad(value*1000.0/std::pow(2,16));
 				break;
 			case SC::gyroscopeZ : 
-				data.angular_velocity_z = value*1000.0/std::pow(2,16);
+                data.angular_velocity_z = degToRad(value*1000.0/std::pow(2,16));
 				break;
 			case SC::rangeSensorLeft : 
 				data.range_sensor_left = value/10000.0;

@@ -22,6 +22,7 @@ public:
 		drivenDistance = 0.0;
 		speed = 0.0;
 		drivingDirection = 0;
+        prevDirection = 0;
 		oldTimeStamp = ros::Time::now();
 		odometric.setK(0.25); // set distance between front axis and back axis (in meters)	
 	}
@@ -39,7 +40,8 @@ public:
 	}
 	inline void updateCommand(const pses_basis::Command& cmd) {
 		command = cmd;
-		if(command.motor_level < 0) drivingDirection = -1;
+        prevDirection = drivingDirection;
+        if(command.motor_level < 0) drivingDirection = -1;
 		else if(command.motor_level > 0) drivingDirection = 1;
 		else drivingDirection = 0;
 	}
@@ -69,6 +71,7 @@ private:
 	float speed;
 	float drivenDistance;
 	float deltaDistance;
+    int prevDirection;
 	int drivingDirection; // -1 = backwards; 0 = stop; 1 = forwards
 	ros::Time oldTimeStamp;
 	geometry_msgs::Point position;
@@ -79,17 +82,28 @@ private:
 		return (currentTimeStamp - oldTimeStamp).toSec();
 	}
 	inline float calcSpeed() {
+        /*
 		float hall_sensor_dt = sensorData.hall_sensor_dt;
 		return isnan(hall_sensor_dt)? 0.0 : drivingDirection * DRIVEN_DISTANCE_PER_TICK / hall_sensor_dt;
+        */
+        if(!isnan(sensorData.hall_sensor_dt)){
+            return  drivingDirection * DRIVEN_DISTANCE_PER_TICK / sensorData.hall_sensor_dt;
+        }else{
+            if(prevDirection!=drivingDirection) return 0;
+            else return speed;
+        }
 	}
 	inline double calcYaw() {
-		return yaw + degToRad(sensorData.angular_velocity_z*dt);
+        //return yaw + degToRad(sensorData.angular_velocity_z*dt);
+        return yaw + sensorData.angular_velocity_z*dt;
 	}
 	inline double calcRoll() {
-		return roll + degToRad(sensorData.angular_velocity_x*dt);
+        //return roll + degToRad(sensorData.angular_velocity_x*dt);
+        return roll + sensorData.angular_velocity_x*dt;
 	}
 	inline double calcPitch() {
-		return pitch + degToRad(sensorData.angular_velocity_y*dt);
+        //return pitch + degToRad(sensorData.angular_velocity_y*dt);
+        return pitch + sensorData.angular_velocity_y*dt;
 	}
 	inline float calcDeltaDistance() { 
 		//return speed*dt;
@@ -106,9 +120,9 @@ private:
 		currentPosition.z = 0.0;
 		return currentPosition;
 	}
-	inline float degToRad(const float value) {
-		return value*M_PI/180;
-	}
+    inline float degToRad(const float value) {
+        return value*M_PI/180;
+    }
 };
 
 #endif

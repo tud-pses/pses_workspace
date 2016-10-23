@@ -17,7 +17,10 @@ namespace Board {
 	const std::string CONNECTION_ALREADY_ESTABLISHED = "Connection to uc-Board already established!";
 	const std::string TRANSMISSION_FAILED = "Transmission to uc-Board failed!";
 	const std::string COMMAND_STEERING_OOB = "Steering level out of bounds => [50, -50]";
+	const std::string COMMAND_STEERING_NR = "No valid answer on steering command.";
 	const std::string COMMAND_MOTOR_OOB = "Motor level out of bounds => [20, -20]";
+	const std::string COMMAND_MOTOR_NR = "No valid answer on motor command.";
+	const std::string REQUEST_NO_ID = "No valid answer on request for ID.";
 }
 
 class PsesUcBoard{

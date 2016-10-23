@@ -57,6 +57,10 @@ const pose_ptr CarModel::getUpdateTwist(const twist_msg cmdVel, const ros::Time&
 								return std::make_shared<std::vector<double> >(pose);
 }
 
+const double CarModel::getTimeStep() const {
+								return timeStep;
+}
+
 const double CarModel::getDistance() const {
 								return distance;
 }

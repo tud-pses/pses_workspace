@@ -39,8 +39,11 @@ void PsesUcBoard::setSteering(const int level){
 	ros::Time start = ros::Time::now();
 	do{
 		sendRequest(command, answer);
-		ROS_INFO_STREAM("<<Command:"<<command<<">>"<<"<<Query:"<<check<<">>"<<"<<Answer:"<<answer<<">>");
-	}while(answer.find(check)==-1 && (ros::Time::now()-start).toSec()<=0.5);
+        //ROS_INFO_STREAM("<<Command:"<<command<<">>"<<"<<Query:"<<check<<">>"<<"<<Answer:"<<answer<<">>");
+	}while(answer.find(check)==-1 && (ros::Time::now()-start).toSec()<=0.1);
+	if(answer.find(check)==-1){
+		throw UcBoardException(Board::COMMAND_STEERING_NR);
+	}
 }
 void PsesUcBoard::setMotor(const int level){
 	if(level > 20 || level <-20){
@@ -51,7 +54,7 @@ void PsesUcBoard::setMotor(const int level){
 		valueStream << "F " << -500;
 	}else if(level>0){
 		valueStream << "F " << 50*level;
-		
+
 	}else{
 		valueStream << "B " << -25*level;
 	}
@@ -62,7 +65,10 @@ void PsesUcBoard::setMotor(const int level){
 	do{
 		sendRequest(command, answer);
 		//ROS_INFO_STREAM("<<Query:"<<value<<">>"<<"<<Answer:"<<answer<<">>");
-	}while(answer.find(value)==-1 && (ros::Time::now()-start).toSec()<=0.5);
+	}while(answer.find(value)==-1 && (ros::Time::now()-start).toSec()<=0.1);
+	if(answer.find(value)==-1){
+		throw UcBoardException(Board::COMMAND_MOTOR_NR);
+	}
 }
 void PsesUcBoard::emptyAllStacks(){
 	std::string out;
@@ -98,7 +104,10 @@ void PsesUcBoard::queryCarID(){
 		}catch(std::exception& e){
 			carID = -1;
 		}
-	}while(carID<0 && (ros::Time::now()-start).toSec()<=0.5);
+	}while(carID<0 && (ros::Time::now()-start).toSec()<=0.1);
+	if(carID==-1){
+		throw UcBoardException(Board::REQUEST_NO_ID);
+	}
 
 }
 void PsesUcBoard::connect(const unsigned int serialTimeout){
@@ -126,15 +135,15 @@ void PsesUcBoard::sendRequest(const std::string& req, std::string& answer){
 	if(!connected){
 		throw UcBoardException(Board::CONNECTION_NOT_ESTABLISHED);
 	}
-	readInputBuffer();
+	//readInputBuffer();
 	send(req);
 	ros::Time start = ros::Time::now();
 	do{
 		readInputBuffer();
 		responseStack->pop(answer);
-		ros::Duration(0.001).sleep();
+		//ros::Duration(0.001).sleep();
 
-	}while(answer.size()==0 && (ros::Time::now()-start).toSec()<=0.1);
+	}while(answer.size()==0 && (ros::Time::now()-start).toSec()<=0.05);
 
 	if(answer.size()!=0){
 		answer = answer.substr(1,answer.size()-2);
@@ -146,53 +155,48 @@ void PsesUcBoard::readInputBuffer(){
 		throw UcBoardException(Board::CONNECTION_NOT_ESTABLISHED);
 	}
 	std::string input;
-	//potentially dangerous <- this needs to be checked out
-	ros::Time start = ros::Time::now();
-	do{
 		receive(input);
 		if(input.size()==0){
 			ROS_INFO_STREAM("<<RAW-zero: "<<input<<" size: "<< input.size() <<" >>");
 			input="";
-			ros::Duration(0.001).sleep();
-			break;
+			//ros::Duration(0.001).sleep();
+			return;
 		}
 		if(input.find("\x03")==-1){
 			ROS_INFO_STREAM("<<RAW-broken: "<<input<<" size: "<< input.size() <<" >>");
 			input="";
-			ros::Duration(0.001).sleep();
-			continue;
+			//ros::Duration(0.001).sleep();
+			return;
 		}
 		if(input.find("##")!=-1 && input.find(":")!=-1){
 			ROS_INFO_STREAM("<<group: "<<input<<" size: "<< input.size() <<" >>");
 			sensorGroupStack->push(input);
 			input="";
-			ros::Duration(0.001).sleep();
-			continue;
+			//ros::Duration(0.001).sleep();
+			return;
 		}
 		if(input.find(":")!=-1 && input.find("##")==-1){
 			ROS_INFO_STREAM("<<response: "<<input<<" size: "<< input.size() <<" >>");
 			responseStack->push(input);
 			input="";
-			ros::Duration(0.001).sleep();
-			continue;
+			//ros::Duration(0.001).sleep();
+			return;
 		}
 		if(input.find("'")!=-1 && input.find("ERR")!=-1){
 			ROS_INFO_STREAM("<<error: "<<input<<" size: "<< input.size() <<" >>");
 			errorStack->push(input);
 			input="";
-			ros::Duration(0.001).sleep();
-			continue;
+			//ros::Duration(0.001).sleep();
+			return;
 		}
 		if(input.find("'")!=-1 && input.find("ERR")==-1){
 			ROS_INFO_STREAM("<<display: "<<input<<" size: "<< input.size() <<" >>");
 			displayStack->push(input);
 			input="";
-			ros::Duration(0.001).sleep();
-			continue;
+			//ros::Duration(0.001).sleep();
+			return;
 		}
-		
-	}while(serialConnection.available() && ((ros::Time::now()-start).toSec()<=0.05));
-		
+
 }
 
 void PsesUcBoard::send(const std::string& msg) {
@@ -214,7 +218,7 @@ void PsesUcBoard::receive(std::string& msg) {
 	}else{
 		msg = "";
 	}
-	
+
 }
 
 void PsesUcBoard::deactivateUCBoard(){
@@ -226,4 +230,3 @@ void PsesUcBoard::deactivateUCBoard(){
 	//send stop daq
 	//send reset
 	}
-	
