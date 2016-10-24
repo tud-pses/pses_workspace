@@ -70,6 +70,26 @@ void PsesUcBoard::setMotor(const int level){
 		throw UcBoardException(Board::COMMAND_MOTOR_NR);
 	}
 }
+
+void PsesUcBoard::getBoardError(std::string& msg){
+	readInputBuffer();
+	errorStack->pop(msg);
+}
+void PsesUcBoard::getBoardMessage(std::string& msg){
+	readInputBuffer();
+	displayStack->pop(msg);
+}
+
+bool PsesUcBoard::boardErrors(){
+	readInputBuffer();
+	return !errorStack->isEmpty();
+}
+
+bool PsesUcBoard::boardMessages(){
+	readInputBuffer();
+	return !displayStack->isEmpty();
+}
+
 void PsesUcBoard::emptyAllStacks(){
 	std::string out;
 	while(!errorStack->isEmpty()){
@@ -221,12 +241,188 @@ void PsesUcBoard::receive(std::string& msg) {
 
 }
 
+void PsesUcBoard::reset(){
+	if(!connected){
+		throw UcBoardException(Board::CONNECTION_NOT_ESTABLISHED);
+	}
+	std::string command = "!RESET NOW";
+	send(command);
+}
+
 void PsesUcBoard::deactivateUCBoard(){
 	if(!connected){
 		throw UcBoardException(Board::CONNECTION_NOT_ESTABLISHED);
 	}
 	setSteering(0);
 	setMotor(0);
+	stopSensors();
+	reset();
 	//send stop daq
 	//send reset
 	}
+
+	void PsesUcBoard::setSensorGroup(const Board::SensorGroup& sensors, const int numOfGroup, const std::string& parameter){
+		if(sensors.size()==0){
+			return;
+		}
+		std::string answer;
+		std::string value = ":ok";
+		std::stringstream command;
+		command<<"!DAQ GRP "<<numOfGroup<<" "<<parameter;
+		for(auto current : sensors){
+			command<<" "<<Board::sensorTable[current];
+		}
+
+		ros::Time start = ros::Time::now();
+		do{
+			sendRequest(command.str(), answer);
+			//ROS_INFO_STREAM("<<Query:"<<value<<">>"<<"<<Answer:"<<answer<<">>");
+		}while(answer.find(value)==-1 && (ros::Time::now()-start).toSec()<=0.1);
+		if(answer.find(value)==-1){
+			throw UcBoardException(Board::REQUEST_NO_GROUP);
+		}
+
+	}
+
+	void PsesUcBoard::startSensors(){
+		std::string command = "!DAQ START";
+		std::string answer;
+		std::string value = ":ok";
+
+		ros::Time start = ros::Time::now();
+		do{
+			sendRequest(command, answer);
+			//ROS_INFO_STREAM("<<Query:"<<value<<">>"<<"<<Answer:"<<answer<<">>");
+		}while(answer.find(value)==-1 && (ros::Time::now()-start).toSec()<=0.1);
+		if(answer.find(value)==-1){
+			throw UcBoardException(Board::REQUEST_NO_START);
+		}
+
+	}
+
+	void PsesUcBoard::stopSensors(){
+		std::string command = "!DAQ STOP";
+		std::string answer;
+		std::string value = ":ok";
+
+		ros::Time start = ros::Time::now();
+		do{
+			sendRequest(command, answer);
+			//ROS_INFO_STREAM("<<Query:"<<value<<">>"<<"<<Answer:"<<answer<<">>");
+		}while(answer.find(value)==-1 && (ros::Time::now()-start).toSec()<=0.1);
+		if(answer.find(value)==-1){
+			throw UcBoardException(Board::REQUEST_NO_STOP);
+		}
+	}
+
+  void PsesUcBoard::getSensorData(pses_basis::SensorData& data){
+		readInputBuffer();
+		std::string rawData;
+		sensorGroupStack->pop(rawData);
+		if(rawData.size()==0){
+			return;
+		}
+		//string must identify as vaild sensor group
+		int start = rawData.find("##");
+		int end = rawData.find("\x03");
+		if(start<0 || end<0){
+			throw UcBoardException(Board::SENSOR_PARSER_INVALID);
+		}
+		//get group ID
+		int groupID = 0;
+		int idBegin = start+2;
+		int idLength = rawData.find(":")-idBegin;
+		try{
+				groupID = std::stoi(rawData.substr(idBegin, idLength));
+				}catch(std::exception& e){
+					throw UcBoardException(Board::SENSOR_ID_INVALID);
+				}
+		//remove preamble and trails
+		start = idBegin+idLength+1;
+		int substrLength = end-start;
+		rawData = rawData.substr(idBegin+idLength+1, substrLength);
+
+		//set message meta data
+		sensorMessage.header.seq++;
+		sensorMessage.header.stamp = ros::Time::now();
+		sensorMessage.header.frame_id = "ucBoard";
+		//reset wheel measurements
+		sensorMessage.hall_sensor_dt = std::numeric_limits<float>::quiet_NaN();
+		sensorMessage.hall_sensor_dt_full = std::numeric_limits<float>::quiet_NaN();
+
+		//parse sensor values
+		int sensorCount = 0;
+		int nextSensor = -1;
+		int sensorValue = 0;
+		do{
+			nextSensor = rawData.find(" | ");
+			if(nextSensor<0){
+				try{
+					sensorValue = std::stoi(rawData);
+					assignSensorValue(sensorMessage, sensorValue, sensorGroups[groupID-1][sensorCount]);
+				}catch(std::exception& e){
+					throw UcBoardException(Board::SENSOR_PARSER_INVALID);
+				}
+			}else{
+				try{
+					sensorValue = std::stoi(rawData.substr(0, nextSensor));
+					assignSensorValue(sensorMessage, sensorValue, sensorGroups[groupID-1][sensorCount]);
+					sensorCount++;
+					start = nextSensor+3;
+					substrLength = rawData.size();
+					rawData = rawData.substr(start, substrLength);
+				}catch(std::exception& e){
+					throw UcBoardException(Board::SENSOR_PARSER_INVALID);
+				}
+			}
+		}while(nextSensor>=0);
+		data = sensorMessage;
+	}
+
+	void PsesUcBoard::assignSensorValue(pses_basis::SensorData& data, const int value , const Board::SensorObject& sensor){
+		switch(sensor){
+			case Board::accelerometerX :
+				data.accelerometer_x = value*8.0/std::pow(2,16)*9.81;
+				break;
+			case Board::accelerometerY :
+				data.accelerometer_y = value*8.0/std::pow(2,16)*9.81;
+				break;
+			case Board::accelerometerZ :
+				data.accelerometer_z = value*8.0/std::pow(2,16)*9.81;
+				break;
+			case Board::gyroscopeX :
+                data.angular_velocity_x = Board::degToRad(value*1000.0/std::pow(2,16));
+				break;
+			case Board::gyroscopeY :
+                data.angular_velocity_y = Board::degToRad(value*1000.0/std::pow(2,16));
+				break;
+			case Board::gyroscopeZ :
+                data.angular_velocity_z = Board::degToRad(value*1000.0/std::pow(2,16));
+				break;
+			case Board::rangeSensorLeft :
+				data.range_sensor_left = value/10000.0;
+				break;
+			case Board::rangeSensorFront :
+				data.range_sensor_front = value/10000.0;
+				break;
+			case Board::rangeSensorRight :
+				data.range_sensor_right = value/10000.0;
+				break;
+			case Board::hallSensorDT :
+				data.hall_sensor_dt = value/10000.0;
+				break;
+			case Board::hallSensorDTFull :
+				data.hall_sensor_dt_full = value/1000.0;
+				break;
+			case Board::hallSensorCount :
+				data.hall_sensor_count = value;
+				break;
+			case Board::batteryVoltageSystem :
+				data.system_battery_voltage = value/1000.0;
+				break;
+			case Board::batteryVoltageMotor :
+				data.motor_battery_voltage = value/1000.0;
+				break;
+
+		}
+}

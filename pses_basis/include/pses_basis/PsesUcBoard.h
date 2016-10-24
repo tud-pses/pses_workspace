@@ -21,6 +21,37 @@ namespace Board {
 	const std::string COMMAND_MOTOR_OOB = "Motor level out of bounds => [20, -20]";
 	const std::string COMMAND_MOTOR_NR = "No valid answer on motor command.";
 	const std::string REQUEST_NO_ID = "No valid answer on request for ID.";
+	const std::string REQUEST_NO_GROUP = "Sensor group not set.";
+	const std::string REQUEST_NO_START = "Request to start groups not send.";
+	const std::string REQUEST_NO_STOP = "Request to stop groups not send.";
+	const std::string SENSOR_PARSER_INVALID = "Invalid sensor group message.";
+	const std::string SENSOR_ID_INVALID = "Invalid sensor group ID.";
+
+	static	std::vector<std::string> sensorTable = {"USL", "USF", "USR", "AX", "AY", "AZ", "GX", "GY", "GZ", "HALL_DT", "HALL_DT8", "HALL_CNT", "VSBAT", "VDBAT"};
+
+	enum SensorObject{
+		rangeSensorLeft = 0,
+		rangeSensorFront = 1,
+		rangeSensorRight = 2,
+		accelerometerX = 3,
+		accelerometerY = 4,
+		accelerometerZ = 5,
+		gyroscopeX = 6,
+		gyroscopeY = 7,
+		gyroscopeZ = 8,
+		hallSensorDT = 9,
+		hallSensorDTFull = 10,
+		hallSensorCount = 11,
+		batteryVoltageSystem = 12,
+		batteryVoltageMotor = 13,
+	};
+
+	typedef std::vector<SensorObject> SensorGroup;
+  typedef std::vector<SensorGroup> SensorGroups;
+
+	float degToRad(const float value) {
+			return value*M_PI/180;
+	}
 }
 
 class PsesUcBoard{
@@ -30,6 +61,11 @@ class PsesUcBoard{
 	void initUcBoard(const unsigned int serialTimeout=5);
 	void setSteering(const int level);
 	void setMotor(const int level);
+	void getSensorData(pses_basis::SensorData& data);
+	bool boardErrors();
+	bool boardMessages();
+	void getBoardError(std::string& msg);
+	void getBoardMessage(std::string& msg);
 	void deactivateUCBoard();
 	void emptyAllStacks();
 
@@ -43,13 +79,21 @@ class PsesUcBoard{
 	InputStack* sensorGroupStack;
 	InputStack* displayStack;
 	int carID;
+	Board::SensorGroups sensorGroups;
+	pses_basis::SensorData sensorMessage;
 
 	void connect(const unsigned int serialTimeout);
 	void send(const std::string& msg);
 	void receive(std::string& msg);
+	void reset();
 	void readInputBuffer();
 	void sendRequest(const std::string& req, std::string& answer);
 	void queryCarID();
+	void startSensors();
+	void stopSensors();
+	void setSensorGroup(const Board::SensorGroup& sensors, const int numOfGroup, const std::string& parameter);
+	void assignSensorValue(pses_basis::SensorData& data, const int value , const Board::SensorObject& sensor);
+
 };
 
 #endif
