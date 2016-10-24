@@ -9,6 +9,7 @@
 #include <pses_basis/SensorData.h>
 #include <nav_msgs/Odometry.h>
 #include <pses_basis/CarInfo.h>
+#include <math.h>
 
 typedef pses_basis::Command command_data;
 typedef pses_basis::SensorData sensor_data;
@@ -16,7 +17,7 @@ typedef pses_basis::CarInfo info_data;
 typedef nav_msgs::Odometry odometry_data;
 
 namespace Ui {
-class Dashboard;
+        class Dashboard;   
 }
 
 void odometryCallback(const odometry_data::ConstPtr& odom, Ui::Dashboard* ui);
@@ -47,7 +48,7 @@ private:
         QTimer *timer;
 
 private slots:
-        void toggleKinect(bool value);
+        void toggleKinect();
         void valueChangedSpeed(int value);
         void valueChangedSteering(int value);
         void maxSpeedClicked();

@@ -7,6 +7,7 @@
 #include <pses_basis/Command.h>
 #include <pses_basis/ForwardKinematics.h>
 #include <math.h>
+#include <sensor_msgs/Imu.h>
 
 #define WHEEL_RADIUS 0.032
 #define RAD_PER_TICK 0.7853981634 // 2*PI/8
@@ -24,19 +25,22 @@ public:
 		drivingDirection = 0;
         prevDirection = 0;
 		oldTimeStamp = ros::Time::now();
-		odometric.setK(0.25); // set distance between front axis and back axis (in meters)	
+		odometric.setK(0.25); // set distance between front axis and back axis (in meters)
 	}
 	inline void updateSensorData(const pses_basis::SensorData& sensorData) {
 		this->sensorData = sensorData;
-		dt = calcDt(sensorData.header.stamp, oldTimeStamp);
+		calcDt(sensorData.header.stamp, oldTimeStamp);
 		oldTimeStamp = sensorData.header.stamp;
-		speed = calcSpeed();
-		yaw = calcYaw();
-		pitch = calcPitch();
-		roll = calcRoll();
-		deltaDistance = calcDeltaDistance();
-		drivenDistance = calcDrivenDistance();
-		position = calcPosition();
+		calcSpeed();
+		calcDeltaDistance();
+		calcDrivenDistance();
+		calcPosition();
+	}
+	inline void updateIMUData(sensor_msgs::Imu& imu){
+		this->imu = imu;
+		tf::Quaternion q;
+		tf::quaternionMsgToTF(imu.orientation, q);
+		tf::Matrix3x3(q).getRPY(roll, pitch, yaw);
 	}
 	inline void updateCommand(const pses_basis::Command& cmd) {
 		command = cmd;
@@ -57,6 +61,9 @@ public:
 	inline float getSpeed() {
 		return speed;
 	}
+	inline void getQuaternion(geometry_msgs::Quaternion& quat) {
+		quat = imu.orientation;
+	}
 	inline float getDrivenDistance() {
 		return drivenDistance;
 	}
@@ -76,54 +83,33 @@ private:
 	ros::Time oldTimeStamp;
 	geometry_msgs::Point position;
 	ForwardKinematics odometric; // object needed for odometric calculations
+	sensor_msgs::Imu imu;
 	pses_basis::SensorData sensorData;
 	pses_basis::Command command;
-	inline double calcDt(const ros::Time& currentTimeStamp, const ros::Time& oldTimeStamp) const{
-		return (currentTimeStamp - oldTimeStamp).toSec();
+	inline void calcDt(const ros::Time& currentTimeStamp, const ros::Time& oldTimeStamp) {
+		dt = (currentTimeStamp - oldTimeStamp).toSec();
 	}
-	inline float calcSpeed() {
-        /*
-		float hall_sensor_dt = sensorData.hall_sensor_dt;
-		return isnan(hall_sensor_dt)? 0.0 : drivingDirection * DRIVEN_DISTANCE_PER_TICK / hall_sensor_dt;
-        */
+	inline void calcSpeed() {
         if(!isnan(sensorData.hall_sensor_dt)){
-            return  drivingDirection * DRIVEN_DISTANCE_PER_TICK / sensorData.hall_sensor_dt;
+            speed =  drivingDirection * DRIVEN_DISTANCE_PER_TICK / sensorData.hall_sensor_dt;
         }else{
-            if(prevDirection!=drivingDirection) return 0;
-            if(drivingDirection == 0) return 0;
-            return speed;
+            if(prevDirection!=drivingDirection) speed = 0;
+            else if(drivingDirection == 0) speed =  0;
         }
 	}
-	inline double calcYaw() {
-        //return yaw + degToRad(sensorData.angular_velocity_z*dt);
-        return yaw + sensorData.angular_velocity_z*dt;
-	}
-	inline double calcRoll() {
-        //return roll + degToRad(sensorData.angular_velocity_x*dt);
-        return roll + sensorData.angular_velocity_x*dt;
-	}
-	inline double calcPitch() {
-        //return pitch + degToRad(sensorData.angular_velocity_y*dt);
-        return pitch + sensorData.angular_velocity_y*dt;
-	}
-	inline float calcDeltaDistance() { 
+	inline void calcDeltaDistance() { 
 		//return speed*dt;
-		return isnan(sensorData.hall_sensor_dt)?0.0 : drivingDirection*DRIVEN_DISTANCE_PER_TICK;
+		deltaDistance = isnan(sensorData.hall_sensor_dt)?0.0 : drivingDirection*DRIVEN_DISTANCE_PER_TICK;
 	}
-	inline float calcDrivenDistance() {
-		return drivenDistance + deltaDistance;
+	inline void calcDrivenDistance() {
+		drivenDistance = drivenDistance + deltaDistance;
 	}
-	inline geometry_msgs::Point calcPosition() {
+	inline void calcPosition() {
 		std::vector<double> pos = odometric.getUpdateWithGyro(yaw, deltaDistance);
-		geometry_msgs::Point currentPosition;
-		currentPosition.x = pos.at(1);
-		currentPosition.y = -pos.at(0);
-		currentPosition.z = 0.0;
-		return currentPosition;
+		position.x = pos.at(1);
+		position.y = -pos.at(0);
+		position.z = 0.0;
 	}
-    inline float degToRad(const float value) {
-        return value*M_PI/180;
-    }
 };
 
 #endif

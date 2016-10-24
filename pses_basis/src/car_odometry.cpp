@@ -5,10 +5,20 @@
 #include <pses_basis/SensorData.h>
 #include <pses_basis/Command.h>
 #include <pses_basis/OdometryHelper.h>
-#include <pses_basis/OdometryHelperAlt.h>
-
+#include <sensor_msgs/Imu.h>
 #include <pses_basis/CarInfo.h>
 
+void buildImuMessage(sensor_msgs::Imu& imu, const pses_basis::SensorData& sensorData) {
+
+	imu.header.stamp = sensorData.header.stamp;
+	imu.header.frame_id = "odom";
+	imu.angular_velocity.x = sensorData.angular_velocity_x;
+	imu.angular_velocity.y = sensorData.angular_velocity_y;
+	imu.angular_velocity.z = sensorData.angular_velocity_z;
+	imu.linear_acceleration.x = sensorData.accelerometer_x;
+	imu.linear_acceleration.y = sensorData.accelerometer_y;
+	imu.linear_acceleration.z = sensorData.accelerometer_z;
+}
 
 void buildOdometryTransformation(geometry_msgs::TransformStamped& odomTransform, const pses_basis::SensorData& sensorData,
 								OdometryHelper& odomHelper, geometry_msgs::Quaternion& odomQuaternion) {
@@ -61,30 +71,34 @@ void commandCallback(const pses_basis::Command::ConstPtr& cmd, OdometryHelper* o
 	odomHelper->updateCommand(*cmd);
 }
 
-void dataCallback(const pses_basis::SensorData::ConstPtr& sensorData, tf::TransformBroadcaster* odomBroadcaster,
-								ros::Publisher* odom_pub, OdometryHelper* odomHelper, OdometryHelperAlt* ohA, ros::Publisher* carInfo_pub) {
+void imuCallback(const sensor_msgs::Imu::ConstPtr& imu, OdometryHelper* odomHelper){
+	sensor_msgs::Imu imu2 = *imu;
+	odomHelper->updateIMUData(imu2);
+}
+
+void dataCallback(const pses_basis::SensorData::ConstPtr& sensorData, tf::TransformBroadcaster* odomBroadcaster, ros::Publisher* imu_pub,
+								ros::Publisher* odom_pub, OdometryHelper* odomHelper, ros::Publisher* carInfo_pub) {
 	// update sensor data for later odometric calculations
 	odomHelper->updateSensorData(*sensorData);
-	ohA->updateSensorData(*sensorData);
 	// objects to store the odometry and its transform
 	geometry_msgs::TransformStamped odomTransform;
 	nav_msgs::Odometry odom;
 	pses_basis::CarInfo info;
-	// get current yaw angle
-	double yaw = odomHelper->getYaw();
+	sensor_msgs::Imu imu;
 	// since all odometry is 6DOF we'll need a quaternion created from yaw
-	geometry_msgs::Quaternion odomQuaternion = tf::createQuaternionMsgFromYaw(yaw);
+	geometry_msgs::Quaternion odomQuaternion;
+	odomHelper->getQuaternion(odomQuaternion);
 	//build odom transform for tf and the odometry message
 	buildOdometryTransformation(odomTransform, *sensorData, *odomHelper, odomQuaternion);
 	buildOdometryMessage(odom, *sensorData, *odomHelper, odomQuaternion);
 	buildInfoMessage(info, *sensorData, *odomHelper);
+	buildImuMessage(imu, *sensorData);
 	// send the transform
 	odomBroadcaster->sendTransform(odomTransform);
 	// publish the odometry message
 	odom_pub->publish(odom);
 	carInfo_pub->publish(info);
-	//ROS_INFO_STREAM(odomHelper->getDrivenDistance());
-	//ROS_INFO_STREAM("Yaw: " << ohA->getYaw() << " Pitch: " << ohA->getPitch() << " Roll: " << ohA->getRoll());
+	imu_pub->publish(imu);
 }
 
 int main(int argc, char **argv)
@@ -99,14 +113,15 @@ int main(int argc, char **argv)
 	pses_basis::Command cmd;
 	// objects needed for odometric calculations
 	OdometryHelper odomHelper;
-	OdometryHelperAlt ohA;
 	// Publishes the results of the odometry calculations to other ros nodes
 	ros::Publisher odom_pub = nh.advertise<nav_msgs::Odometry>("odom", 50);
+	ros::Publisher imu_pub = nh.advertise<sensor_msgs::Imu>("imu/data_raw", 50);
 	ros::Publisher carInfo_pub = nh.advertise<pses_basis::CarInfo>("pses_basis/car_info", 50);
 	// Here we subscribe to the sensor_data and command topics
 	ros::Subscriber sensor_data_sub = nh.subscribe<pses_basis::SensorData>("pses_basis/sensor_data", 1,
-							std::bind(dataCallback, std::placeholders::_1, &odomBroadcaster, &odom_pub, &odomHelper, &ohA, &carInfo_pub));
+							std::bind(dataCallback, std::placeholders::_1, &odomBroadcaster, &imu_pub, &odom_pub, &odomHelper, &carInfo_pub));
 	ros::Subscriber command_sub = nh.subscribe<pses_basis::Command>("pses_basis/command", 1, std::bind(commandCallback, std::placeholders::_1, &odomHelper));
+	ros::Subscriber imu_sub = nh.subscribe<sensor_msgs::Imu>("imu/data", 50, std::bind(imuCallback, std::placeholders::_1, &odomHelper));
 
 	ros::spin();
 

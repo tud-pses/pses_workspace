@@ -9,9 +9,6 @@
 #include <pses_basis/Command.h>
 #include <pses_basis/CarInfo.h>
 #include <pses_basis/SensorData.h>
-#include <random>
-#include <math.h>
-#include <pses_simulation/Kalman.h>
 
 void motionCommands(const geometry_msgs::Twist::ConstPtr& motionIn, geometry_msgs::Twist* motionOut, bool* flag){
         *motionOut = *motionIn;
@@ -61,18 +58,6 @@ int main(int argc, char **argv){
         ros::Publisher odomPub = nh.advertise<nav_msgs::Odometry>("odom", 10);
         ros::Publisher carInfoPub = nh.advertise<pses_basis::CarInfo>("pses_basis/car_info", 10);
         ros::Publisher sensorPub = nh.advertise<pses_basis::SensorData>("pses_basis/sensor_data", 10);
-
-        //spielwiese:
-        /*
-        Kalman k;
-        k.setAngle(0);
-        k.setQangle(0.99);
-        //k.setQbias(0.0003);
-        //k.setRmeasure(0.03);
-        std::random_device generator;
-        std::normal_distribution<double> distribution(0.0, M_PI/10.0);
-        double filtered = 0;
-        */
 
         // Loop starts here:
         ros::Rate loop_rate(100);
@@ -139,26 +124,6 @@ int main(int argc, char **argv){
                 // set accelerometer data
                 sensors.accelerometer_x = car.getAx();
                 sensors.accelerometer_y = car.getAy();
-
-                //Spielwiese
-                /*
-                double noisyWZ = car.getAngularVelocity() + distribution(generator);
-
-                filtered = k.getAngle(filtered*180.0/M_PI, noisyWZ*180.0/M_PI, car.getTimeStep())*M_PI/180.0;
-                double val = 0;
-                if(std::fabs(filtered/M_PI)>1.0){
-                  double multiple = filtered / M_PI;
-                  double sign = multiple / std::fabs(multiple);
-                  multiple = std::floor(std::fabs(multiple));
-                  val = filtered - sign*multiple*M_PI;
-                }else{
-                  val = filtered;
-                }
-
-
-                //noisyYaw = noisyYaw + noisyWZ * car.getTimeStep();
-                ROS_INFO("Perfect Yaw: %lf // Filtered Yaw: %lf", simPose[2],val);
-                */
 
                 // publish the messages over ROS
                 odomPub.publish(odom);

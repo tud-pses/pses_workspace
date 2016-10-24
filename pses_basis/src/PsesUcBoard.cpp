@@ -133,10 +133,18 @@ void PsesUcBoard::deactivateKinect(){
 void PsesUcBoard::getBoardError(std::string& msg){
 	readInputBuffer();
 	errorStack->pop(msg);
+	int strayBreak = msg.find("\n");
+	int strayEOT = msg.find("\x03");
+	if(strayBreak!=-1) msg.at(strayBreak)='/';
+	if(strayEOT!=-1) msg.at(strayEOT)='/';
 }
 void PsesUcBoard::getBoardMessage(std::string& msg){
 	readInputBuffer();
 	displayStack->pop(msg);
+	int strayBreak = msg.find("\n");
+	int strayEOT = msg.find("\x03");
+	if(strayBreak!=-1) msg.at(strayBreak)='/';
+	if(strayEOT!=-1) msg.at(strayEOT)='/';
 }
 
 bool PsesUcBoard::boardSensorValues(){
