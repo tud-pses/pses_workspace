@@ -303,53 +303,6 @@
      <string>m/s</string>
     </property>
    </widget>
-   <widget class="QLCDNumber" name="odom_w_z">
-    <property name="geometry">
-     <rect>
-      <x>30</x>
-      <y>80</y>
-      <width>64</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <weight>75</weight>
-      <bold>true</bold>
-      <strikeout>false</strikeout>
-      <kerning>true</kerning>
-     </font>
-    </property>
-    <property name="segmentStyle">
-     <enum>QLCDNumber::Flat</enum>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_9">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>80</y>
-      <width>21</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Wz</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_10">
-    <property name="geometry">
-     <rect>
-      <x>100</x>
-      <y>80</y>
-      <width>31</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>rad/s</string>
-    </property>
-   </widget>
    <widget class="QLabel" name="label_12">
     <property name="geometry">
      <rect>
@@ -551,7 +504,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>rad/s</string>
+     <string>deg/s</string>
     </property>
    </widget>
    <widget class="QLCDNumber" name="sensor_wz">
@@ -606,7 +559,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>rad/s</string>
+     <string>deg/s</string>
     </property>
    </widget>
    <widget class="QLCDNumber" name="sensor_wx">
@@ -640,7 +593,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>rad/s</string>
+     <string>deg/s</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_20">
@@ -1356,7 +1309,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>rad</string>
+     <string>deg</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_51">
@@ -1369,7 +1322,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>rad</string>
+     <string>deg</string>
     </property>
    </widget>
    <widget class="QLCDNumber" name="info_yaw">
@@ -1403,7 +1356,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>rad</string>
+     <string>deg</string>
     </property>
    </widget>
    <widget class="QLCDNumber" name="info_roll">

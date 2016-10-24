@@ -34,8 +34,6 @@ void odometryCallback(const odometry_data::ConstPtr& odom, Ui::Dashboard* ui){
         // absolute velocity components of robot
         ui->odom_v_x->display(odom->twist.twist.linear.x);
         ui->odom_v_y->display(odom->twist.twist.linear.y);
-        // angular velocity arround z-axis of robot ("turnrate") in deg/s
-        ui->odom_w_z->display(odom->twist.twist.angular.z);
         // absolute position components of robot
         ui->odom_p_x->display(odom->pose.pose.position.x);
         ui->odom_p_y->display(odom->pose.pose.position.y);
@@ -59,9 +57,9 @@ void sensorCallback(const sensor_data::ConstPtr& sensor, Ui::Dashboard* ui){
         ui->sensor_ay->display(sensor->accelerometer_y);
         ui->sensor_az->display(sensor->accelerometer_z);
         // gyroscope sensor (angular velocity arround x-/y-/z-axis)
-        ui->sensor_wx->display(sensor->angular_velocity_x);
-        ui->sensor_wy->display(sensor->angular_velocity_y);
-        ui->sensor_wz->display(sensor->angular_velocity_z);
+        ui->sensor_wx->display(sensor->angular_velocity_x/M_PI*180.0);
+        ui->sensor_wy->display(sensor->angular_velocity_y/M_PI*180.0);
+        ui->sensor_wz->display(sensor->angular_velocity_z/M_PI*180.0);
         ros::spinOnce();
 }
 
@@ -71,9 +69,9 @@ void infoCallback(const info_data::ConstPtr& info, Ui::Dashboard* ui){
         // over all driven distance
         ui->info_d_all->display(info->driven_distance);
         // rpy-Info
-        ui->info_roll->display(info->roll);
-        ui->info_pitch->display(info->pitch);
-        ui->info_yaw->display(info->yaw);
+        ui->info_roll->display(info->roll/M_PI*180.0);
+        ui->info_pitch->display(info->pitch/M_PI*180.0);
+        ui->info_yaw->display(info->yaw/M_PI*180.0);
 }
 
 void Dashboard::keyPressEvent(QKeyEvent *event){

@@ -9,6 +9,7 @@
 #include <pses_basis/SensorData.h>
 #include <nav_msgs/Odometry.h>
 #include <pses_basis/CarInfo.h>
+#include <math.h>
 
 typedef pses_basis::Command command_data;
 typedef pses_basis::SensorData sensor_data;
