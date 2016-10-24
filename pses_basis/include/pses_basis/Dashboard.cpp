@@ -18,6 +18,7 @@ Dashboard::Dashboard(ros::NodeHandle* nh, QWidget *parent) :
         connect(ui->maxSteering, SIGNAL(clicked()), this, SLOT(maxSteeringClicked()));
         connect(ui->minSteering, SIGNAL(clicked()), this, SLOT(minSteeringClicked()));
         connect(ui->centerSteering, SIGNAL(clicked()), this, SLOT(centerSteeringClicked()));
+        connect(ui->kinectToggle, SIGNAL(valueChanged(bool)), this, SLOT(toggleKinect(bool value)));
 
         timer = new QTimer(this);
         connect(timer, SIGNAL(timeout()), this, SLOT(pollNodeHandle()));
@@ -130,6 +131,13 @@ void Dashboard::keyPressEvent(QKeyEvent *event){
 void Dashboard::pollNodeHandle(){
         ros::spinOnce();
         timer->start(5);
+}
+
+void Dashboard::toggleKinect(bool value){
+        cmd.header.stamp = ros::Time::now();
+        cmd.enable_kinect=value;
+        robotCommand.publish(cmd);
+        ros::spinOnce();
 }
 
 void Dashboard::valueChangedSpeed(int value){

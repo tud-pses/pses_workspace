@@ -47,6 +47,7 @@ private:
         QTimer *timer;
 
 private slots:
+        void toggleKinect(bool value);
         void valueChangedSpeed(int value);
         void valueChangedSteering(int value);
         void maxSpeedClicked();
