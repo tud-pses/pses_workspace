@@ -2,10 +2,10 @@
 
 PsesUcBoard::PsesUcBoard(const unsigned int baudRate, const std::string deviceName) : baudRate(baudRate), deviceName(deviceName){
 	connected = false;
-	errorStack = new InputStack(100);
-	responseStack = new InputStack(100);
-	sensorGroupStack = new InputStack(100);
-	displayStack = new InputStack(100);
+	errorStack = new InputStack(10);
+	responseStack = new InputStack(20);
+	sensorGroupStack = new InputStack(20);
+	displayStack = new InputStack(10);
 	carID = -1;
 }
 PsesUcBoard::~PsesUcBoard() {
@@ -23,6 +23,36 @@ void PsesUcBoard::initUcBoard(const unsigned int serialTimeout){
 	setSteering(0);
 	setMotor(0);
 	queryCarID();
+	//generate sensor groups
+    Board::SensorGroup sg;
+    std::string params;
+    //US-Sensor Group
+    sg = {Board::rangeSensorLeft, Board::rangeSensorFront, Board::rangeSensorRight};
+    params = "~ALL=5";
+    sensorGroups.push_back(sg);
+    setSensorGroup(sg, 1, params);
+    //Accel-Sensor Group
+    sg = {Board::accelerometerX, Board::accelerometerY, Board::accelerometerZ};
+    params = "~SKIP=8";
+    sensorGroups.push_back(sg);
+    setSensorGroup(sg, 2, params);
+    //Gyro-Sensor Group
+    sg = {Board::gyroscopeX, Board::gyroscopeY, Board::gyroscopeZ};
+    params = "~SKIP=8";
+    sensorGroups.push_back(sg);
+    setSensorGroup(sg, 3, params);
+    //Hall-Sensor Group
+    sg = {Board::hallSensorDT, Board::hallSensorDTFull, Board::hallSensorCount};
+    params = "~ALL=5";
+    sensorGroups.push_back(sg);
+    setSensorGroup(sg, 4, params);
+    //Misc Group
+    sg = {Board::batteryVoltageSystem, Board::batteryVoltageMotor};
+    params = "~ALL=500";
+    sensorGroups.push_back(sg);
+    setSensorGroup(sg, 5, params);
+
+    startSensors();
 }
 void PsesUcBoard::setSteering(const int level){
 	if(level > 50 || level <-50){
@@ -39,7 +69,6 @@ void PsesUcBoard::setSteering(const int level){
 	ros::Time start = ros::Time::now();
 	do{
 		sendRequest(command, answer);
-        //ROS_INFO_STREAM("<<Command:"<<command<<">>"<<"<<Query:"<<check<<">>"<<"<<Answer:"<<answer<<">>");
 	}while(answer.find(check)==-1 && (ros::Time::now()-start).toSec()<=0.1);
 	if(answer.find(check)==-1){
 		throw UcBoardException(Board::COMMAND_STEERING_NR);
@@ -51,7 +80,7 @@ void PsesUcBoard::setMotor(const int level){
 	}
 	std::stringstream valueStream;
 	if(level == 0){
-		valueStream << "F " << -500;
+		valueStream << "F " << 0; // was -500 -> active braking, caused a malfunction where driving backwards was no longer possible
 	}else if(level>0){
 		valueStream << "F " << 50*level;
 
@@ -64,11 +93,41 @@ void PsesUcBoard::setMotor(const int level){
 	ros::Time start = ros::Time::now();
 	do{
 		sendRequest(command, answer);
-		//ROS_INFO_STREAM("<<Query:"<<value<<">>"<<"<<Answer:"<<answer<<">>");
+		
 	}while(answer.find(value)==-1 && (ros::Time::now()-start).toSec()<=0.1);
 	if(answer.find(value)==-1){
 		throw UcBoardException(Board::COMMAND_MOTOR_NR);
 	}
+}
+
+void PsesUcBoard::activateKinect(){
+	std::string command = "!VOUT ON";
+	std::string answer;
+	std::string value = ":ON";
+
+	ros::Time start = ros::Time::now();
+	do{
+		sendRequest(command, answer);
+	}while(answer.find(value)==-1 && (ros::Time::now()-start).toSec()<=0.1);
+	if(answer.find(value)==-1){
+		throw UcBoardException(Board::REQUEST_KINECT_ON);
+	}
+
+}
+
+void PsesUcBoard::deactivateKinect(){
+	std::string command = "!VOUT OFF";
+	std::string answer;
+	std::string value = ":OFF";
+
+	ros::Time start = ros::Time::now();
+	do{
+		sendRequest(command, answer);
+	}while(answer.find(value)==-1 && (ros::Time::now()-start).toSec()<=0.1);
+	if(answer.find(value)==-1){
+		throw UcBoardException(Board::REQUEST_KINECT_ON);
+	}
+
 }
 
 void PsesUcBoard::getBoardError(std::string& msg){
@@ -78,6 +137,11 @@ void PsesUcBoard::getBoardError(std::string& msg){
 void PsesUcBoard::getBoardMessage(std::string& msg){
 	readInputBuffer();
 	displayStack->pop(msg);
+}
+
+bool PsesUcBoard::boardSensorValues(){
+	readInputBuffer();
+	return !sensorGroupStack->isEmpty();
 }
 
 bool PsesUcBoard::boardErrors(){
@@ -90,29 +154,6 @@ bool PsesUcBoard::boardMessages(){
 	return !displayStack->isEmpty();
 }
 
-void PsesUcBoard::emptyAllStacks(){
-	std::string out;
-	while(!errorStack->isEmpty()){
-		errorStack->pop(out);
-		ROS_INFO_STREAM("<<Error: "<<out<<" >>");
-		out="";
-	}
-	while(!responseStack->isEmpty()){
-		responseStack->pop(out);
-		ROS_INFO_STREAM("<<Response: "<<out<<" >>");
-		out="";
-	}
-	while(!sensorGroupStack->isEmpty()){
-		sensorGroupStack->pop(out);
-		ROS_INFO_STREAM("<<Group: "<<out<<" >>");
-		out="";
-	}
-	while(!displayStack->isEmpty()){
-		displayStack->pop(out);
-		ROS_INFO_STREAM("<<Display: "<<out<<" >>");
-		out="";
-	}
-}
 void PsesUcBoard::queryCarID(){
 	std::string command ="?ID";
 	std::string answer;
@@ -120,6 +161,7 @@ void PsesUcBoard::queryCarID(){
 	do{
 		sendRequest(command, answer);
 		try{
+			answer = answer.substr(1, answer.size()-1);
 			carID = std::stoi(answer);
 		}catch(std::exception& e){
 			carID = -1;
@@ -155,13 +197,11 @@ void PsesUcBoard::sendRequest(const std::string& req, std::string& answer){
 	if(!connected){
 		throw UcBoardException(Board::CONNECTION_NOT_ESTABLISHED);
 	}
-	//readInputBuffer();
 	send(req);
 	ros::Time start = ros::Time::now();
 	do{
 		readInputBuffer();
 		responseStack->pop(answer);
-		//ros::Duration(0.001).sleep();
 
 	}while(answer.size()==0 && (ros::Time::now()-start).toSec()<=0.05);
 
@@ -177,43 +217,31 @@ void PsesUcBoard::readInputBuffer(){
 	std::string input;
 		receive(input);
 		if(input.size()==0){
-			ROS_INFO_STREAM("<<RAW-zero: "<<input<<" size: "<< input.size() <<" >>");
 			input="";
-			//ros::Duration(0.001).sleep();
 			return;
 		}
 		if(input.find("\x03")==-1){
-			ROS_INFO_STREAM("<<RAW-broken: "<<input<<" size: "<< input.size() <<" >>");
 			input="";
-			//ros::Duration(0.001).sleep();
 			return;
 		}
 		if(input.find("##")!=-1 && input.find(":")!=-1){
-			ROS_INFO_STREAM("<<group: "<<input<<" size: "<< input.size() <<" >>");
 			sensorGroupStack->push(input);
 			input="";
-			//ros::Duration(0.001).sleep();
 			return;
 		}
 		if(input.find(":")!=-1 && input.find("##")==-1){
-			ROS_INFO_STREAM("<<response: "<<input<<" size: "<< input.size() <<" >>");
 			responseStack->push(input);
 			input="";
-			//ros::Duration(0.001).sleep();
 			return;
 		}
 		if(input.find("'")!=-1 && input.find("ERR")!=-1){
-			ROS_INFO_STREAM("<<error: "<<input<<" size: "<< input.size() <<" >>");
 			errorStack->push(input);
 			input="";
-			//ros::Duration(0.001).sleep();
 			return;
 		}
 		if(input.find("'")!=-1 && input.find("ERR")==-1){
-			ROS_INFO_STREAM("<<display: "<<input<<" size: "<< input.size() <<" >>");
 			displayStack->push(input);
 			input="";
-			//ros::Duration(0.001).sleep();
 			return;
 		}
 
@@ -257,8 +285,6 @@ void PsesUcBoard::deactivateUCBoard(){
 	setMotor(0);
 	stopSensors();
 	reset();
-	//send stop daq
-	//send reset
 	}
 
 	void PsesUcBoard::setSensorGroup(const Board::SensorGroup& sensors, const int numOfGroup, const std::string& parameter){
@@ -276,7 +302,6 @@ void PsesUcBoard::deactivateUCBoard(){
 		ros::Time start = ros::Time::now();
 		do{
 			sendRequest(command.str(), answer);
-			//ROS_INFO_STREAM("<<Query:"<<value<<">>"<<"<<Answer:"<<answer<<">>");
 		}while(answer.find(value)==-1 && (ros::Time::now()-start).toSec()<=0.1);
 		if(answer.find(value)==-1){
 			throw UcBoardException(Board::REQUEST_NO_GROUP);
@@ -287,12 +312,11 @@ void PsesUcBoard::deactivateUCBoard(){
 	void PsesUcBoard::startSensors(){
 		std::string command = "!DAQ START";
 		std::string answer;
-		std::string value = ":ok";
+		std::string value = ":started";
 
 		ros::Time start = ros::Time::now();
 		do{
 			sendRequest(command, answer);
-			//ROS_INFO_STREAM("<<Query:"<<value<<">>"<<"<<Answer:"<<answer<<">>");
 		}while(answer.find(value)==-1 && (ros::Time::now()-start).toSec()<=0.1);
 		if(answer.find(value)==-1){
 			throw UcBoardException(Board::REQUEST_NO_START);
@@ -303,12 +327,11 @@ void PsesUcBoard::deactivateUCBoard(){
 	void PsesUcBoard::stopSensors(){
 		std::string command = "!DAQ STOP";
 		std::string answer;
-		std::string value = ":ok";
+		std::string value = ":stopped";
 
 		ros::Time start = ros::Time::now();
 		do{
 			sendRequest(command, answer);
-			//ROS_INFO_STREAM("<<Query:"<<value<<">>"<<"<<Answer:"<<answer<<">>");
 		}while(answer.find(value)==-1 && (ros::Time::now()-start).toSec()<=0.1);
 		if(answer.find(value)==-1){
 			throw UcBoardException(Board::REQUEST_NO_STOP);
@@ -333,10 +356,10 @@ void PsesUcBoard::deactivateUCBoard(){
 		int idBegin = start+2;
 		int idLength = rawData.find(":")-idBegin;
 		try{
-				groupID = std::stoi(rawData.substr(idBegin, idLength));
-				}catch(std::exception& e){
-					throw UcBoardException(Board::SENSOR_ID_INVALID);
-				}
+			groupID = std::stoi(rawData.substr(idBegin, idLength));
+		}catch(std::exception& e){
+			throw UcBoardException(Board::SENSOR_ID_INVALID);
+		}
 		//remove preamble and trails
 		start = idBegin+idLength+1;
 		int substrLength = end-start;
@@ -358,14 +381,23 @@ void PsesUcBoard::deactivateUCBoard(){
 			nextSensor = rawData.find(" | ");
 			if(nextSensor<0){
 				try{
-					sensorValue = std::stoi(rawData);
+					if(rawData.find("[") != std::string::npos && rawData.find("]") != std::string::npos){
+						sensorValue = std::numeric_limits<int>::quiet_NaN();
+					}else{
+						sensorValue = std::stoi(rawData);
+					}
 					assignSensorValue(sensorMessage, sensorValue, sensorGroups[groupID-1][sensorCount]);
 				}catch(std::exception& e){
 					throw UcBoardException(Board::SENSOR_PARSER_INVALID);
 				}
 			}else{
 				try{
-					sensorValue = std::stoi(rawData.substr(0, nextSensor));
+					std::string current = rawData.substr(0, nextSensor);
+					if(current.find("[") != std::string::npos && current.find("]") != std::string::npos){
+						sensorValue = std::numeric_limits<int>::quiet_NaN();
+					}else{
+						sensorValue = std::stoi(current);
+					}
 					assignSensorValue(sensorMessage, sensorValue, sensorGroups[groupID-1][sensorCount]);
 					sensorCount++;
 					start = nextSensor+3;

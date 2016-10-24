@@ -24,6 +24,8 @@ namespace Board {
 	const std::string REQUEST_NO_GROUP = "Sensor group not set.";
 	const std::string REQUEST_NO_START = "Request to start groups not send.";
 	const std::string REQUEST_NO_STOP = "Request to stop groups not send.";
+	const std::string REQUEST_KINECT_ON = "Request to activate Kinect not send.";
+	const std::string REQUEST_KINECT_OFF = "Request to deactivate Kinect not send.";
 	const std::string SENSOR_PARSER_INVALID = "Invalid sensor group message.";
 	const std::string SENSOR_ID_INVALID = "Invalid sensor group ID.";
 
@@ -61,13 +63,15 @@ class PsesUcBoard{
 	void initUcBoard(const unsigned int serialTimeout=5);
 	void setSteering(const int level);
 	void setMotor(const int level);
+	void activateKinect();
+	void deactivateKinect();
 	void getSensorData(pses_basis::SensorData& data);
+	bool boardSensorValues();
 	bool boardErrors();
 	bool boardMessages();
 	void getBoardError(std::string& msg);
 	void getBoardMessage(std::string& msg);
 	void deactivateUCBoard();
-	void emptyAllStacks();
 
 	private:
 	unsigned int baudRate;

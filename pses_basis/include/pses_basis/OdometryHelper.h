@@ -90,7 +90,8 @@ private:
             return  drivingDirection * DRIVEN_DISTANCE_PER_TICK / sensorData.hall_sensor_dt;
         }else{
             if(prevDirection!=drivingDirection) return 0;
-            else return speed;
+            if(drivingDirection == 0) return 0;
+            return speed;
         }
 	}
 	inline double calcYaw() {

@@ -34,6 +34,10 @@ class InputStack{
 		return stack.size()==0;
 	}
 
+	inline int size(){
+		return stack.size();
+	}
+
 	private:
 	unsigned int maxSize;
 	std::list<std::string> stack;
