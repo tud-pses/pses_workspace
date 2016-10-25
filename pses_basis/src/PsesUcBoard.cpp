@@ -61,16 +61,16 @@ void PsesUcBoard::setSteering(const int level){
 	std::stringstream valueStream;
 	std::stringstream checkStream;
 	valueStream << level*(-20);
-	checkStream << level*(-10);
+	//checkStream << level*(-10);
 	std::string value = valueStream.str();
-	std::string check = checkStream.str();
+  //std::string check = checkStream.str();
 	std::string command = "!STEER " + value;
 	std::string answer;
 	ros::Time start = ros::Time::now();
 	do{
 		sendRequest(command, answer);
-	}while(answer.find(check)==-1 && (ros::Time::now()-start).toSec()<=0.1);
-	if(answer.find(check)==-1){
+	}while(answer.find(value)==-1 && (ros::Time::now()-start).toSec()<=0.1);
+	if(answer.find(value)==-1){
 		throw UcBoardException(Board::COMMAND_STEERING_NR);
 	}
 }
@@ -93,7 +93,7 @@ void PsesUcBoard::setMotor(const int level){
 	ros::Time start = ros::Time::now();
 	do{
 		sendRequest(command, answer);
-		
+
 	}while(answer.find(value)==-1 && (ros::Time::now()-start).toSec()<=0.1);
 	if(answer.find(value)==-1){
 		throw UcBoardException(Board::COMMAND_MOTOR_NR);
