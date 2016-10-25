@@ -33,12 +33,14 @@ void PsesUcBoard::initUcBoard(const unsigned int serialTimeout){
     setSensorGroup(sg, 1, params);
     //Accel-Sensor Group
     sg = {Board::accelerometerX, Board::accelerometerY, Board::accelerometerZ};
-    params = "~SKIP=8";
+    //params = "~SKIP=8";
+		params = "~TS=10 ~AVG";
     sensorGroups.push_back(sg);
     setSensorGroup(sg, 2, params);
     //Gyro-Sensor Group
     sg = {Board::gyroscopeX, Board::gyroscopeY, Board::gyroscopeZ};
-    params = "~SKIP=8";
+    //params = "~SKIP=8";
+		params = "~TS=10 ~AVG";
     sensorGroups.push_back(sg);
     setSensorGroup(sg, 3, params);
     //Hall-Sensor Group
