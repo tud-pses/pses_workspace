@@ -22,7 +22,7 @@ Dashboard::Dashboard(ros::NodeHandle* nh, QWidget *parent) :
 
         timer = new QTimer(this);
         connect(timer, SIGNAL(timeout()), this, SLOT(pollNodeHandle()));
-        timer->start(5);
+        timer->start(33);
 
 }
 
@@ -38,7 +38,7 @@ void odometryCallback(const odometry_data::ConstPtr& odom, Ui::Dashboard* ui){
         // absolute position components of robot
         ui->odom_p_x->display(odom->pose.pose.position.x);
         ui->odom_p_y->display(odom->pose.pose.position.y);
-        ros::spinOnce();
+        //ros::spinOnce();
 }
 
 void sensorCallback(const sensor_data::ConstPtr& sensor, Ui::Dashboard* ui){
@@ -61,7 +61,7 @@ void sensorCallback(const sensor_data::ConstPtr& sensor, Ui::Dashboard* ui){
         ui->sensor_wx->display(sensor->angular_velocity_x/M_PI*180.0);
         ui->sensor_wy->display(sensor->angular_velocity_y/M_PI*180.0);
         ui->sensor_wz->display(sensor->angular_velocity_z/M_PI*180.0);
-        ros::spinOnce();
+        //ros::spinOnce();
 }
 
 void infoCallback(const info_data::ConstPtr& info, Ui::Dashboard* ui){
@@ -128,7 +128,7 @@ void Dashboard::keyPressEvent(QKeyEvent *event){
 
 void Dashboard::pollNodeHandle(){
         ros::spinOnce();
-        timer->start(5);
+        timer->start(33);
 }
 
 void Dashboard::toggleKinect(){
