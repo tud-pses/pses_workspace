@@ -81,12 +81,13 @@ class PsesUcBoard{
 	bool connected;
 	InputStack* errorStack;
 	InputStack* responseStack;
-	InputStack* sensorGroupStack;
 	InputStack* displayStack;
 	int carID;
 	Board::SensorGroups sensorGroups;
 	pses_basis::SensorData sensorMessage;
 	Board::GroupMessages groupStacks;
+	int motorLevel;
+	int steeringLevel;
 	bool kinectOn;
 
 	void connect(const unsigned int serialTimeout);

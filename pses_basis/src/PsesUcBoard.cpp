@@ -2,10 +2,12 @@
 
 PsesUcBoard::PsesUcBoard(const unsigned int baudRate, const std::string deviceName) : baudRate(baudRate), deviceName(deviceName){
 	connected = false;
-	errorStack = new InputStack(10);
-	responseStack = new InputStack(20);
-	displayStack = new InputStack(10);
+	errorStack = new InputStack(30);
+	responseStack = new InputStack(30);
+	displayStack = new InputStack(30);
 	carID = -1;
+	motorLevel = 0;
+	steeringLevel = 0;
 	kinectOn = false;
 }
 PsesUcBoard::~PsesUcBoard() {
@@ -34,14 +36,12 @@ void PsesUcBoard::initUcBoard(const unsigned int serialTimeout){
     setSensorGroup(sg, 1, params);
     //Accel-Sensor Group
     sg = {Board::accelerometerX, Board::accelerometerY, Board::accelerometerZ};
-    //params = "~SKIP=8";
 		params = "~TS=10 ~AVG";
     sensorGroups.push_back(sg);
 		groupStacks.push_back(InputStack(20));
     setSensorGroup(sg, 2, params);
     //Gyro-Sensor Group
     sg = {Board::gyroscopeX, Board::gyroscopeY, Board::gyroscopeZ};
-    //params = "~SKIP=8";
 		params = "~TS=10 ~AVG";
     sensorGroups.push_back(sg);
 		groupStacks.push_back(InputStack(20));
@@ -65,26 +65,33 @@ void PsesUcBoard::setSteering(const int level){
 	if(level > 50 || level <-50){
 		throw UcBoardException(Board::COMMAND_STEERING_OOB);
 	}
+
+	if(level == steeringLevel) return;
+
 	std::stringstream valueStream;
 	std::stringstream checkStream;
 	valueStream << level*(-20);
-	//checkStream << level*(-10);
 	std::string value = valueStream.str();
-  //std::string check = checkStream.str();
 	std::string command = "!STEER " + value;
 	std::string answer;
 	ros::Time start = ros::Time::now();
 	do{
 		sendRequest(command, answer);
 	}while(answer.find(value)==-1 && (ros::Time::now()-start).toSec()<=0.1);
+
 	if(answer.find(value)==-1){
 		throw UcBoardException(Board::COMMAND_STEERING_NR);
 	}
+
+	steeringLevel = level;
 }
 void PsesUcBoard::setMotor(const int level){
 	if(level > 20 || level <-20){
 		throw UcBoardException(Board::COMMAND_MOTOR_OOB);
 	}
+
+	if(level == motorLevel) return;
+
 	std::stringstream valueStream;
 	if(level == 0){
 		valueStream << "F " << 0; // was -500 -> active braking, caused a malfunction where driving backwards was no longer possible
@@ -105,6 +112,8 @@ void PsesUcBoard::setMotor(const int level){
 	if(answer.find(value)==-1){
 		throw UcBoardException(Board::COMMAND_MOTOR_NR);
 	}
+
+	motorLevel = level;
 }
 
 void PsesUcBoard::activateKinect(){
@@ -157,12 +166,7 @@ void PsesUcBoard::getBoardMessage(std::string& msg){
 	if(strayBreak!=-1) msg.at(strayBreak)='/';
 	if(strayEOT!=-1) msg.at(strayEOT)='/';
 }
-/*
-bool PsesUcBoard::boardSensorValues(){
-	readInputBuffer();
-	return !sensorGroupStack->isEmpty();
-}
-*/
+
 bool PsesUcBoard::boardErrors(){
 	readInputBuffer();
 	return !errorStack->isEmpty();
@@ -244,7 +248,6 @@ void PsesUcBoard::readInputBuffer(){
 			return;
 		}
 		if(input.find("##")!=-1 && input.find(":")!=-1){
-			//sensorGroupStack->push(input);
 			putGroupInStack(input);
 			input="";
 			return;
@@ -400,7 +403,7 @@ void PsesUcBoard::deactivateUCBoard(){
 
 		for(int groupID = 1; groupID<=groupStacks.size(); groupID++){
 			InputStack& group = groupStacks[groupID-1];
-			// get pop group data from stack
+			// pop group data from stack
 			// if stack empty -> skip group
 			std::string rawData;
 			group.pop(rawData);
