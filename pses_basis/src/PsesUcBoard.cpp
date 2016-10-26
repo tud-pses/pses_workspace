@@ -420,11 +420,10 @@ void PsesUcBoard::deactivateUCBoard(){
 		sensorMessage.hall_sensor_dt = std::numeric_limits<float>::quiet_NaN();
 		sensorMessage.hall_sensor_dt_full = std::numeric_limits<float>::quiet_NaN();
 
-		int groupID = 0;
+		//int groupID = 0;
 
-		for(auto group : groupStacks){
-			// set current group ID
-			groupID++;
+		for(int groupID = 1; groupID<groupStacks.size(); groupID++){
+			InputStack& group = groupStacks[groupID];
 			// get pop group data from stack
 			// if stack empty -> skip group
 			std::string rawData;

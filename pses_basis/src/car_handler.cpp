@@ -19,7 +19,7 @@ void checkBoardErrors(PsesUcBoard& board){
         }
     }catch(std::exception& e){
         ROS_ERROR("%s",e.what());
-    } 
+    }
 }
 
 void checkBoardMessages(PsesUcBoard& board){
@@ -31,7 +31,7 @@ void checkBoardMessages(PsesUcBoard& board){
         }
     }catch(std::exception& e){
         ROS_ERROR("%s",e.what());
-    }  
+    }
 }
 
 void commandCallback(const pses_basis::Command::ConstPtr& cmd, PsesUcBoard* board) {
@@ -65,7 +65,7 @@ int main(int argc, char **argv)
 
     ros::Subscriber command_sub = nh.subscribe<pses_basis::Command>("pses_basis/command", 10, std::bind(commandCallback, std::placeholders::_1, &board));
     ros::Publisher sensor_pub = nh.advertise<pses_basis::SensorData>("pses_basis/sensor_data", 10);
-    
+
     try{
         board.initUcBoard();
     }catch(std::exception& e){
@@ -74,17 +74,17 @@ int main(int argc, char **argv)
 
     checkBoardMessages(board);
     checkBoardErrors(board);
-    
+
     pses_basis::SensorData sensorValues;
 
-    ros::Rate loop_rate(200);
+    ros::Rate loop_rate(100);
     while(ros::ok()) {
 
     checkBoardErrors(board);
     checkBoardMessages(board);
     getSensorData(board, sensorValues);
     sensor_pub.publish(sensorValues);
-    
+
     ros::spinOnce();
     loop_rate.sleep();
 
