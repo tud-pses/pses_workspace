@@ -50,6 +50,7 @@ namespace Board {
 
 	typedef std::vector<SensorObject> SensorGroup;
   typedef std::vector<SensorGroup> SensorGroups;
+	typedef std::vector<InputStack> GroupMessages;
 
 	float degToRad(const float value) {
 			return value*M_PI/180;
@@ -66,7 +67,7 @@ class PsesUcBoard{
 	void activateKinect();
 	void deactivateKinect();
 	void getSensorData(pses_basis::SensorData& data);
-	bool boardSensorValues();
+	//bool boardSensorValues();
 	bool boardErrors();
 	bool boardMessages();
 	void getBoardError(std::string& msg);
@@ -85,6 +86,7 @@ class PsesUcBoard{
 	int carID;
 	Board::SensorGroups sensorGroups;
 	pses_basis::SensorData sensorMessage;
+	Board::GroupMessages groupStacks;
 
 	void connect(const unsigned int serialTimeout);
 	void send(const std::string& msg);
@@ -96,6 +98,7 @@ class PsesUcBoard{
 	void startSensors();
 	void stopSensors();
 	void setSensorGroup(const Board::SensorGroup& sensors, const int numOfGroup, const std::string& parameter);
+	void putGroupInStack(const std::string& groupMsg);
 	void assignSensorValue(pses_basis::SensorData& data, const int value , const Board::SensorObject& sensor);
 
 };

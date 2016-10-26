@@ -4,14 +4,14 @@ PsesUcBoard::PsesUcBoard(const unsigned int baudRate, const std::string deviceNa
 	connected = false;
 	errorStack = new InputStack(10);
 	responseStack = new InputStack(20);
-	sensorGroupStack = new InputStack(20);
+	//sensorGroupStack = new InputStack(20);
 	displayStack = new InputStack(10);
 	carID = -1;
 }
 PsesUcBoard::~PsesUcBoard() {
 	delete errorStack;
 	delete responseStack;
-	delete sensorGroupStack;
+	//delete sensorGroupStack;
 	delete displayStack;
 
 	if(connected){
@@ -30,28 +30,33 @@ void PsesUcBoard::initUcBoard(const unsigned int serialTimeout){
     sg = {Board::rangeSensorLeft, Board::rangeSensorFront, Board::rangeSensorRight};
     params = "~ALL=5";
     sensorGroups.push_back(sg);
+		groupStacks.push_back(InputStack(20));
     setSensorGroup(sg, 1, params);
     //Accel-Sensor Group
     sg = {Board::accelerometerX, Board::accelerometerY, Board::accelerometerZ};
     //params = "~SKIP=8";
 		params = "~TS=10 ~AVG";
     sensorGroups.push_back(sg);
+		groupStacks.push_back(InputStack(20));
     setSensorGroup(sg, 2, params);
     //Gyro-Sensor Group
     sg = {Board::gyroscopeX, Board::gyroscopeY, Board::gyroscopeZ};
     //params = "~SKIP=8";
 		params = "~TS=10 ~AVG";
     sensorGroups.push_back(sg);
+		groupStacks.push_back(InputStack(20));
     setSensorGroup(sg, 3, params);
     //Hall-Sensor Group
     sg = {Board::hallSensorDT, Board::hallSensorDTFull, Board::hallSensorCount};
     params = "~ALL=5";
     sensorGroups.push_back(sg);
+		groupStacks.push_back(InputStack(20));
     setSensorGroup(sg, 4, params);
     //Misc Group
     sg = {Board::batteryVoltageSystem, Board::batteryVoltageMotor};
     params = "~ALL=500";
     sensorGroups.push_back(sg);
+		groupStacks.push_back(InputStack(20));
     setSensorGroup(sg, 5, params);
 
     startSensors();
@@ -148,12 +153,12 @@ void PsesUcBoard::getBoardMessage(std::string& msg){
 	if(strayBreak!=-1) msg.at(strayBreak)='/';
 	if(strayEOT!=-1) msg.at(strayEOT)='/';
 }
-
+/*
 bool PsesUcBoard::boardSensorValues(){
 	readInputBuffer();
 	return !sensorGroupStack->isEmpty();
 }
-
+*/
 bool PsesUcBoard::boardErrors(){
 	readInputBuffer();
 	return !errorStack->isEmpty();
@@ -235,7 +240,8 @@ void PsesUcBoard::readInputBuffer(){
 			return;
 		}
 		if(input.find("##")!=-1 && input.find(":")!=-1){
-			sensorGroupStack->push(input);
+			//sensorGroupStack->push(input);
+			putGroupInStack(input);
 			input="";
 			return;
 		}
@@ -256,6 +262,8 @@ void PsesUcBoard::readInputBuffer(){
 		}
 
 }
+
+
 
 void PsesUcBoard::send(const std::string& msg) {
 	if(!connected){
@@ -348,8 +356,36 @@ void PsesUcBoard::deactivateUCBoard(){
 		}
 	}
 
+	void PsesUcBoard::putGroupInStack(const std::string& groupMsg){
+		if(groupMsg.size()==0){
+			return;
+		}
+		//string must identify as vaild sensor group
+		int start = groupMsg.find("##");
+		int end = groupMsg.find("\x03");
+		if(start<0 || end<0){
+			throw UcBoardException(Board::SENSOR_PARSER_INVALID);
+		}
+		//get group ID
+		int groupID = 0;
+		int idBegin = start+2;
+		int idLength = groupMsg.find(":")-idBegin;
+		try{
+			groupID = std::stoi(groupMsg.substr(idBegin, idLength));
+		}catch(std::exception& e){
+			throw UcBoardException(Board::SENSOR_ID_INVALID);
+		}
+		//remove preamble and trails
+		start = idBegin+idLength+1;
+		int substrLength = end-start;
+		std::string out = groupMsg.substr(idBegin+idLength+1, substrLength);
+		groupStacks[groupID-1].push(out);
+
+	}
+
   void PsesUcBoard::getSensorData(pses_basis::SensorData& data){
 		readInputBuffer();
+		/*
 		std::string rawData;
 		sensorGroupStack->pop(rawData);
 		if(rawData.size()==0){
@@ -374,6 +410,7 @@ void PsesUcBoard::deactivateUCBoard(){
 		start = idBegin+idLength+1;
 		int substrLength = end-start;
 		rawData = rawData.substr(idBegin+idLength+1, substrLength);
+		*/
 
 		//set message meta data
 		sensorMessage.header.seq++;
@@ -383,41 +420,51 @@ void PsesUcBoard::deactivateUCBoard(){
 		sensorMessage.hall_sensor_dt = std::numeric_limits<float>::quiet_NaN();
 		sensorMessage.hall_sensor_dt_full = std::numeric_limits<float>::quiet_NaN();
 
-		//parse sensor values
-		int sensorCount = 0;
-		int nextSensor = -1;
-		int sensorValue = 0;
-		do{
-			nextSensor = rawData.find(" | ");
-			if(nextSensor<0){
-				try{
-					if(rawData.find("[") != std::string::npos && rawData.find("]") != std::string::npos){
-						sensorValue = std::numeric_limits<int>::quiet_NaN();
-					}else{
-						sensorValue = std::stoi(rawData);
+		int groupID = 0;
+
+		for(auto group : groupStacks){
+			// set current group ID
+			groupID++;
+			// get pop group data from stack
+			// if stack empty -> skip group
+			std::string rawData;
+			group.pop(rawData);
+			if(rawData.size()==0) continue;
+			//parse sensor values
+			int sensorCount = 0;
+			int nextSensor = -1;
+			int sensorValue = 0;
+			do{
+				nextSensor = rawData.find(" | ");
+				if(nextSensor<0){
+					try{
+						if(rawData.find("[") != std::string::npos && rawData.find("]") != std::string::npos){
+							sensorValue = std::numeric_limits<int>::quiet_NaN();
+						}else{
+							sensorValue = std::stoi(rawData);
+						}
+						assignSensorValue(sensorMessage, sensorValue, sensorGroups[groupID-1][sensorCount]);
+					}catch(std::exception& e){
+						throw UcBoardException(Board::SENSOR_PARSER_INVALID);
 					}
-					assignSensorValue(sensorMessage, sensorValue, sensorGroups[groupID-1][sensorCount]);
-				}catch(std::exception& e){
-					throw UcBoardException(Board::SENSOR_PARSER_INVALID);
-				}
-			}else{
-				try{
-					std::string current = rawData.substr(0, nextSensor);
-					if(current.find("[") != std::string::npos && current.find("]") != std::string::npos){
-						sensorValue = std::numeric_limits<int>::quiet_NaN();
-					}else{
-						sensorValue = std::stoi(current);
+				}else{
+					try{
+						std::string current = rawData.substr(0, nextSensor);
+						if(current.find("[") != std::string::npos && current.find("]") != std::string::npos){
+							sensorValue = std::numeric_limits<int>::quiet_NaN();
+						}else{
+							sensorValue = std::stoi(current);
+						}
+						assignSensorValue(sensorMessage, sensorValue, sensorGroups[groupID-1][sensorCount]);
+						sensorCount++;
+						rawData = rawData.substr(nextSensor+3, rawData.size());
+					}catch(std::exception& e){
+						throw UcBoardException(Board::SENSOR_PARSER_INVALID);
 					}
-					assignSensorValue(sensorMessage, sensorValue, sensorGroups[groupID-1][sensorCount]);
-					sensorCount++;
-					start = nextSensor+3;
-					substrLength = rawData.size();
-					rawData = rawData.substr(start, substrLength);
-				}catch(std::exception& e){
-					throw UcBoardException(Board::SENSOR_PARSER_INVALID);
 				}
-			}
-		}while(nextSensor>=0);
+			}while(nextSensor>=0);
+
+		}
 		data = sensorMessage;
 	}
 
