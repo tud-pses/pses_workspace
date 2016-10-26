@@ -422,8 +422,8 @@ void PsesUcBoard::deactivateUCBoard(){
 
 		//int groupID = 0;
 
-		for(int groupID = 1; groupID<groupStacks.size(); groupID++){
-			InputStack& group = groupStacks[groupID];
+		for(int groupID = 1; groupID<=groupStacks.size(); groupID++){
+			InputStack& group = groupStacks[groupID-1];
 			// get pop group data from stack
 			// if stack empty -> skip group
 			std::string rawData;
