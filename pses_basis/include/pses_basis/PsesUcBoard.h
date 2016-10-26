@@ -87,6 +87,7 @@ class PsesUcBoard{
 	Board::SensorGroups sensorGroups;
 	pses_basis::SensorData sensorMessage;
 	Board::GroupMessages groupStacks;
+	bool kinectOn;
 
 	void connect(const unsigned int serialTimeout);
 	void send(const std::string& msg);

@@ -1,5 +1,4 @@
 #include <ros/ros.h>
-#include <pses_basis/SerialCommunication.h>
 #include <pses_basis/SensorData.h>
 #include <pses_basis/Command.h>
 #include <pses_basis/PsesUcBoard.h>
@@ -45,15 +44,6 @@ void commandCallback(const pses_basis::Command::ConstPtr& cmd, PsesUcBoard* boar
     }catch(std::exception& e){
         ROS_ERROR("%s",e.what());
     }
-    try{
-        if(cmd->enable_kinect){
-            board->activateKinect();
-        }else{
-            board->deactivateKinect();
-        }
-    }catch(std::exception& e){
-        ROS_ERROR("%s",e.what());
-    }
 }
 
 int main(int argc, char **argv)
@@ -76,9 +66,21 @@ int main(int argc, char **argv)
     checkBoardErrors(board);
 
     pses_basis::SensorData sensorValues;
+    bool kinect = true;
 
     ros::Rate loop_rate(200);
     while(ros::ok()) {
+
+    nh.getParam("kinect_on", kinect);
+    try{
+      if(kinect){
+        board.activateKinect();
+      }else{
+        board.deactivateKinect();
+      }
+    }catch(std::exception& e){
+      ROS_ERROR("%s",e.what());
+    }
 
     checkBoardErrors(board);
     checkBoardMessages(board);

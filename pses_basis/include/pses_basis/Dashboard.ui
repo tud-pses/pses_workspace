@@ -1484,6 +1484,9 @@
     <property name="text">
      <string>Kinect On/Off</string>
     </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
    </widget>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>

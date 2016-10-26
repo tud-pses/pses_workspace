@@ -22,7 +22,7 @@ Dashboard::Dashboard(ros::NodeHandle* nh, QWidget *parent) :
 
         timer = new QTimer(this);
         connect(timer, SIGNAL(timeout()), this, SLOT(pollNodeHandle()));
-        timer->start(33);
+        timer->start(50);
 
 }
 
@@ -128,13 +128,12 @@ void Dashboard::keyPressEvent(QKeyEvent *event){
 
 void Dashboard::pollNodeHandle(){
         ros::spinOnce();
-        timer->start(33);
+        timer->start(50);
 }
 
 void Dashboard::toggleKinect(){
         cmd.header.stamp = ros::Time::now();
-        cmd.enable_kinect=ui->kinectToggle->isChecked();
-        robotCommand.publish(cmd);
+        nh->setParam("kinect_on", ui->kinectToggle->isChecked());
         ros::spinOnce();
 }
 

@@ -21,7 +21,7 @@ Dashboard::Dashboard(ros::NodeHandle* nh, QWidget *parent) :
 
         timer = new QTimer(this);
         connect(timer, SIGNAL(timeout()), this, SLOT(pollNodeHandle()));
-        timer->start(5);
+        timer->start(50);
 
 }
 
@@ -127,7 +127,7 @@ void Dashboard::keyPressEvent(QKeyEvent *event){
 
 void Dashboard::pollNodeHandle(){
         ros::spinOnce();
-        timer->start(5);
+        timer->start(50);
 }
 
 void Dashboard::valueChangedSpeed(int value){

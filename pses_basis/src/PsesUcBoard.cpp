@@ -4,14 +4,14 @@ PsesUcBoard::PsesUcBoard(const unsigned int baudRate, const std::string deviceNa
 	connected = false;
 	errorStack = new InputStack(10);
 	responseStack = new InputStack(20);
-	//sensorGroupStack = new InputStack(20);
 	displayStack = new InputStack(10);
 	carID = -1;
+	kinectOn = false;
 }
 PsesUcBoard::~PsesUcBoard() {
+	if(kinectOn) deactivateKinect();
 	delete errorStack;
 	delete responseStack;
-	//delete sensorGroupStack;
 	delete displayStack;
 
 	if(connected){
@@ -108,6 +108,7 @@ void PsesUcBoard::setMotor(const int level){
 }
 
 void PsesUcBoard::activateKinect(){
+	if(kinectOn) return;
 	std::string command = "!VOUT ON";
 	std::string answer;
 	std::string value = ":ON";
@@ -119,10 +120,12 @@ void PsesUcBoard::activateKinect(){
 	if(answer.find(value)==-1){
 		throw UcBoardException(Board::REQUEST_KINECT_ON);
 	}
+	kinectOn = true;
 
 }
 
 void PsesUcBoard::deactivateKinect(){
+	if(!kinectOn) return;
 	std::string command = "!VOUT OFF";
 	std::string answer;
 	std::string value = ":OFF";
@@ -134,6 +137,7 @@ void PsesUcBoard::deactivateKinect(){
 	if(answer.find(value)==-1){
 		throw UcBoardException(Board::REQUEST_KINECT_ON);
 	}
+	kinectOn = false;
 
 }
 
@@ -385,32 +389,6 @@ void PsesUcBoard::deactivateUCBoard(){
 
   void PsesUcBoard::getSensorData(pses_basis::SensorData& data){
 		readInputBuffer();
-		/*
-		std::string rawData;
-		sensorGroupStack->pop(rawData);
-		if(rawData.size()==0){
-			return;
-		}
-		//string must identify as vaild sensor group
-		int start = rawData.find("##");
-		int end = rawData.find("\x03");
-		if(start<0 || end<0){
-			throw UcBoardException(Board::SENSOR_PARSER_INVALID);
-		}
-		//get group ID
-		int groupID = 0;
-		int idBegin = start+2;
-		int idLength = rawData.find(":")-idBegin;
-		try{
-			groupID = std::stoi(rawData.substr(idBegin, idLength));
-		}catch(std::exception& e){
-			throw UcBoardException(Board::SENSOR_ID_INVALID);
-		}
-		//remove preamble and trails
-		start = idBegin+idLength+1;
-		int substrLength = end-start;
-		rawData = rawData.substr(idBegin+idLength+1, substrLength);
-		*/
 
 		//set message meta data
 		sensorMessage.header.seq++;
@@ -419,8 +397,6 @@ void PsesUcBoard::deactivateUCBoard(){
 		//reset wheel measurements
 		sensorMessage.hall_sensor_dt = std::numeric_limits<float>::quiet_NaN();
 		sensorMessage.hall_sensor_dt_full = std::numeric_limits<float>::quiet_NaN();
-
-		//int groupID = 0;
 
 		for(int groupID = 1; groupID<=groupStacks.size(); groupID++){
 			InputStack& group = groupStacks[groupID-1];

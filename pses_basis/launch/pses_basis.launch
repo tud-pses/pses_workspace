@@ -4,7 +4,9 @@
 
 	<arg name="dashboard" default="true"/>
 	<!-- Run the necessary nodes to bring up the car -->
-	<node pkg="pses_basis" type="car_handler" name="car_handler" output="screen"/>
+	<node pkg="pses_basis" type="car_handler" name="car_handler" output="screen">
+		<param name="kinect_on" value="true" />
+	</node>
 	<node pkg="pses_basis" type="car_odometry" name="car_odometry" output="screen"/>
 	<node pkg="imu_complementary_filter" type="complementary_filter_node" name="imu_filter" output="screen">
 		<param name="do_bias_estimation" value="true" />
