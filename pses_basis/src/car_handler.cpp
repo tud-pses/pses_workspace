@@ -9,6 +9,22 @@ void getSensorData(PsesUcBoard& board, pses_basis::SensorData& sensorValues){
     }catch(std::exception& e){
     }
 }
+void checkKinectParameter(ros::NodeHandle& nh, PsesUcBoard& board, ros::Time& timer, double seconds){
+  if((ros::Time::now()-timer).toSec()>seconds){
+    bool kinect = true;
+    nh.getParam("kinect_on", kinect);
+    timer = ros::Time::now();
+    try{
+      if(kinect){
+        board.activateKinect();
+      }else{
+        board.deactivateKinect();
+      }
+    }catch(std::exception& e){
+      ROS_ERROR("%s",e.what());
+    }
+  }
+}
 void checkBoardErrors(PsesUcBoard& board){
     try{
         if(board.boardErrors()){
@@ -20,7 +36,6 @@ void checkBoardErrors(PsesUcBoard& board){
         ROS_ERROR("%s",e.what());
     }
 }
-
 void checkBoardMessages(PsesUcBoard& board){
     try{
         if(board.boardMessages()){
@@ -32,7 +47,6 @@ void checkBoardMessages(PsesUcBoard& board){
         ROS_ERROR("%s",e.what());
     }
 }
-
 void commandCallback(const pses_basis::Command::ConstPtr& cmd, PsesUcBoard* board) {
     try{
         board->setSteering(cmd->steering_level);
@@ -66,31 +80,21 @@ int main(int argc, char **argv)
     checkBoardErrors(board);
 
     pses_basis::SensorData sensorValues;
-    bool kinect = true;
     std::string firmwareVersion = board.getFirmwareVersion();
     int carID = board.getId();
     nh.setParam("firmware_version", firmwareVersion);
     nh.setParam("car_id", carID);
 
-
+    ros::Time timer = ros::Time::now();
     ros::Rate loop_rate(200);
     while(ros::ok()) {
-
-    nh.getParam("kinect_on", kinect);
-    try{
-      if(kinect){
-        board.activateKinect();
-      }else{
-        board.deactivateKinect();
-      }
-    }catch(std::exception& e){
-      ROS_ERROR("%s",e.what());
-    }
 
     checkBoardErrors(board);
     checkBoardMessages(board);
     getSensorData(board, sensorValues);
     sensor_pub.publish(sensorValues);
+
+    checkKinectParameter(nh, board, timer, 0.5);
 
     ros::spinOnce();
     loop_rate.sleep();
