@@ -6,6 +6,7 @@ PsesUcBoard::PsesUcBoard(const unsigned int baudRate, const std::string deviceNa
 	responseStack = new InputStack(30);
 	displayStack = new InputStack(30);
 	carID = -1;
+	firmwareVersion = "no_info";
 	motorLevel = -99999;
 	steeringLevel = -99999;
 	kinectOn = false;
@@ -25,6 +26,7 @@ void PsesUcBoard::initUcBoard(const unsigned int serialTimeout){
 	setSteering(0);
 	setMotor(0);
 	queryCarID();
+	queryFirmwareVersion();
 	//generate sensor groups
     Board::SensorGroup sg;
     std::string params;
@@ -60,6 +62,12 @@ void PsesUcBoard::initUcBoard(const unsigned int serialTimeout){
     setSensorGroup(sg, 5, params);
 
     startSensors();
+}
+const int PsesUcBoard::getId() const {
+	return carID;
+}
+const std::string& PsesUcBoard::getFirmwareVersion() const {
+	return firmwareVersion;
 }
 void PsesUcBoard::setSteering(const int level){
 	if(level > 50 || level <-50){
@@ -194,6 +202,23 @@ void PsesUcBoard::queryCarID(){
 		throw UcBoardException(Board::REQUEST_NO_ID);
 	}
 
+}
+void PsesUcBoard::queryFirmwareVersion(){
+	std::string command ="?VER";
+	std::string answer;
+	ros::Time start = ros::Time::now();
+	do{
+		sendRequest(command, answer);
+		answer = answer.substr(1, answer.size()-1);
+	}while(answer.size()<=0 && (ros::Time::now()-start).toSec()<=0.1);
+	if(answer.size()<=0){
+		throw UcBoardException(Board::REQUEST_NO_FWV);
+	}
+	int strayBreak = answer.find("\n");
+	int strayEOT = answer.find("\x03");
+	if(strayBreak!=-1) answer.at(strayBreak)=' ';
+	if(strayEOT!=-1) answer.at(strayEOT)=' ';
+	firmwareVersion = answer;
 }
 void PsesUcBoard::connect(const unsigned int serialTimeout){
 	if(!connected){

@@ -67,6 +67,11 @@ int main(int argc, char **argv)
 
     pses_basis::SensorData sensorValues;
     bool kinect = true;
+    std::string firmwareVersion = board.getFirmwareVersion();
+    int carID = board.getId();
+    nh.setParam("firmware_version", firmwareVersion);
+    nh.setParam("car_id", carID);
+
 
     ros::Rate loop_rate(200);
     while(ros::ok()) {

@@ -21,6 +21,7 @@ namespace Board {
 	const std::string COMMAND_MOTOR_OOB = "Motor level out of bounds => [20, -20]";
 	const std::string COMMAND_MOTOR_NR = "No valid answer on motor command.";
 	const std::string REQUEST_NO_ID = "No valid answer on request for ID.";
+	const std::string REQUEST_NO_FWV = "No valid answer on request for firmware Version.";
 	const std::string REQUEST_NO_GROUP = "Sensor group not set.";
 	const std::string REQUEST_NO_START = "Request to start groups not send.";
 	const std::string REQUEST_NO_STOP = "Request to stop groups not send.";
@@ -62,12 +63,13 @@ class PsesUcBoard{
 	PsesUcBoard(const unsigned int baudRate=921600, const std::string deviceName="ttyUSB0");
 	~PsesUcBoard();
 	void initUcBoard(const unsigned int serialTimeout=5);
+	const int getId() const;
+	const std::string& getFirmwareVersion() const;
 	void setSteering(const int level);
 	void setMotor(const int level);
 	void activateKinect();
 	void deactivateKinect();
 	void getSensorData(pses_basis::SensorData& data);
-	//bool boardSensorValues();
 	bool boardErrors();
 	bool boardMessages();
 	void getBoardError(std::string& msg);
@@ -83,6 +85,7 @@ class PsesUcBoard{
 	InputStack* responseStack;
 	InputStack* displayStack;
 	int carID;
+	std::string firmwareVersion;
 	Board::SensorGroups sensorGroups;
 	pses_basis::SensorData sensorMessage;
 	Board::GroupMessages groupStacks;
@@ -97,6 +100,7 @@ class PsesUcBoard{
 	void readInputBuffer();
 	void sendRequest(const std::string& req, std::string& answer);
 	void queryCarID();
+	void queryFirmwareVersion();
 	void startSensors();
 	void stopSensors();
 	void setSensorGroup(const Board::SensorGroup& sensors, const int numOfGroup, const std::string& parameter);

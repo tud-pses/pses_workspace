@@ -12,6 +12,7 @@
 #include <math.h>
 #include <std_msgs/String.h>
 #include <string>
+#include <sstream>
 
 typedef pses_basis::Command command_data;
 typedef pses_basis::SensorData sensor_data;

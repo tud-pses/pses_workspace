@@ -32,6 +32,16 @@ Dashboard::Dashboard(ros::NodeHandle* nh, QWidget *parent) :
 
         timer = new QTimer(this);
         connect(timer, SIGNAL(timeout()), this, SLOT(pollNodeHandle()));
+        std::string firmware;
+        int carID;
+        nh->getParam("firmware_version",firmware);
+        nh->getParam("car_id",carID);
+        std::stringstream id;
+        id<<carID;
+
+        ui->firmware_label->setText(QString(firmware.c_str()));
+        ui->id_label->setText(QString(id.str().c_str()));
+
         timer->start(50);
 
 }
