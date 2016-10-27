@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>998</width>
-    <height>1057</height>
+    <height>1039</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1630,14 +1630,40 @@
    <widget class="QLabel" name="display_camera">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>60</x>
       <y>480</y>
-      <width>981</width>
-      <height>521</height>
+      <width>881</width>
+      <height>441</height>
      </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::WinPanel</enum>
     </property>
     <property name="text">
      <string/>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="camera_selection">
+    <property name="geometry">
+     <rect>
+      <x>360</x>
+      <y>940</y>
+      <width>281</width>
+      <height>26</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_57">
+    <property name="geometry">
+     <rect>
+      <x>270</x>
+      <y>940</y>
+      <width>81</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Video Feed:</string>
     </property>
    </widget>
   </widget>

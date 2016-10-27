@@ -31,6 +31,7 @@ void odometryCallback(const odometry_data::ConstPtr& odom, Ui::Dashboard* ui);
 void sensorCallback(const sensor_data::ConstPtr& sensor, Ui::Dashboard* ui);
 void infoCallback(const info_data::ConstPtr& info, Ui::Dashboard* ui);
 void cameraCallback(const image_msg::ConstPtr& img, Ui::Dashboard* ui);
+void depthCallback(const image_msg::ConstPtr& img, Ui::Dashboard* ui);
 
 class Dashboard : public QMainWindow
 {
@@ -56,11 +57,13 @@ private:
         ros::Subscriber robotSensors;
         ros::Subscriber carInfo;
         ros::Subscriber cameraSub;
+        ros::Subscriber depthSub;
         QTimer *timer;
 
 private slots:
         void toggleKinect();
         void modeSelect(int index);
+        void cameraSelect(int index);
         void valueChangedSpeed(int value);
         void valueChangedSteering(int value);
         void maxSpeedClicked();

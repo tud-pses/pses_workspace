@@ -42,10 +42,14 @@ Dashboard::Dashboard(ros::NodeHandle* nh, QWidget *parent) :
 
         QPixmap videoFeed(1280,720);
         ui->display_camera->setPixmap(videoFeed);
+        ui->camera_selection->addItem(QString("Color Image (1280x720)"), QVariant());
+        ui->camera_selection->addItem(QString("Depth Image (640x480) "), QVariant());
+        ui->camera_selection->addItem(QString("Off"), QVariant());
+        connect(ui->camera_selection, SIGNAL(currentIndexChanged(int)), this, SLOT(cameraSelect(int)));
 
         timer = new QTimer(this);
         connect(timer, SIGNAL(timeout()), this, SLOT(pollNodeHandle()));
-        timer->start(50);
+        timer->start(100);
 
 }
 
@@ -100,6 +104,11 @@ void infoCallback(const info_data::ConstPtr& info, Ui::Dashboard* ui){
 
 void cameraCallback(const image_msg::ConstPtr& img, Ui::Dashboard* ui){
         QImage image(&img->data[0], (int)img->width, (int)img->height, QImage::Format_Indexed8);
+        ui->display_camera->setPixmap(QPixmap::fromImage(image.rgbSwapped()));
+}
+
+void depthCallback(const image_msg::ConstPtr& img, Ui::Dashboard* ui){
+        QImage image(&img->data[0], (int)img->width, (int)img->height, QImage::Format_Mono);
         ui->display_camera->setPixmap(QPixmap::fromImage(image));
 }
 
@@ -156,7 +165,7 @@ void Dashboard::keyPressEvent(QKeyEvent *event){
 
 void Dashboard::pollNodeHandle(){
         ros::spinOnce();
-        timer->start(50);
+        timer->start(100);
 }
 
 void Dashboard::toggleKinect(){
@@ -168,6 +177,19 @@ void Dashboard::modeSelect(int index){
         mode.data = ui->modeSelection->itemText(index).toStdString();
         modeControl.publish(mode);
         ros::spinOnce();
+}
+
+void Dashboard::cameraSelect(int index){
+        if(index==0){
+            depthSub.shutdown();
+            cameraSub = nh->subscribe<image_msg>("kinect2/qhd/image_color", 10, boost::bind(cameraCallback, _1, ui));
+        }else if(index = 1){
+            cameraSub.shutdown();
+            depthSub = nh->subscribe<image_msg>("kinect2/sd/image_depth", 10, boost::bind(depthCallback, _1, ui));
+        }else{
+            depthSub.shutdown();
+            cameraSub.shutdown();
+        }
 }
 
 void Dashboard::valueChangedSpeed(int value){
