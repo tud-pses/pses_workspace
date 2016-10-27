@@ -103,12 +103,23 @@ void infoCallback(const info_data::ConstPtr& info, Ui::Dashboard* ui){
 }
 
 void cameraCallback(const image_msg::ConstPtr& img, Ui::Dashboard* ui){
-        QImage image(&img->data[0], (int)img->width, (int)img->height, QImage::Format_Indexed8);
+        QImage image(&img->data[0], (int)img->width, (int)img->height, QImage::Format_RGB888);
         ui->display_camera->setPixmap(QPixmap::fromImage(image.rgbSwapped()));
 }
 
 void depthCallback(const image_msg::ConstPtr& img, Ui::Dashboard* ui){
-        QImage image(&img->data[0], (int)img->width, (int)img->height, QImage::Format_Mono);
+        cv_bridge::CvImagePtr cv_ptr;
+        try{
+            cv_ptr = cv_bridge::toCvCopy(*img, img->encoding);
+        }catch(cv_bridge::Exception& e){
+            ROS_ERROR("cv_bridge exception: %s", e.what());
+        }
+        cv::Mat im16 = cv_ptr->image;
+        double min,max;
+        cv::minMaxIdx(im16, &min, &max);
+        cv::Mat im8;
+        im16.convertTo(im8, CV_8UC1, 255/(max-min), -min);
+        QImage image(im8.data, im8.cols, im8.rows, static_cast<int>(im8.step),QImage::Format_Indexed8);
         ui->display_camera->setPixmap(QPixmap::fromImage(image));
 }
 
@@ -183,7 +194,7 @@ void Dashboard::cameraSelect(int index){
         if(index==0){
             depthSub.shutdown();
             cameraSub = nh->subscribe<image_msg>("kinect2/qhd/image_color", 10, boost::bind(cameraCallback, _1, ui));
-        }else if(index = 1){
+        }else if(index==1){
             cameraSub.shutdown();
             depthSub = nh->subscribe<image_msg>("kinect2/sd/image_depth", 10, boost::bind(depthCallback, _1, ui));
         }else{

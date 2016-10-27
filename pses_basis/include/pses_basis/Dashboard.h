@@ -14,6 +14,7 @@
 #include <string>
 #include <sstream>
 #include <sensor_msgs/Image.h>
+#include <cv_bridge/cv_bridge.h>
 
 typedef pses_basis::Command command_data;
 typedef pses_basis::SensorData sensor_data;

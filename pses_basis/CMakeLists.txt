@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   tf
   serial
   message_generation
+  cv_bridge
 )
 
 find_package(OpenCV 2 REQUIRED)
@@ -135,7 +136,7 @@ add_dependencies(car_handler ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORT
 target_link_libraries(ucboard ${catkin_LIBRARIES})
 target_link_libraries(car_handler ${catkin_LIBRARIES} ucboard)
 target_link_libraries(car_odometry ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} forward_kinematics)
-target_link_libraries(dashboard_ui Qt5::Widgets Qt5::Core Qt5::Gui)
+target_link_libraries(dashboard_ui Qt5::Widgets Qt5::Core Qt5::Gui ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
 target_link_libraries(car_dashboard ${catkin_LIBRARIES} dashboard_ui)
 
 #############
