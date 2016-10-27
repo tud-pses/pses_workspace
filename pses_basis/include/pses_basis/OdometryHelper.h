@@ -11,7 +11,8 @@
 
 #define WHEEL_RADIUS 0.032
 #define RAD_PER_TICK 0.7853981634 // 2*PI/8
-#define DRIVEN_DISTANCE_PER_TICK 0.0251327412 // RAD_PER_TICK * WHEEL_RADIUS 
+#define DRIVEN_DISTANCE_PER_TICK 0.0251327412 // RAD_PER_TICK * WHEEL_RADIUS
+#define STANDARD_GRAVITY 9.80665 // m/s^2  
 
 class OdometryHelper{
 public:
@@ -24,10 +25,27 @@ public:
 		speed = 0.0;
 		drivingDirection = 0;
         prevDirection = 0;
+        wxOffset = 0.0;
+        wyOffset = 0.0;
+        wzOffset = 0.0;
+        axOffset = 0.0;
+        ayOffset = 0.0;
+        azOffset = 0.0;
+        dataCount = 0;
+        imuCalibrated = false;
 		oldTimeStamp = ros::Time::now();
 		odometric.setK(0.25); // set distance between front axis and back axis (in meters)
 	}
-	inline void updateSensorData(const pses_basis::SensorData& sensorData) {
+	inline void updateSensorData(pses_basis::SensorData& sensorData) {
+		if(imuCalibrated) {
+			sensorData.angular_velocity_x -= wxOffset;
+			sensorData.angular_velocity_y -= wyOffset;
+			sensorData.angular_velocity_z -= wzOffset;
+			sensorData.accelerometer_x -= axOffset;
+			sensorData.accelerometer_y -= ayOffset;
+			sensorData.accelerometer_z -= azOffset;
+		}
+		else calibrateIMU();
 		this->sensorData = sensorData;
 		calcDt(sensorData.header.stamp, oldTimeStamp);
 		oldTimeStamp = sensorData.header.stamp;
@@ -70,6 +88,9 @@ public:
 	inline geometry_msgs::Point getPosition() {
 		return position;
 	}
+	inline bool isImuCalibrated() {
+		return imuCalibrated;
+	}
 private:
 	double yaw;
 	double roll;
@@ -80,6 +101,17 @@ private:
 	float deltaDistance;
     int prevDirection;
 	int drivingDirection; // -1 = backwards; 0 = stop; 1 = forwards
+	
+	//IMU offsets
+	double wxOffset;
+	double wyOffset;
+	double wzOffset;
+	double axOffset;
+	double ayOffset;
+	double azOffset;
+
+	uint32_t dataCount;
+	bool imuCalibrated;
 	ros::Time oldTimeStamp;
 	geometry_msgs::Point position;
 	ForwardKinematics odometric; // object needed for odometric calculations
@@ -88,6 +120,26 @@ private:
 	pses_basis::Command command;
 	inline void calcDt(const ros::Time& currentTimeStamp, const ros::Time& oldTimeStamp) {
 		dt = (currentTimeStamp - oldTimeStamp).toSec();
+	}
+	inline void calibrateIMU() {
+		if(dataCount < 500 && sensorData.angular_velocity_z != 0.0) {
+			dataCount++;
+			wxOffset += sensorData.angular_velocity_x;
+			wyOffset += sensorData.angular_velocity_y;
+			wzOffset += sensorData.angular_velocity_z;
+			axOffset += sensorData.accelerometer_x;
+			ayOffset += sensorData.accelerometer_y;
+			azOffset += (sensorData.accelerometer_z - STANDARD_GRAVITY);
+		}
+		else if(dataCount == 500 && !imuCalibrated) {
+			wxOffset /= dataCount;
+			wyOffset /= dataCount;
+			wzOffset /= dataCount;
+			axOffset /= dataCount;
+			ayOffset /= dataCount;
+			azOffset /= dataCount;
+			imuCalibrated = true;
+		}
 	}
 	inline void calcSpeed() {
         if(!isnan(sensorData.hall_sensor_dt)){

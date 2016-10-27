@@ -78,8 +78,10 @@ void imuCallback(const sensor_msgs::Imu::ConstPtr& imu, OdometryHelper* odomHelp
 
 void dataCallback(const pses_basis::SensorData::ConstPtr& sensorData, tf::TransformBroadcaster* odomBroadcaster, ros::Publisher* imu_pub,
 								ros::Publisher* odom_pub, OdometryHelper* odomHelper, ros::Publisher* carInfo_pub) {
+	
+	pses_basis::SensorData sensorDataCopy = *sensorData;
 	// update sensor data for later odometric calculations
-	odomHelper->updateSensorData(*sensorData);
+	odomHelper->updateSensorData(sensorDataCopy);
 	// objects to store the odometry and its transform
 	geometry_msgs::TransformStamped odomTransform;
 	nav_msgs::Odometry odom;
@@ -89,16 +91,16 @@ void dataCallback(const pses_basis::SensorData::ConstPtr& sensorData, tf::Transf
 	geometry_msgs::Quaternion odomQuaternion;
 	odomHelper->getQuaternion(odomQuaternion);
 	//build odom transform for tf and the odometry message
-	buildOdometryTransformation(odomTransform, *sensorData, *odomHelper, odomQuaternion);
-	buildOdometryMessage(odom, *sensorData, *odomHelper, odomQuaternion);
-	buildInfoMessage(info, *sensorData, *odomHelper);
-	buildImuMessage(imu, *sensorData);
+	buildOdometryTransformation(odomTransform, sensorDataCopy, *odomHelper, odomQuaternion);
+	buildOdometryMessage(odom, sensorDataCopy, *odomHelper, odomQuaternion);
+	buildInfoMessage(info, sensorDataCopy, *odomHelper);
+	if(odomHelper->isImuCalibrated()) buildImuMessage(imu, sensorDataCopy);
 	// send the transform
 	odomBroadcaster->sendTransform(odomTransform);
 	// publish the odometry message
 	odom_pub->publish(odom);
 	carInfo_pub->publish(info);
-	imu_pub->publish(imu);
+	if(odomHelper->isImuCalibrated()) imu_pub->publish(imu);
 }
 
 int main(int argc, char **argv)

@@ -12,7 +12,23 @@ PsesUcBoard::PsesUcBoard(const unsigned int baudRate, const std::string deviceNa
 	kinectOn = false;
 }
 PsesUcBoard::~PsesUcBoard() {
-	if(kinectOn) deactivateKinect();
+	try{
+		setSteering(0);
+	}catch(std::exception& e){
+
+	}
+	try{
+		setMotor(0);
+	}catch(std::exception& e){
+
+	}
+	if(kinectOn){
+		try{
+			deactivateKinect();
+		}catch(std::exception& e){
+
+		}
+	}
 	delete errorStack;
 	delete responseStack;
 	delete displayStack;
@@ -152,7 +168,7 @@ void PsesUcBoard::deactivateKinect(){
 		sendRequest(command, answer);
 	}while(answer.find(value)==-1 && (ros::Time::now()-start).toSec()<=0.1);
 	if(answer.find(value)==-1){
-		throw UcBoardException(Board::REQUEST_KINECT_ON);
+		throw UcBoardException(Board::REQUEST_KINECT_OFF);
 	}
 	kinectOn = false;
 
