@@ -10,6 +10,7 @@ Dashboard::Dashboard(ros::NodeHandle* nh, QWidget *parent) :
         robotOdometry = nh->subscribe<odometry_data>("odom", 10, boost::bind(odometryCallback, _1, ui));
         robotSensors = nh->subscribe<sensor_data>("pses_basis/sensor_data", 10, boost::bind(sensorCallback, _1, ui));
         carInfo = nh->subscribe<info_data>("pses_basis/car_info", 10, boost::bind(infoCallback, _1, ui));
+        cameraSub = nh->subscribe<image_msg>("kinect2/qhd/image_color", 10, boost::bind(cameraCallback, _1, ui));
 
         connect(ui->speedSlider, SIGNAL(valueChanged(int)), this, SLOT(valueChangedSpeed(int)));
         connect(ui->steeringSlider, SIGNAL(valueChanged(int)), this, SLOT(valueChangedSteering(int)));
@@ -27,21 +28,23 @@ Dashboard::Dashboard(ros::NodeHandle* nh, QWidget *parent) :
         ui->modeSelection->addItem(QString("Park Car"), QVariant());
         ui->modeSelection->addItem(QString("Lane Detection"), QVariant());
         ui->modeSelection->addItem(QString("Exploration"), QVariant());
-
         connect(ui->modeSelection, SIGNAL(currentIndexChanged(int)), this, SLOT(modeSelect(int)));
 
-        timer = new QTimer(this);
-        connect(timer, SIGNAL(timeout()), this, SLOT(pollNodeHandle()));
+
         std::string firmware;
         int carID;
         nh->getParam("firmware_version",firmware);
         nh->getParam("car_id",carID);
         std::stringstream id;
         id<<carID;
-
         ui->firmware_label->setText(QString(firmware.c_str()));
         ui->id_label->setText(QString(id.str().c_str()));
 
+        QPixmap videoFeed(1280,720);
+        ui->display_camera->setPixmap(videoFeed);
+
+        timer = new QTimer(this);
+        connect(timer, SIGNAL(timeout()), this, SLOT(pollNodeHandle()));
         timer->start(50);
 
 }
@@ -93,6 +96,11 @@ void infoCallback(const info_data::ConstPtr& info, Ui::Dashboard* ui){
         ui->info_roll->display(info->roll/M_PI*180.0);
         ui->info_pitch->display(info->pitch/M_PI*180.0);
         ui->info_yaw->display(info->yaw/M_PI*180.0);
+}
+
+void cameraCallback(const image_msg::ConstPtr& img, Ui::Dashboard* ui){
+        QImage image(&img->data[0], (int)img->width, (int)img->height, QImage::Format_Indexed8);
+        ui->display_camera->setPixmap(QPixmap::fromImage(image));
 }
 
 void Dashboard::keyPressEvent(QKeyEvent *event){

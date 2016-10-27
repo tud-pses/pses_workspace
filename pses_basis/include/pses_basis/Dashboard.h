@@ -13,12 +13,15 @@
 #include <std_msgs/String.h>
 #include <string>
 #include <sstream>
+#include <sensor_msgs/Image.h>
 
 typedef pses_basis::Command command_data;
 typedef pses_basis::SensorData sensor_data;
 typedef pses_basis::CarInfo info_data;
 typedef nav_msgs::Odometry odometry_data;
 typedef std_msgs::String string_msg;
+typedef sensor_msgs::Image image_msg;
+
 
 namespace Ui {
         class Dashboard;
@@ -27,6 +30,7 @@ namespace Ui {
 void odometryCallback(const odometry_data::ConstPtr& odom, Ui::Dashboard* ui);
 void sensorCallback(const sensor_data::ConstPtr& sensor, Ui::Dashboard* ui);
 void infoCallback(const info_data::ConstPtr& info, Ui::Dashboard* ui);
+void cameraCallback(const image_msg::ConstPtr& img, Ui::Dashboard* ui);
 
 class Dashboard : public QMainWindow
 {
@@ -51,6 +55,7 @@ private:
         ros::Subscriber robotOdometry;
         ros::Subscriber robotSensors;
         ros::Subscriber carInfo;
+        ros::Subscriber cameraSub;
         QTimer *timer;
 
 private slots:
