@@ -6,8 +6,8 @@ PsesUcBoard::PsesUcBoard(const unsigned int baudRate, const std::string deviceNa
 	responseStack = new InputStack(30);
 	displayStack = new InputStack(30);
 	carID = -1;
-	motorLevel = 0;
-	steeringLevel = 0;
+	motorLevel = -99999;
+	steeringLevel = -99999;
 	kinectOn = false;
 }
 PsesUcBoard::~PsesUcBoard() {

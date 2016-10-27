@@ -5,6 +5,7 @@ Dashboard::Dashboard(ros::NodeHandle* nh, QWidget *parent) :
         QMainWindow(parent), ui(new Ui::Dashboard), nh(nh)
 {
         ui->setupUi(this);
+        modeControl =  nh->advertise<string_msg>("pses_basis/mode_control", 10);
         robotCommand = nh->advertise<command_data>("pses_basis/command", 10);
         robotOdometry = nh->subscribe<odometry_data>("odom", 10, boost::bind(odometryCallback, _1, ui));
         robotSensors = nh->subscribe<sensor_data>("pses_basis/sensor_data", 10, boost::bind(sensorCallback, _1, ui));
@@ -19,6 +20,15 @@ Dashboard::Dashboard(ros::NodeHandle* nh, QWidget *parent) :
         connect(ui->minSteering, SIGNAL(clicked()), this, SLOT(minSteeringClicked()));
         connect(ui->centerSteering, SIGNAL(clicked()), this, SLOT(centerSteeringClicked()));
         connect(ui->kinectToggle, SIGNAL(clicked()), this, SLOT(toggleKinect()));
+
+        ui->modeSelection->addItem(QString("Remote Control"), QVariant());
+        ui->modeSelection->addItem(QString("Follow Wall"), QVariant());
+        ui->modeSelection->addItem(QString("Roundtrip w. Obstacles"), QVariant());
+        ui->modeSelection->addItem(QString("Park Car"), QVariant());
+        ui->modeSelection->addItem(QString("Lane Detection"), QVariant());
+        ui->modeSelection->addItem(QString("Exploration"), QVariant());
+
+        connect(ui->modeSelection, SIGNAL(currentIndexChanged(int)), this, SLOT(modeSelect(int)));
 
         timer = new QTimer(this);
         connect(timer, SIGNAL(timeout()), this, SLOT(pollNodeHandle()));
@@ -132,8 +142,13 @@ void Dashboard::pollNodeHandle(){
 }
 
 void Dashboard::toggleKinect(){
-        cmd.header.stamp = ros::Time::now();
         nh->setParam("kinect_on", ui->kinectToggle->isChecked());
+        ros::spinOnce();
+}
+
+void Dashboard::modeSelect(int index){
+        mode.data = ui->modeSelection->itemText(index).toStdString();
+        modeControl.publish(mode);
         ros::spinOnce();
 }
 
