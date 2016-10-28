@@ -3,7 +3,7 @@
 	<node pkg="nodelet" type="nodelet" name="imu_manager" args="manager" output="screen" />
 
 	<arg name="dashboard" default="true"/>
-        <arg name="kinect2" default="true" />
+    <arg name="kinect" default="true" />
 
 	<!-- Run the necessary nodes to bring up the car -->
 	<node pkg="pses_basis" type="car_handler" name="car_handler" output="screen">
@@ -22,7 +22,7 @@
 	<group if="$(arg dashboard)">
 		<node pkg="pses_basis" type="car_dashboard" name="car_dashboard" output="screen"/>
 	</group>
-        <group if="$(arg kinect2)">
+        <group if="$(arg kinect)">
         <!-- Bring up the Kinect -->
                 <include file="$(find kinect2_bridge)/launch/kinect2_bridge.launch" />
         </group>
