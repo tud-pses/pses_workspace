@@ -23,6 +23,9 @@
       <height>211</height>
      </rect>
     </property>
+    <property name="focusPolicy">
+     <enum>Qt::NoFocus</enum>
+    </property>
     <property name="minimum">
      <number>-20</number>
     </property>
@@ -47,6 +50,9 @@
       <width>351</width>
       <height>29</height>
      </rect>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::NoFocus</enum>
     </property>
     <property name="minimum">
      <number>-50</number>
@@ -79,6 +85,9 @@
       <height>27</height>
      </rect>
     </property>
+    <property name="focusPolicy">
+     <enum>Qt::NoFocus</enum>
+    </property>
     <property name="text">
      <string>20</string>
     </property>
@@ -91,6 +100,9 @@
       <width>31</width>
       <height>27</height>
      </rect>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::NoFocus</enum>
     </property>
     <property name="text">
      <string>-20</string>
@@ -105,6 +117,9 @@
       <height>27</height>
      </rect>
     </property>
+    <property name="focusPolicy">
+     <enum>Qt::NoFocus</enum>
+    </property>
     <property name="text">
      <string>0</string>
     </property>
@@ -117,6 +132,9 @@
       <width>31</width>
       <height>27</height>
      </rect>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::NoFocus</enum>
     </property>
     <property name="text">
      <string>50</string>
@@ -131,6 +149,9 @@
       <height>27</height>
      </rect>
     </property>
+    <property name="focusPolicy">
+     <enum>Qt::NoFocus</enum>
+    </property>
     <property name="text">
      <string>-50</string>
     </property>
@@ -143,6 +164,9 @@
       <width>51</width>
       <height>27</height>
      </rect>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::NoFocus</enum>
     </property>
     <property name="text">
      <string>center</string>
@@ -1493,6 +1517,9 @@
       <width>161</width>
       <height>26</height>
      </rect>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::NoFocus</enum>
     </property>
    </widget>
   </widget>
