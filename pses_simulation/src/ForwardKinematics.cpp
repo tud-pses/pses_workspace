@@ -16,6 +16,7 @@ ForwardKinematics::ForwardKinematics(const ForwardKinematics& other) : k(other.k
 								T = other.T;
 								prevT = other.prevT;
 								currentPosition = other.currentPosition;
+                                radius = 0;
 }
 
 ForwardKinematics::ForwardKinematics(double k) : k(k) {
@@ -29,6 +30,11 @@ void ForwardKinematics::init(){
 								prevT = initT;
 								currentPosition=std::vector<double>(3,0);
 }
+
+const double ForwardKinematics::getRadius() const {
+    return radius;
+}
+
 std::pair<double, double> ForwardKinematics::calcICC(double alpha){
 								double x = -k/std::tan(alpha);
 								double y = -k;
@@ -45,7 +51,8 @@ double ForwardKinematics::radToDeg(double angle){
 }
 
 double ForwardKinematics::calcRadius(std::pair<double, double> ICC){
-								return std::sqrt(ICC.first*ICC.first+ICC.second*ICC.second);
+                                radius = std::sqrt(ICC.first*ICC.first+ICC.second*ICC.second);
+                                return radius;
 }
 double ForwardKinematics::calcTheta(double distance, double radius){
 								return distance/radius;
