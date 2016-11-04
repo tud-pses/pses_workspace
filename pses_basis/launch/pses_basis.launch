@@ -5,8 +5,8 @@
 	<arg name="dashboard" default="true"/>
     <arg name="kinect" default="true" />
 
-	<!-- Run the necessary nodes to bring up the car -->
-	<node pkg="pses_basis" type="car_handler" name="car_handler" output="screen">
+        <!-- Run the necessary nodes to bring up the car -->
+        <node pkg="pses_basis" type="car_handler" name="car_handler" output="screen">
 		<param name="kinect_on" value="true" />
 	</node>
 	<node pkg="pses_basis" type="car_odometry" name="car_odometry" output="screen"/>
@@ -20,7 +20,10 @@
 	</node>
 	<!-- Run the Dashboard Application -->
 	<group if="$(arg dashboard)">
-		<node pkg="pses_basis" type="car_dashboard" name="car_dashboard" output="screen"/>
+		<node pkg="pses_basis" type="car_dashboard" name="car_dashboard" output="screen">
+                    <!-- allowed params: image_color, image_depth, off -->
+                    <param name="video_feed" value="off" />
+		</node>
 	</group>
         <group if="$(arg kinect)">
         <!-- Bring up the Kinect -->

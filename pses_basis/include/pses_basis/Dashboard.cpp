@@ -10,7 +10,6 @@ Dashboard::Dashboard(ros::NodeHandle* nh, QWidget *parent) :
         robotOdometry = nh->subscribe<odometry_data>("odom", 10, boost::bind(odometryCallback, _1, ui));
         robotSensors = nh->subscribe<sensor_data>("pses_basis/sensor_data", 10, boost::bind(sensorCallback, _1, ui));
         carInfo = nh->subscribe<info_data>("pses_basis/car_info", 10, boost::bind(infoCallback, _1, ui));
-        cameraSub = nh->subscribe<image_msg>("kinect2/qhd/image_color", 10, boost::bind(cameraCallback, _1, ui));
 
         connect(ui->speedSlider, SIGNAL(valueChanged(int)), this, SLOT(valueChangedSpeed(int)));
         connect(ui->steeringSlider, SIGNAL(valueChanged(int)), this, SLOT(valueChangedSteering(int)));
@@ -40,12 +39,24 @@ Dashboard::Dashboard(ros::NodeHandle* nh, QWidget *parent) :
         ui->firmware_label->setText(QString(firmware.c_str()));
         ui->id_label->setText(QString(id.str().c_str()));
 
+        std::string videoMode = "off";
+        nh->getParam("car_dashboard/video_feed",videoMode);
         QPixmap videoFeed(1280,720);
         ui->display_camera->setPixmap(videoFeed);
         ui->camera_selection->addItem(QString("Color Image (1280x720)"), QVariant());
         ui->camera_selection->addItem(QString("Depth Image (640x480) "), QVariant());
         ui->camera_selection->addItem(QString("Off"), QVariant());
         connect(ui->camera_selection, SIGNAL(currentIndexChanged(int)), this, SLOT(cameraSelect(int)));
+
+        if(videoMode.compare("image_color")==0){
+            cameraSub = nh->subscribe<image_msg>("kinect2/qhd/image_color", 10, boost::bind(cameraCallback, _1, ui));
+            ui->camera_selection->setCurrentIndex(0);
+        }else if(videoMode.compare("image_depth")==0){
+            depthSub = nh->subscribe<image_msg>("kinect2/sd/image_depth", 10, boost::bind(depthCallback, _1, ui));
+            ui->camera_selection->setCurrentIndex(1);
+        }else if(videoMode.compare("off")==0){
+            ui->camera_selection->setCurrentIndex(2);
+        }
 
         timer = new QTimer(this);
         connect(timer, SIGNAL(timeout()), this, SLOT(pollNodeHandle()));
