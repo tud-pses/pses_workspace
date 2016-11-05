@@ -16,7 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
   cv_bridge
 )
 
-find_package(OpenCV 2 REQUIRED)
+find_package(OpenCV REQUIRED)
 find_package(Qt5Widgets)
 find_package(Qt5Core)
 find_package(Qt5Gui)
