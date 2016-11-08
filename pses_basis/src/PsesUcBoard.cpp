@@ -10,7 +10,7 @@ PsesUcBoard::PsesUcBoard(const unsigned int baudRate, const std::string deviceNa
 								motorLevel = -99999;
 								steeringLevel = -99999;
 								kinectOn = true;
-								usOn = true;
+								usOn = false;
 }
 PsesUcBoard::~PsesUcBoard() {
 								delete errorStack;
