@@ -9,7 +9,8 @@ PsesUcBoard::PsesUcBoard(const unsigned int baudRate, const std::string deviceNa
 								firmwareVersion = "no_info";
 								motorLevel = -99999;
 								steeringLevel = -99999;
-								kinectOn = false;
+								kinectOn = true;
+								usOn = true;
 }
 PsesUcBoard::~PsesUcBoard() {
 								delete errorStack;
@@ -22,6 +23,8 @@ void PsesUcBoard::initUcBoard(const unsigned int serialTimeout){
 								setMotor(0);
 								queryCarID();
 								queryFirmwareVersion();
+								//activate us sensors
+								activateUS();
 								//generate sensor groups
 								Board::SensorGroup sg;
 								std::string params;
@@ -117,6 +120,37 @@ void PsesUcBoard::setMotor(const int level){
 								}
 
 								motorLevel = level;
+}
+
+void PsesUcBoard::activateUS(){
+								if(usOn) return;
+								std::string command = "!US ON";
+								std::string answer;
+								std::string value = ":ON";
+
+								ros::Time start = ros::Time::now();
+								do {
+																sendRequest(command, answer);
+								} while(answer.find(value)==-1 && (ros::Time::now()-start).toSec()<=0.1);
+								if(answer.find(value)==-1) {
+																throw UcBoardException(Board::REQUEST_US_ON);
+								}
+								usOn = true;
+}
+void PsesUcBoard::deactivateUS(){
+								if(!usOn) return;
+								std::string command = "!US OFF";
+								std::string answer;
+								std::string value = ":OFF";
+
+								ros::Time start = ros::Time::now();
+								do {
+																sendRequest(command, answer);
+								} while(answer.find(value)==-1 && (ros::Time::now()-start).toSec()<=0.1);
+								if(answer.find(value)==-1) {
+																throw UcBoardException(Board::REQUEST_US_OFF);
+								}
+								usOn = false;
 }
 
 void PsesUcBoard::activateKinect(){
@@ -326,10 +360,10 @@ void PsesUcBoard::deactivateUCBoard(){
 								if(!connected) {
 																throw UcBoardException(Board::CONNECTION_NOT_ESTABLISHED);
 								}
-								if(kinectOn) deactivateKinect();
 								setSteering(0);
 								setMotor(0);
 								stopSensors();
+								if(usOn) deactivateUS();
 								reset();
 								if(connected) {
 																serialConnection.close();
