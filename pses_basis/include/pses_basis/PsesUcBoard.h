@@ -27,6 +27,8 @@ const std::string REQUEST_NO_START = "Request to start groups not send.";
 const std::string REQUEST_NO_STOP = "Request to stop groups not send.";
 const std::string REQUEST_KINECT_ON = "Request to activate Kinect not send.";
 const std::string REQUEST_KINECT_OFF = "Request to deactivate Kinect not send.";
+const std::string REQUEST_US_ON = "Request to activate US sensors not send.";
+const std::string REQUEST_US_OFF = "Request to deactivate US sensors not send.";
 const std::string SENSOR_PARSER_INVALID = "Invalid sensor group message.";
 const std::string SENSOR_ID_INVALID = "Invalid sensor group ID.";
 
@@ -67,6 +69,8 @@ public:
 								const std::string& getFirmwareVersion() const;
 								void setSteering(const int level);
 								void setMotor(const int level);
+								void activateUS();
+								void deactivateUS();
 								void activateKinect();
 								void deactivateKinect();
 								void getSensorData(pses_basis::SensorData& data);
@@ -92,6 +96,7 @@ private:
 								int motorLevel;
 								int steeringLevel;
 								bool kinectOn;
+								bool usOn;
 
 								void connect(const unsigned int serialTimeout);
 								void send(const std::string& msg);
