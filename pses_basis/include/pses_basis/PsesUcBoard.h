@@ -25,6 +25,7 @@ const std::string REQUEST_NO_FWV = "No valid answer on request for firmware Vers
 const std::string REQUEST_NO_GROUP = "Sensor group not set.";
 const std::string REQUEST_NO_START = "Request to start groups not send.";
 const std::string REQUEST_NO_STOP = "Request to stop groups not send.";
+const std::string REQUEST_SET_GYRO = "Request to set Gyro-Parameters not send.";
 const std::string REQUEST_KINECT_ON = "Request to activate Kinect not send.";
 const std::string REQUEST_KINECT_OFF = "Request to deactivate Kinect not send.";
 const std::string REQUEST_US_ON = "Request to activate US sensors not send.";
@@ -32,7 +33,7 @@ const std::string REQUEST_US_OFF = "Request to deactivate US sensors not send.";
 const std::string SENSOR_PARSER_INVALID = "Invalid sensor group message.";
 const std::string SENSOR_ID_INVALID = "Invalid sensor group ID.";
 
-static std::vector<std::string> sensorTable = {"USL", "USF", "USR", "AX", "AY", "AZ", "GX", "GY", "GZ", "HALL_DT", "HALL_DT8", "HALL_CNT", "VSBAT", "VDBAT"};
+static std::vector<std::string> sensorTable = {"USL", "USF", "USR", "AX", "AY", "AZ", "GX", "GY", "GZ", "HALL_DT", "HALL_DT8", "HALL_CNT", "VSBAT", "VDBAT", "MX", "MY", "MZ"};
 
 enum SensorObject {
 								rangeSensorLeft = 0,
@@ -49,6 +50,9 @@ enum SensorObject {
 								hallSensorCount = 11,
 								batteryVoltageSystem = 12,
 								batteryVoltageMotor = 13,
+								magnetometerX = 14,
+								magnetometerY = 15,
+								magnetometerZ = 16,
 };
 
 typedef std::vector<SensorObject> SensorGroup;
@@ -109,6 +113,7 @@ private:
 								void startSensors();
 								void stopSensors();
 								void setSensorGroup(const Board::SensorGroup& sensors, const int numOfGroup, const std::string& parameter);
+								void setGyroSensitivity(unsigned int value);
 								void putGroupInStack(const std::string& groupMsg);
 								void assignSensorValue(pses_basis::SensorData& data, const int value, const Board::SensorObject& sensor);
 
