@@ -7,7 +7,6 @@
 #include <pses_basis/Command.h>
 #include <pses_basis/ForwardKinematics.h>
 #include <math.h>
-#include <sensor_msgs/Imu.h>
 
 #define WHEEL_RADIUS 0.032
 #define RAD_PER_TICK 0.7853981634 // 2*PI/8
@@ -37,6 +36,7 @@ public:
 		odometric.setK(0.25); // set distance between front axis and back axis (in meters)
 	}
 	inline void updateSensorData(pses_basis::SensorData& sensorData) {
+		calcDt(sensorData.header.stamp, oldTimeStamp);
 		if(imuCalibrated) {
 			sensorData.angular_velocity_x -= wxOffset;
 			sensorData.angular_velocity_y -= wyOffset;
@@ -44,21 +44,17 @@ public:
 			sensorData.accelerometer_x -= axOffset;
 			sensorData.accelerometer_y -= ayOffset;
 			sensorData.accelerometer_z -= azOffset;
+			yaw = integrateEulerAngles(yaw, sensorData.angular_velocity_z, dt);
+			pitch = integrateEulerAngles(pitch, sensorData.angular_velocity_y, dt);
+			roll = integrateEulerAngles(roll, sensorData.angular_velocity_x, dt);
 		}
 		else calibrateIMU();
 		this->sensorData = sensorData;
-		calcDt(sensorData.header.stamp, oldTimeStamp);
 		oldTimeStamp = sensorData.header.stamp;
 		calcSpeed();
 		calcDeltaDistance();
 		calcDrivenDistance();
 		calcPosition();
-	}
-	inline void updateIMUData(sensor_msgs::Imu& imu){
-		this->imu = imu;
-		tf::Quaternion q;
-		tf::quaternionMsgToTF(imu.orientation, q);
-		tf::Matrix3x3(q).getRPY(roll, pitch, yaw);
 	}
 	inline void updateCommand(const pses_basis::Command& cmd) {
 		command = cmd;
@@ -80,7 +76,7 @@ public:
 		return speed;
 	}
 	inline void getQuaternion(geometry_msgs::Quaternion& quat) {
-		quat = imu.orientation;
+		quat = tf::createQuaternionMsgFromYaw(yaw);
 	}
 	inline float getDrivenDistance() {
 		return drivenDistance;
@@ -115,7 +111,6 @@ private:
 	ros::Time oldTimeStamp;
 	geometry_msgs::Point position;
 	ForwardKinematics odometric; // object needed for odometric calculations
-	sensor_msgs::Imu imu;
 	pses_basis::SensorData sensorData;
 	pses_basis::Command command;
 	inline void calcDt(const ros::Time& currentTimeStamp, const ros::Time& oldTimeStamp) {
@@ -141,6 +136,18 @@ private:
 			imuCalibrated = true;
 		}
 	}
+	inline void calcRPY(){
+	}
+	inline double integrateEulerAngles(double angle, double dAngle, double dT){
+		double result = angle + dAngle*dT;
+			if(result>M_PI){
+				return -2*M_PI+result;
+			}else if(result<-M_PI){
+				return 2*M_PI+result;
+			}else{
+				return result;
+			}
+	}
 	inline void calcSpeed() {
         if(!std::isnan(sensorData.hall_sensor_dt)){
             speed =  drivingDirection * DRIVEN_DISTANCE_PER_TICK / sensorData.hall_sensor_dt;
@@ -149,8 +156,8 @@ private:
             else if(drivingDirection == 0) speed =  0;
         }
 	}
-	inline void calcDeltaDistance() { 
-		//return speed*dt;
+
+	inline void calcDeltaDistance() {
 		deltaDistance = std::isnan(sensorData.hall_sensor_dt)?0.0 : drivingDirection*DRIVEN_DISTANCE_PER_TICK;
 	}
 	inline void calcDrivenDistance() {

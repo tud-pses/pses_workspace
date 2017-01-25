@@ -46,6 +46,7 @@ void PsesUcBoard::initUcBoard(const unsigned int serialTimeout){
 								sensorGroups.push_back(sg);
 								groupStacks.push_back(InputStack(20));
 								setSensorGroup(sg, 3, params);
+								setGyroSensitivity(2000);
 								//Hall-Sensor Group
 								sg = {Board::hallSensorDT, Board::hallSensorDTFull, Board::hallSensorCount};
 								params = "~ALL=5";
@@ -58,6 +59,12 @@ void PsesUcBoard::initUcBoard(const unsigned int serialTimeout){
 								sensorGroups.push_back(sg);
 								groupStacks.push_back(InputStack(20));
 								setSensorGroup(sg, 5, params);
+								//Magnetometer Group
+								sg = {Board::magnetometerX, Board::magnetometerY, Board::magnetometerZ};
+								params = "";
+								sensorGroups.push_back(sg);
+								groupStacks.push_back(InputStack(20));
+								setSensorGroup(sg, 6, params);
 
 								startSensors();
 }
@@ -186,7 +193,19 @@ void PsesUcBoard::deactivateKinect(){
 								kinectOn = false;
 
 }
+void PsesUcBoard::setGyroSensitivity(unsigned int sensitivity){
+								std::string command = "!IMU OPT ~GRANGE="+std::to_string(sensitivity);
+								std::string answer;
+								std::string value = "~GRANGE="+std::to_string(sensitivity);
 
+								ros::Time start = ros::Time::now();
+								do {
+																sendRequest(command, answer);
+								} while(answer.find(value)==-1 && (ros::Time::now()-start).toSec()<=0.1);
+								if(answer.find(value)==-1) {
+																throw UcBoardException(Board::REQUEST_SET_GYRO);
+								}
+}
 void PsesUcBoard::getBoardError(std::string& msg){
 								readInputBuffer();
 								errorStack->pop(msg);
@@ -203,17 +222,14 @@ void PsesUcBoard::getBoardMessage(std::string& msg){
 								if(strayBreak!=-1) msg.at(strayBreak)='/';
 								if(strayEOT!=-1) msg.at(strayEOT)='/';
 }
-
 bool PsesUcBoard::boardErrors(){
 								readInputBuffer();
 								return !errorStack->isEmpty();
 }
-
 bool PsesUcBoard::boardMessages(){
 								readInputBuffer();
 								return !displayStack->isEmpty();
 }
-
 void PsesUcBoard::queryCarID(){
 								std::string command ="?ID";
 								std::string answer;
@@ -516,13 +532,13 @@ void PsesUcBoard::assignSensorValue(pses_basis::SensorData& data, const int valu
 																data.accelerometer_z = value*8.0/std::pow(2,16)*9.81;
 																break;
 								case Board::gyroscopeX:
-																data.angular_velocity_x = Board::degToRad(value*1000.0/std::pow(2,16));
+																data.angular_velocity_x = Board::degToRad(value/16.4);
 																break;
 								case Board::gyroscopeY:
-																data.angular_velocity_y = Board::degToRad(value*1000.0/std::pow(2,16));
+																data.angular_velocity_y = Board::degToRad(value/16.4);
 																break;
 								case Board::gyroscopeZ:
-																data.angular_velocity_z = Board::degToRad(value*1000.0/std::pow(2,16));
+																data.angular_velocity_z = Board::degToRad(value/16.4);
 																break;
 								case Board::rangeSensorLeft:
 																data.range_sensor_left = value/10000.0;
@@ -548,6 +564,14 @@ void PsesUcBoard::assignSensorValue(pses_basis::SensorData& data, const int valu
 								case Board::batteryVoltageMotor:
 																data.motor_battery_voltage = value/1000.0;
 																break;
-
+								case Board::magnetometerX:
+																data.magnetometer_x = value*0.00000015;
+																break;
+								case Board::magnetometerY:
+																data.magnetometer_y = value*0.00000015;
+																break;
+								case Board::magnetometerZ:
+																data.magnetometer_z = value*0.00000015;
+																break;
 								}
 }

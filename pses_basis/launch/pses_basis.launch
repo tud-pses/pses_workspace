@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <launch>
-	<node pkg="nodelet" type="nodelet" name="imu_manager" args="manager" output="screen" />
-
 	<arg name="dashboard" default="true"/>
     <arg name="kinect" default="true" />
 
@@ -10,14 +8,6 @@
 		<param name="kinect_on" value="true" />
 	</node>
 	<node pkg="pses_basis" type="car_odometry" name="car_odometry" output="screen"/>
-	<node pkg="imu_complementary_filter" type="complementary_filter_node" name="imu_filter" output="screen">
-		<param name="do_bias_estimation" value="true" />
-		<param name="do_adaptive_gain" value="true" />
-		<param name="use_mag" value="false" />
-		<param name="gain_acc" value="0.01" />
-		<param name="gain_mag" value="0.01" />
-		<param name="bias_alpha" value="0.01" />
-	</node>
 	<!-- Run the Dashboard Application -->
 	<group if="$(arg dashboard)">
 		<node pkg="pses_basis" type="car_dashboard" name="car_dashboard" output="screen">
