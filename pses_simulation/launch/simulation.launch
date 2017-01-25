@@ -5,8 +5,9 @@
 	<arg name="dashboard" default="true"/>
 	<arg name="rviz" default="true"/>
 	<arg name="map_path" default="$(find pses_simulation)/data/map/map"/>
+	<arg name="scan_map_path" default="$(arg map_path)"/>
 
-	<param name="map_path" value="$(arg map_path)"/>
+	<param name="map_path" value="$(arg scan_map_path)"/>
 
 	<!-- Set static tf transformations -->
 	<node pkg="tf" type="static_transform_publisher" name="map_broadcaster" args="0 0 0 0 0 0 1 map odom 10"/>
