@@ -149,15 +149,16 @@ private:
 			}
 	}
 	inline void calcSpeed() {
-        if(!isnan(sensorData.hall_sensor_dt)){
+        if(!std::isnan(sensorData.hall_sensor_dt)){
             speed =  drivingDirection * DRIVEN_DISTANCE_PER_TICK / sensorData.hall_sensor_dt;
         }else{
             if(prevDirection!=drivingDirection) speed = 0;
             else if(drivingDirection == 0) speed =  0;
         }
 	}
+
 	inline void calcDeltaDistance() {
-		deltaDistance = isnan(sensorData.hall_sensor_dt)?0.0 : drivingDirection*DRIVEN_DISTANCE_PER_TICK;
+		deltaDistance = std::isnan(sensorData.hall_sensor_dt)?0.0 : drivingDirection*DRIVEN_DISTANCE_PER_TICK;
 	}
 	inline void calcDrivenDistance() {
 		drivenDistance = drivenDistance + deltaDistance;

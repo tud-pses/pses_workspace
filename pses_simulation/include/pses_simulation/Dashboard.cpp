@@ -1,5 +1,5 @@
 #include "Dashboard.h"
-#include "../../../build/pses_simulation/ui_Dashboard.h"
+#include "ui_Dashboard.h"
 
 Dashboard::Dashboard(ros::NodeHandle* nh, QWidget *parent) :
         QMainWindow(parent), ui(new Ui::Dashboard), nh(nh){

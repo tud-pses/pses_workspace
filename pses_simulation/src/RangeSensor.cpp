@@ -74,10 +74,10 @@ const rs::rangeArray_ptr RangeSensor::getLaserScan(const cv::Point sensorPos, co
 
                 P2.x = (int) round(
                         sensorPos.x
-                        + maxDistance * cv::cos((-angle) * CV_PI / 180.0)); // - vor angle entfernt
+                        + maxDistance * std::cos((-angle) * CV_PI / 180.0)); // - vor angle entfernt
                 P2.y = (int) round(
                         sensorPos.y
-                        + maxDistance * cv::sin((-angle) * CV_PI / 180.0)); // - vor angle entfernt
+                        + maxDistance * std::sin((-angle) * CV_PI / 180.0)); // - vor angle entfernt
 
                 cv::LineIterator it(map, sensorPos, P2, 8);
                 cv::Point currentPos = it.pos();

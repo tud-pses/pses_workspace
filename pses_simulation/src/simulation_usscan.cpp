@@ -110,16 +110,18 @@ int main(int argc, char **argv){
 
         // get "god" map meta info
         nav_msgs::MapMetaData mapInfo;
-        std::string imgMetaPath = ros::package::getPath("pses_simulation") + "/data/map/map.yaml";
-        YAML::Node imgMetaInfo = YAML::LoadFile(imgMetaPath);
+        std::string mapDefaultPath = ros::package::getPath("pses_simulation") + "/data/map/map";
+        std::string mapPath;
+        nh.param<std::string>("map_path", mapPath, mapDefaultPath);
+
+        YAML::Node imgMetaInfo = YAML::LoadFile(mapPath + ".yaml");
         double resolution = imgMetaInfo["resolution"].as<double>();
         geometry_msgs::Pose origin = imgMetaInfo["origin"].as<geometry_msgs::Pose>();
         mapInfo.origin = origin;
         mapInfo.resolution = resolution;
 
         // get "god" map
-        std::string imagePath = ros::package::getPath("pses_simulation") + "/data/map/map.pgm";
-        cv::Mat map = cv::imread(imagePath,1);
+        cv::Mat map = cv::imread(mapPath + ".pgm", 1);
         cv::cvtColor(map, map, CV_RGB2GRAY);
 
         // create sensor object and link with config object
