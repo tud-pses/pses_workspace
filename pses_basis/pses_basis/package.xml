@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package>
+  <name>pses_basis</name>
+  <version>0.0.1</version>
+  <description>
+    The pses_basis metapackage
+  </description>
+
+  <maintainer email="sebastian.ehmes@gmx.de">Sebastian Ehmes</maintainer>
+  <maintainer email="aceronicolas@hotmail.com">Nicolas Acero</maintainer>
+  <license>BSD</license>
+  <url>https://github.com/tud-pses</url>
+  <author>Sebastian Ehmes</author>
+  <author>Nicolas Acero</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <run_depend>pses_ucboard</run_depend>
+  <run_depend>pses_simulation</run_depend>
+  <run_depend>pses_sensors</run_depend>
+
+  <export>
+    <metapackage/>
+  </export>
+</package>
