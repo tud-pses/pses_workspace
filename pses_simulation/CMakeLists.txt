@@ -128,10 +128,12 @@ set( QT_USE_QTXML TRUE )
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories(include)
-include_directories(include ${catkin_INCLUDE_DIRS})
-include_directories(include ${OpenCV_INCLUDE_DIRS})
-#include_directories(include ${Qt5_INCLUDE_DIRS})
+include_directories(
+	include
+	${CMAKE_BINARY_DIR}/pses_simulation # ui_Dashboard.h
+	${catkin_INCLUDE_DIRS}
+	${OpenCV_INCLUDE_DIRS}
+)
 QT5_WRAP_UI(UIS_HDRS include/pses_simulation/Dashboard.ui)
 
 
