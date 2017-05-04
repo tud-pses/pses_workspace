@@ -7,7 +7,7 @@ sudo chmod a+x install*.sh
 
 * Entwicklungsumgebung definieren:
 ```bash 
-echo "source /opt/ros/indigo/setup.bash" >> ~/.bashrc
+echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc
 source ~/.bashrc
 ```
 *	install2.sh ausführen `./install2.sh`
@@ -17,7 +17,7 @@ source ~/.bashrc
 echo "source /home/pses/catkin_ws/devel/setup.bash" >> ~/.bashrc
 source ~/.bashrc
 sudo su
-echo "source /opt/ros/indigo/setup.bash" >> /etc/bash.bashrc
+echo "source /opt/ros/kinetic/setup.bash" >> /etc/bash.bashrc
 echo "source /home/pses/catkin_ws/devel/setup.bash" >> /etc/bash.bashrc
 source  /etc/bash.bashrc
 exit

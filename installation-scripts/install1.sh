@@ -8,6 +8,7 @@ then
     exit 1
 fi
 
+sudo dpkg --configure -a
 sudo apt-get update
 sudo apt-get -y upgrade
 sudo apt-get -y install chromium-browser
