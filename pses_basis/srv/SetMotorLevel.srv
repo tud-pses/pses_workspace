@@ -1,0 +1,3 @@
+int8 level
+---
+bool was_set
