@@ -119,15 +119,15 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-# include_directories(include)
+include_directories(include)
 include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
-# add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/pses_basis.cpp
-# )
+ add_library(
+   serialinterface src/serialinterface.cpp
+ )
 
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
@@ -150,7 +150,7 @@ include_directories(
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
- target_link_libraries(uc_bridge ${catkin_LIBRARIES})
+ target_link_libraries(uc_bridge ${catkin_LIBRARIES} serialinterface)
 
 #############
 ## Install ##

@@ -3,6 +3,7 @@
 
 #include <serial/serial.h>
 #include <string>
+#include <ros/ros.h>
 
 class SerialInterface
 {
@@ -22,7 +23,7 @@ private:
   std::string deviceName;
   serial::Serial serialConnection;
   bool connected;
-  // priva methods & constructors
+  // private methods & constructors
   SerialInterface();
   SerialInterface(const SerialInterface&);
   SerialInterface& operator=(const SerialInterface&);

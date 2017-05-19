@@ -1,4 +1,4 @@
-#include "serialinterface.h"
+#include "pses_basis/serialinterface.h"
 
 SerialInterface::SerialInterface()
 {
@@ -7,7 +7,8 @@ SerialInterface::SerialInterface()
   deviceName = "/dev/ttyUSB0";
 }
 
-void SerialInterface::configure(const unsigned int baudRate, const std::string deviceName)
+void SerialInterface::configure(const unsigned int baudRate,
+                                const std::string deviceName)
 {
   this->baudRate = baudRate;
   this->deviceName = deviceName;
@@ -15,31 +16,19 @@ void SerialInterface::configure(const unsigned int baudRate, const std::string d
 
 void SerialInterface::connect(const unsigned int serialTimeout)
 {
-  if (!connected)
+  ROS_INFO_STREAM("Config Phase..");
+  serialConnection.setPort(deviceName);
+  serialConnection.setBaudrate(baudRate);
+  serial::Timeout timeout = serial::Timeout::simpleTimeout(serialTimeout);
+  serialConnection.setTimeout(timeout);
+
+  try
   {
-    try
-    {
-      serialConnection.setPort("/dev/" + deviceName);
-      serialConnection.setBaudrate(baudRate);
-      serial::Timeout timeout = serial::Timeout::simpleTimeout(serialTimeout);
-      serialConnection.setTimeout(timeout);
-      serialConnection.open();
-    }
-    catch (serial::IOException& e)
-    {
-      // throw UcBoardException(Board::CONNECTING_FAILED);
-    }
-    if (serialConnection.isOpen())
-    {
-      connected = true;
-    }
-    else
-    {
-      // throw UcBoardException(Board::CONNECTION_NOT_ESTABLISHED);
-    }
+    serialConnection.open();
+    ROS_INFO_STREAM("Connection open..");
   }
-  else
+  catch (serial::IOException& e)
   {
-    // throw UcBoardException(Board::CONNECTION_ALREADY_ESTABLISHED);
+    ROS_INFO_STREAM(e.what());
   }
 }
