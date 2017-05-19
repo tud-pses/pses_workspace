@@ -16,9 +16,9 @@ void SerialInterface::configure(unsigned int baudRate, std::string deviceTag)
 int SerialInterface::connect(const unsigned int serialTimeout)
 {
   std::string deviceName;
-  if (findDeviceName(deviceName) < 0)
-  {
-    return -1;
+  int status = findDeviceName(deviceName);
+  if (status < 0) {
+    return status;
   }
   serialConnection.setPort(deviceName);
   serialConnection.setBaudrate(baudRate);
@@ -32,8 +32,8 @@ int SerialInterface::connect(const unsigned int serialTimeout)
   }
   catch (serial::IOException& e)
   {
-    std::cout << e.what() << std::endl;
-    return -2;
+    std::cout<<e.what()<<std::endl;
+    return -3;
   }
 }
 
@@ -65,13 +65,12 @@ int SerialInterface::findDeviceName(std::string& deviceName)
     return -2;
   }
 
-  char buffer1[PATH_MAX + 1];
+  char buffer1[PATH_MAX+1];
   size_t len = readlink(devicePath.c_str(), buffer1, sizeof(buffer1) - 1);
-  if (len != -1)
-  {
-    buffer1[len] = '\0';
+  if (len != -1) {
+        buffer1[len] = '\0';
   }
-  char buffer2[PATH_MAX + 1];
+  char buffer2[PATH_MAX+1];
   realpath(serialDevices.append(std::string(buffer1)).c_str(), buffer2);
   std::string serialPortName(buffer2);
   deviceName = std::string(buffer2);

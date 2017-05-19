@@ -19,10 +19,21 @@ int main(int argc, char** argv)
   // ROS_INFO_STREAM("tut was ...");
   SerialInterface& si = SerialInterface::instance();
   int result = si.connect();
-  ROS_INFO_STREAM("COMMUNICATION STATUS CODE: " << result);
-  // DIR *pDir = opendir("/dev/serial/by-id");
-  // if(d == NULL) //Couldn't open directory
-  //  return 0;
+  switch (result)
+  {
+  case 1:
+    ROS_INFO_STREAM("Connection with uc-board established");
+    break;
+  case -1:
+    ROS_ERROR("No serial devices found");
+    break;
+  case -2:
+    ROS_ERROR("uc-board is not connected");
+    break;
+  default:
+    ROS_ERROR("Unknown error, while establishing serial communication");
+    break;
+  }
 
   ros::spin();
 
