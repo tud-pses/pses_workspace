@@ -6,7 +6,6 @@
 #include <dirent.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <algorithm>
 #include <iostream>
 
 class SerialInterface
@@ -33,8 +32,6 @@ private:
   SerialInterface& operator=(const SerialInterface&);
 
   int findDeviceName(std::string& deviceName);
-  inline static bool invalidChar(const char c) { return c > 126 || c < 33; }
-  void stripIllegal(std::string& str);
 };
 
 #endif // SERIALINTERFACE_H
