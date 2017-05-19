@@ -3,6 +3,7 @@
 
 #include <serial/serial.h>
 #include <string>
+#include <stdio.h>
 #include <ros/ros.h>
 
 class SerialInterface
