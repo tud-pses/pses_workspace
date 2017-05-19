@@ -1,1 +1,1 @@
-# Installationsanweisungen [here](https://github.com/tud-pses/PSES-Basis/tree/master/installation-scripts)
+# Installationsanweisungen [hier](https://github.com/tud-pses/PSES-Basis/tree/master/installation-scripts)

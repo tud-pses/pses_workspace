@@ -29,3 +29,4 @@ rosdep update
 sudo apt-get -y install python-rosinstall
 mkdir -p /home/$user/catkin_ws/src
 sudo apt-get -y install --reinstall cmake
+sudo usermod -a -G dialout $user

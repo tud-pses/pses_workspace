@@ -1,4 +1,5 @@
 # Installationsanweisungen
+* Falls der Benutzername nicht `pses` lautet, dann die Variable `user` in den bereitgestellten Skriptdateien entsprechend ändern. 
 * Skriptdateien ausführbar machen
 ```bash 
 sudo chmod a+x install*.sh 
@@ -23,5 +24,7 @@ source  /etc/bash.bashrc
 exit
 ```
 *	install3.sh ausführen `./install3.sh`
+
+*	Computer neustarten
 
 **Anmerkung:** install4.sh soll nur auf dem Auto ausführt werden. Diese Datei installiert und konfiguriert den Treiber für die Kinect.
