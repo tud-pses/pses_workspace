@@ -2,7 +2,6 @@
 
 SerialInterface::SerialInterface()
 {
-  connected = false;
   baudRate = 921600;
   deviceTag = "usb-FTDI_FT232R_USB_UART";
 }
@@ -13,31 +12,46 @@ void SerialInterface::configure(unsigned int baudRate, std::string deviceTag)
   this->deviceTag = deviceTag;
 }
 
-int SerialInterface::connect(const unsigned int serialTimeout)
+void SerialInterface::connect(const unsigned int serialTimeout)
 {
+  if (serialConnection.isOpen())
+    return;
   std::string deviceName;
-  int status = findDeviceName(deviceName);
-  if (status < 0) {
-    return status;
-  }
+  findDeviceName(deviceName);
   serialConnection.setPort(deviceName);
   serialConnection.setBaudrate(baudRate);
   serial::Timeout timeout = serial::Timeout::simpleTimeout(serialTimeout);
   serialConnection.setTimeout(timeout);
-
-  try
-  {
-    serialConnection.open();
-    return 1;
-  }
-  catch (serial::IOException& e)
-  {
-    std::cout<<e.what()<<std::endl;
-    return -3;
-  }
+  serialConnection.open();
 }
 
-int SerialInterface::findDeviceName(std::string& deviceName)
+void SerialInterface::send(std::string& message)
+{
+  if (!serialConnection.isOpen())
+    throw std::runtime_error("UC-board connection not established/lost.");
+  serialConnection.write(message);
+}
+
+// be careful when using this method, it will block the calling thread until
+// something has been
+// received or the request took longer than a certain timeout threshold
+void SerialInterface::read(std::string& message, std::string& delimiter,
+                           unsigned int maxLineLength)
+{
+  if (!serialConnection.isOpen())
+    throw std::runtime_error("UC-board connection not established/lost.");
+  if (serialConnection.waitReadable())
+    serialConnection.readline(message, maxLineLength, delimiter);
+}
+
+void SerialInterface::disconnect()
+{
+  if (!serialConnection.isOpen())
+    return;
+  serialConnection.close();
+}
+
+void SerialInterface::findDeviceName(std::string& deviceName)
 {
   std::string serialDevices = "/dev/serial/by-id/";
   std::string devicePath;
@@ -46,7 +60,7 @@ int SerialInterface::findDeviceName(std::string& deviceName)
   int numOfFiles = scandir(serialDevices.c_str(), &fileList, NULL, alphasort);
   if (numOfFiles < 3)
   {
-    return -1;
+    throw std::runtime_error("No serial devices found.");
   }
 
   for (int i = 0; i < numOfFiles; i++)
@@ -62,18 +76,16 @@ int SerialInterface::findDeviceName(std::string& deviceName)
 
   if (devicePath.length() <= 0)
   {
-    return -2;
+    throw std::runtime_error("UC-board is not connected.");
   }
 
-  char buffer1[PATH_MAX+1];
+  char buffer1[PATH_MAX + 1];
   size_t len = readlink(devicePath.c_str(), buffer1, sizeof(buffer1) - 1);
-  if (len != -1) {
-        buffer1[len] = '\0';
+  if (len != -1)
+  {
+    buffer1[len] = '\0';
   }
-  char buffer2[PATH_MAX+1];
+  char buffer2[PATH_MAX + 1];
   realpath(serialDevices.append(std::string(buffer1)).c_str(), buffer2);
-  std::string serialPortName(buffer2);
   deviceName = std::string(buffer2);
-
-  return 1;
 }
