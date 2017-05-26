@@ -34,7 +34,7 @@ void SerialInterface::send(std::string& message)
 
 // be careful when using this method, it will block the calling thread until
 // something has been
-// received oder the request took longer than a certain timeout threshold
+// received or the request took longer than a certain timeout threshold
 void SerialInterface::read(std::string& message, std::string& delimiter,
                            unsigned int maxLineLength)
 {
