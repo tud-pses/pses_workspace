@@ -18,20 +18,23 @@ public:
   }
   ~SerialInterface() {}
   void configure(unsigned int baudRate, std::string deviceTag);
-  int connect(const unsigned int serialTimeout = 5);
+  void connect(const unsigned int serialTimeout = 5);
+  void send(std::string& message);
+  void read(std::string& message, std::string& delimiter,
+            unsigned int maxLineLength = 65536);
+  void disconnect();
 
 private:
   // private class attributes
   unsigned int baudRate;
   std::string deviceTag;
   serial::Serial serialConnection;
-  bool connected;
   // private methods & constructors
   SerialInterface();
   SerialInterface(const SerialInterface&);
   SerialInterface& operator=(const SerialInterface&);
 
-  int findDeviceName(std::string& deviceName);
+  void findDeviceName(std::string& deviceName);
 };
 
 #endif // SERIALINTERFACE_H

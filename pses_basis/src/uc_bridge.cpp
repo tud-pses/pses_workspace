@@ -16,23 +16,11 @@ int main(int argc, char** argv)
   ros::NodeHandle nh;
   ros::ServiceServer service =
       nh.advertiseService("set_motor_level", setMotorLevel);
-  // ROS_INFO_STREAM("tut was ...");
   SerialInterface& si = SerialInterface::instance();
-  int result = si.connect();
-  switch (result)
-  {
-  case 1:
-    ROS_INFO_STREAM("Connection with uc-board established");
-    break;
-  case -1:
-    ROS_ERROR("No serial devices found");
-    break;
-  case -2:
-    ROS_ERROR("uc-board is not connected");
-    break;
-  default:
-    ROS_ERROR("Unknown error, while establishing serial communication");
-    break;
+  try {
+    si.connect();
+  }catch(std::exception& e){
+    ROS_ERROR("%s",e.what());
   }
 
   ros::spin();
