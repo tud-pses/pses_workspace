@@ -1,8 +1,10 @@
 #include <vector>
 #include <string>
 
-// from azawadzki,
-// https://stackoverflow.com/questions/180947/base64-decode-snippet-in-c
+/*** from azawadzki,
+* https://stackoverflow.com/questions/180947/base64-decode-snippet-in-c
+*/
+
 inline std::vector<unsigned char> base64_to_binary(const std::string& in)
 {
 
