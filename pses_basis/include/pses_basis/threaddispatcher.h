@@ -1,7 +1,6 @@
 #ifndef THREADDISPATCHER_H
 #define THREADDISPATCHER_H
 
-#include <thread>
 #include <string>
 #include <pses_basis/serialinterface.h>
 #include <pses_basis/communicationthread.h>
@@ -13,7 +12,9 @@ class ReadingThread;
 class ThreadDispatcher : public CommunicationThread
 {
 public:
-  ThreadDispatcher();
+  ThreadDispatcher(std::string delimiter);
+  ~ThreadDispatcher();
+
   void startThread();
   void stopThread();
 

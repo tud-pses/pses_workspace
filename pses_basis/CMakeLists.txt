@@ -125,7 +125,7 @@ include_directories(
 )
 
 ## Declare a C++ library
-  add_library(
+ add_library(
    readingthread src/readingthread.cpp
   )
  add_library(
@@ -133,6 +133,9 @@ include_directories(
   )
  add_library(
    serialinterface src/serialinterface.cpp
+  )
+ add_library(
+   communication src/communication.cpp
   )
 
 ## Declare a C++ executable
@@ -154,9 +157,11 @@ include_directories(
 ## same as for the library above
 
 ## Specify libraries to link a library or executable target against
+ target_link_libraries(serialinterface ${catkin_LIBRARIES})
  target_link_libraries(readingthread serialinterface)
  target_link_libraries(threaddispatcher readingthread)
- target_link_libraries(uc_bridge ${catkin_LIBRARIES} serialinterface threaddispatcher)
+ target_link_libraries(communication serialinterface threaddispatcher)
+ target_link_libraries(uc_bridge ${catkin_LIBRARIES} communication)
 
 #############
 ## Install ##

@@ -1,8 +1,12 @@
 #include "pses_basis/threaddispatcher.h"
 
-ThreadDispatcher::ThreadDispatcher()
+ThreadDispatcher::ThreadDispatcher(std::string delimiter)
 {
-  readingThread = new ReadingThread("\x03", this);
+  readingThread = new ReadingThread(delimiter, this);
+}
+ThreadDispatcher::~ThreadDispatcher()
+{
+  delete(readingThread);
 }
 
 void ThreadDispatcher::startThread(){
