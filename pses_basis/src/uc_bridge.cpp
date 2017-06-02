@@ -17,7 +17,7 @@ int main(int argc, char** argv)
   ros::NodeHandle nh;
   ros::ServiceServer service =
       nh.advertiseService("set_motor_level", setMotorLevel);
-  /*
+
   SerialInterface& si = SerialInterface::instance();
   try {
     si.connect();
@@ -25,19 +25,29 @@ int main(int argc, char** argv)
     ROS_ERROR("%s",e.what());
   }
   ThreadDispatcher td;
-  td.startReading("\x03");
+  td.startThread();
   std::string msg = std::string("?ID\n");
   si.send(msg);
   ros::Duration(0.5).sleep();
+  msg = std::string("?ID\n");
+  si.send(msg);
+  ros::Duration(0.5).sleep();
+  msg = std::string("?ID\n");
+  si.send(msg);
+  ros::Duration(0.5).sleep();
+  /*
   msg = "!DAQ GRP 1 ~TS=10 ~AVG AX AY AZ\n";
   si.send(msg);
   ros::Duration(0.5).sleep();
   msg = "!DAQ START\n";
   si.send(msg);
-  //ros::Duration(5.0).sleep();
-  //msg = "!DAQ STOP\n";
-  //si.send(msg);
+  ros::Duration(10.0).sleep();
+  msg = "!DAQ STOP\n";
+  si.send(msg);
+  ros::Duration(0.5).sleep();
   */
+  td.stopThread();
+  si.disconnect();
 
   ros::spin();
 

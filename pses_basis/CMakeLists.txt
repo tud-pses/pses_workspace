@@ -125,12 +125,15 @@ include_directories(
 )
 
 ## Declare a C++ library
+  add_library(
+   readingthread src/readingthread.cpp
+  )
  add_library(
    threaddispatcher src/threaddispatcher.cpp
   )
  add_library(
    serialinterface src/serialinterface.cpp
- )
+  )
 
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
@@ -151,7 +154,8 @@ include_directories(
 ## same as for the library above
 
 ## Specify libraries to link a library or executable target against
- target_link_libraries(serialinterface threaddispatcher)
+ target_link_libraries(readingthread serialinterface)
+ target_link_libraries(threaddispatcher readingthread)
  target_link_libraries(uc_bridge ${catkin_LIBRARIES} serialinterface threaddispatcher)
 
 #############

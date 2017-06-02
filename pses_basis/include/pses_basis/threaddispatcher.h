@@ -4,20 +4,22 @@
 #include <thread>
 #include <string>
 #include <pses_basis/serialinterface.h>
+#include <pses_basis/communicationthread.h>
+#include <pses_basis/readingthread.h>
 #include <ros/ros.h>
 
-class ThreadDispatcher
+class ReadingThread;
+
+class ThreadDispatcher : public CommunicationThread
 {
 public:
   ThreadDispatcher();
-  void startReading(std::string delimiter);
-  void stopReading();
+  void startThread();
+  void stopThread();
 
 private:
-  bool doRead;
-  std::thread serialReader;
-  std::string delimiter;
-  void readFromSerial();
+  void workerFunction();
+  ReadingThread* readingThread;
 };
 
 #endif // THREADDISPATCHER_H
