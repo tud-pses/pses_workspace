@@ -1,0 +1,14 @@
+# Describes the format for a new device/sensor
+
+description: "Hall sensor: Impulse count (modulo 256)"
+
+connection:
+	channel: 'HALL_CNT'
+
+communication:
+	datatype: 'uint8_t'
+	size: '1'
+	convert_data:
+		conversion_needed: n
+		conversion_factor:	
+ 

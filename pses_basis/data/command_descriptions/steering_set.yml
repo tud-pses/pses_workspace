@@ -1,0 +1,11 @@
+# Describes the format of microcontroller command
+
+description: "Set the steering level"
+
+command: "!STEER"
+
+answer_is_sent: y
+
+options:
+
+ 

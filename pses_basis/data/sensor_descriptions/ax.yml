@@ -1,0 +1,14 @@
+# Describes the format for a new device/sensor
+
+description: "Accelerometer x-axis (ahead)"
+
+connection:
+	channel: 'AX'
+
+communication:
+	datatype: 'int16_t'
+	size: '2'
+	convert_data:
+		conversion_needed: y
+		conversion_factor: '0.00119750976'
+ 

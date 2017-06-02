@@ -1,0 +1,11 @@
+# Describes the format of microcontroller command
+
+description: "Turns motor off"
+
+command: "!DRV OFF"
+
+answer_is_sent: y
+
+options:
+
+ 

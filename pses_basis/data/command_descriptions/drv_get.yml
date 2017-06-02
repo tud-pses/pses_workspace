@@ -1,0 +1,11 @@
+# Describes the format of microcontroller command
+
+description: "Get the current motor level"
+
+command: "?DRV"
+
+answer_is_sent: y
+
+options:
+
+ 

@@ -1,0 +1,3 @@
+int8 steering
+---
+bool was_set

@@ -1,0 +1,14 @@
+# Describes the format for a new device/sensor
+
+description: "Magnetometer: Magnetic flux around z-axis (up)"
+
+connection:
+	channel: 'MZ'
+
+communication:
+	datatype: 'int16_t'
+	size: '2'
+	convert_data:
+		conversion_needed: y
+		conversion_factor: '0.00000015'
+ 

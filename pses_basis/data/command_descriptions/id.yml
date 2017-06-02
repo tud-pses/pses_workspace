@@ -1,0 +1,11 @@
+# Describes the format of microcontroller command
+
+description: "Get the car ID"
+
+command: "?ID"
+
+answer_is_sent: y
+
+options:
+
+ 

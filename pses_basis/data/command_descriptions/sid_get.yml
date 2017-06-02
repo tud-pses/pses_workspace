@@ -1,0 +1,11 @@
+# Describes the format of microcontroller command
+
+description: "Get the session ID"
+
+command: "?SID"
+
+answer_is_sent: y
+
+options:
+
+ 

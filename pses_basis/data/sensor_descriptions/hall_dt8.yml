@@ -1,0 +1,14 @@
+# Describes the format for a new device/sensor
+
+description: "Hall sensor: Delta time of the last wheel revolution"
+
+connection:
+	channel: 'HALL_DT8'
+
+communication:
+	datatype: 'uint16_t'
+	size: '2'
+	convert_data:
+		conversion_needed: y
+		conversion_factor: '0.001'
+ 
