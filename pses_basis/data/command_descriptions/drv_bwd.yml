@@ -2,10 +2,12 @@
 
 description: "Drives backwards"
 
+command_has_params: True
+params: ['$var_speed']
 command: "!DRV B"
 
-answer_is_sent: y
-
+answer_contains_params: True
+answer: ":B"
 options:
 
  

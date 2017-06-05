@@ -1,0 +1,29 @@
+- name: int8_t
+  byte_size: 1
+  signed: True
+  float: False
+
+- name: uint8_t
+  byte_size: 1
+  signed: False
+  float: False
+
+- name: int16_t
+  byte_size: 2
+  signed: True
+  float: False
+
+- name: uint16_t
+  byte_size: 2
+  signed: False
+  float: False
+
+- name: int32_t
+  byte_size: 4
+  signed: True
+  float: False
+
+- name: uint32_t
+  byte_size: 4
+  signed: False
+  float: False

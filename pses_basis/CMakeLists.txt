@@ -15,7 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   serial
   std_msgs
-  tf
+  roslib
 )
 
 ## System dependencies are found with CMake's conventions
@@ -137,6 +137,9 @@ include_directories(
  add_library(
    communication src/communication.cpp
   )
+ add_library(
+   threadfactory src/threadfactory.cpp
+  )
 
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
@@ -161,7 +164,8 @@ include_directories(
  target_link_libraries(readingthread serialinterface)
  target_link_libraries(threaddispatcher readingthread)
  target_link_libraries(communication serialinterface threaddispatcher)
- target_link_libraries(uc_bridge ${catkin_LIBRARIES} communication)
+ target_link_libraries(threadfactory yaml-cpp)
+ target_link_libraries(uc_bridge ${catkin_LIBRARIES} communication threadfactory)
 
 #############
 ## Install ##
