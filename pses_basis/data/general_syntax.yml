@@ -1,0 +1,14 @@
+# basic communication tokens
+end_of_message: '\x03'
+end_of_frame: '\n'
+token_separator: ' '
+
+# basic prefixes
+command_prefix: '!'
+request_prefix: '?'
+answer_on_command_prefix: ':'
+answer_on_request_prefix: ':'
+
+# advanced prefixes
+channel_group_msg: '#'
+error_prefix: 'err'

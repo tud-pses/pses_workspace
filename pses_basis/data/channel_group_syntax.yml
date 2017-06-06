@@ -1,0 +1,4 @@
+# basic grouping functions
+set_group:
+  cmd_name: "!GRP $var_grp_nr $var_channel_list $options"
+  # irgendwie so, mal schaun
