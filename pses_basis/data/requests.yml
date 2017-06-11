@@ -4,7 +4,6 @@
   request: "DRV"
   response_has_params: True
   response: "$var_direction $var_level"
-  options:
 
 - req_name: "Get Steering Level"
   req_has_params: False
@@ -12,7 +11,6 @@
   request: "STEER"
   response_has_params: True
   response: "$var_level"
-  options:
 
 - req_name: "Get Controller ID"
   req_has_params: False
@@ -20,7 +18,6 @@
   request: "ID"
   response_has_params: True
   response: "$var_ID"
-  options:
 
 - req_name: "Get Session ID"
   req_has_params: False
@@ -28,7 +25,6 @@
   request: "SID"
   response_has_params: True
   response: "$var_ID"
-  options:
 
 - req_name: "Get Firmware Version"
   req_has_params: False
@@ -36,4 +32,10 @@
   request: "VER"
   response_has_params: True
   response: "$var_version"
-  options:
+
+- req_name: "Get Kinect Status"
+  req_has_params: False
+  params: ['var_kinect_stat']
+  request: "VOUT"
+  response_has_params: True
+  response: "$var_kinect_stat"

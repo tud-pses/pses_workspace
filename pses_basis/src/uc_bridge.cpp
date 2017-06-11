@@ -21,6 +21,7 @@ int main(int argc, char** argv)
   std::string typesPath = ros::package::getPath("pses_basis")+ "/data/";
   ThreadFactory tf(typesPath);
   tf.readDataTypes();
+  tf.readGeneralSyntax();
 
   /*
   Communication com;

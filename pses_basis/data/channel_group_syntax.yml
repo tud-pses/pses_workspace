@@ -1,4 +1,123 @@
 # basic grouping functions
-set_group:
-  cmd_name: "!GRP $var_grp_nr $var_channel_list $options"
-  # irgendwie so, mal schaun
+set_group: #this will be treated as a commad
+  params: ['var_grp_nr', 'var_channel_list', 'var_options']
+  command: "DAQ GRP $var_grp_nr $var_channel_list $var_options"
+  cmd_has_response: True
+  cmd_contains_params: False
+  response: 'ok'
+
+start_daq: #this will be treated as command
+  params:
+  command: "DAQ START"
+  cmd_has_response: True
+  cmd_contains_params: False
+  response: 'started'
+
+stop_daq: #this will be treated as command
+  params:
+  command: "DAQ STOP"
+  cmd_has_response: True
+  cmd_contains_params: False
+  response: 'stopped'
+
+daq_info: #this will be treated as request
+  req_has_params: False
+  params: ['var_grps']
+  request: "DAQ GRPS"
+  response_has_params: True
+  response: "$var_grps"
+
+daq_started: #this will be treated as request
+  req_has_params: False
+  params: ['var_grp_stat']
+  request: "DAQ"
+  response_has_params: True
+  response: '$var_grp_stat'
+
+get_group_info: #this will be treated as request
+  req_has_params: True
+  params: ['var_grp_nr', 'var_grp_info']
+  command: "DAQ $var_grp_nr"
+  cmd_has_response: True
+  cmd_contains_params: True
+  response: "$var_grp_info"
+
+delete_group: #this will be treated as command
+  cmd_has_params: True
+  params: ['var_grp_nr']
+  request: "DAQ GRP $var_grp_nr ~DELETE"
+  response_has_params: False
+  response: "ok"
+
+activate_group: #this will be treated as command
+  cmd_has_params: True
+  params: ['var_grp_nr']
+  command: "DAQ GRP $var_grp_nr ~ACTIVATE"
+  cmd_has_response: True
+  response_contains_params: False
+  response: "ok"
+
+deactivate_group: #this will be treated as command
+  cmd_has_params: True
+  params: ['var_grp_nr']
+  command: "DAQ GRP $var_grp_nr ~DEACTIVATE"
+  cmd_has_response: True
+  response_contains_params: False
+  response: "ok"
+
+options:
+  crc_16:
+    opt_has_params: False
+    params: ['var_crc']
+    opt: 'CRC'
+    opt_returns_params: True
+  encoding_ascii:
+    opt_has_params: False
+    params:
+    opt: 'ASCII'
+    opt_returns_params: False
+  encoding_b64:
+    opt_has_params: False
+    params:
+    opt: 'ENC=B64'
+    opt_returns_params: False
+  encoding_hex:
+    opt_has_params: False
+    params:
+    opt: 'ENC=HEX'
+    opt_returns_params: False
+  wait_for_all: #a value of -1 will set wait for all to inf
+    opt_has_params: False
+    params: ['var_time']
+    opt: 'ALL=$var_time'
+    opt_returns_params: False
+  wait_for_any:
+    opt_has_params: False
+    params:
+    opt: 'ANY'
+    opt_returns_params: False
+  channel_polling_interval:
+    opt_has_params: True
+    params: ['var_time']
+    opt: 'TS=$var_time'
+    opt_returns_params: False
+  average_over_interval:
+    opt_has_params: False
+    params:
+    opt: 'AVG'
+    opt_returns_params: False
+  skip_polling_intervalls:
+    opt_has_params: True
+    params: 'var_n'
+    opt: 'SKIP=$var_n'
+    opt_returns_params: False
+  age:
+    opt_has_params: False
+    params: 'var_age'
+    opt: 'AGE'
+    opt_returns_params: True
+  tics:
+    opt_has_params: False
+    params: 'var_tics'
+    opt: 'TICS'
+    opt_returns_params: True

@@ -5,7 +5,6 @@
   cmd_has_response: True
   response_contains_params: True
   response: "F $var_speed"
-  options:
 
 - cmd_name: "Drive Backward"
   cmd_has_params: True
@@ -14,7 +13,6 @@
   cmd_has_response: True
   response_contains_params: True
   response: "B $var_speed"
-  options:
 
 - cmd_name: "Full Stop"
   cmd_has_params: False
@@ -23,7 +21,6 @@
   cmd_has_response: True
   response_contains_params: False
   response: "B -500"
-  options:
 
 - cmd_name: "Motor Off"
   cmd_has_params: False
@@ -32,7 +29,6 @@
   cmd_has_response: True
   response_contains_params: False
   response: "OFF"
-  options:
 
 - cmd_name: "Set Steering Level"
   cmd_has_params: True
@@ -41,7 +37,6 @@
   cmd_has_response: True
   response_contains_params: True
   response: "STEER $var_steering"
-  options:
 
 - cmd_name: "Set Session ID"
   cmd_has_params: True
@@ -50,7 +45,6 @@
   cmd_has_response: True
   response_contains_params: True
   response: "SID $var_ID"
-  options:
 
 - cmd_name: "Reset Controller"
   cmd_has_params: False
@@ -59,7 +53,22 @@
   cmd_has_response: False
   response_contains_params: False
   response:
-  options:
+
+- cmd_name: "Toggle Kinect On"
+  cmd_has_params: False
+  params:
+  command: "VOUT ON"
+  cmd_has_response: True
+  response_contains_params: False
+  response: 'ON'
+
+- cmd_name: "Toggle Kinect Off"
+  cmd_has_params: False
+  params:
+  command: "VOUT OFF"
+  cmd_has_response: True
+  response_contains_params: False
+  response: 'OFF'
 
 # hier fehlen noch jede Menge sachen...
 
