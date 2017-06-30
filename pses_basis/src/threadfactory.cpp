@@ -16,8 +16,15 @@ void ThreadFactory::readDataTypes(){
 
   for (auto node : typesYaml)
   {
-    Params::DataType dataType;
-    node >> dataType;
-    dataTypes.insert (std::make_pair(dataType.name,dataType));
+    node >> dataTypes;
+  }
+}
+
+void ThreadFactory::readCommands(){
+  YAML::Node commandsYaml = YAML::LoadFile(configPath+"commands.yml");
+
+  for (auto node : commandsYaml)
+  {
+    node >> dataTypes;
   }
 }
