@@ -1,7 +1,7 @@
 #include "ros/ros.h"
 #include "pses_basis/SetMotorLevel.h"
 #include <pses_basis/communication.h>
-#include <pses_basis/threadfactory.h>
+#include <pses_basis/communicationconfig.h>
 #include <ros/package.h>
 
 bool setMotorLevel(pses_basis::SetMotorLevel::Request& req,
@@ -19,9 +19,11 @@ int main(int argc, char** argv)
   ros::ServiceServer service =
       nh.advertiseService("set_motor_level", setMotorLevel);
   std::string typesPath = ros::package::getPath("pses_basis")+ "/data/";
-  ThreadFactory tf(typesPath);
-  tf.readDataTypes();
-  tf.readGeneralSyntax();
+  //CommunicationConfig tf(typesPath);
+  //tf.readDataTypes();
+  //tf.readGeneralSyntax();
+  //tf.readCommands();
+  Communication com(typesPath);
 
   /*
   Communication com;

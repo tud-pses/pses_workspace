@@ -1,18 +1,18 @@
 - cmd_name: "Drive Forward"
   cmd_has_params: True
-  params: ['var_speed']
-  command: "DRV F $var_speed"
+  params: ['uint16_t:speed']
+  command: "DRV F $speed"
   cmd_has_response: True
   response_contains_params: True
-  response: "F $var_speed"
+  response: "F $speed"
 
 - cmd_name: "Drive Backward"
   cmd_has_params: True
-  params: ['var_speed']
-  command: "DRV B $var_speed"
+  params: ['uint16_t:speed']
+  command: "DRV B $speed"
   cmd_has_response: True
   response_contains_params: True
-  response: "B $var_speed"
+  response: "B $speed"
 
 - cmd_name: "Full Stop"
   cmd_has_params: False
@@ -32,19 +32,19 @@
 
 - cmd_name: "Set Steering Level"
   cmd_has_params: True
-  params: ['var_steering']
-  command: "DRV F $var_steering"
+  params: ['uint16_t:steering']
+  command: "DRV F $steering"
   cmd_has_response: True
   response_contains_params: True
-  response: "STEER $var_steering"
+  response: "STEER $steering"
 
 - cmd_name: "Set Session ID"
   cmd_has_params: True
-  params: ['var_ID']
-  command: "SID $var_ID"
+  params: ['string_t:ID']
+  command: "SID $ID"
   cmd_has_response: True
   response_contains_params: True
-  response: "SID $var_ID"
+  response: "SID $ID"
 
 - cmd_name: "Reset Controller"
   cmd_has_params: False

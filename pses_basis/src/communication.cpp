@@ -1,6 +1,13 @@
 #include "pses_basis/communication.h"
 
-Communication::Communication() { dispatcher = new ThreadDispatcher("\x03"); }
+Communication::Communication(const std::string& configPath) {
+  comCfg = CommunicationConfig(configPath);
+  comCfg.readDataTypes();
+  comCfg.readGeneralSyntax();
+  comCfg.readCommands();
+  dispatcher = new ThreadDispatcher(comCfg.getSyntax().endOfMessage);
+  //ROS_INFO_STREAM(comCfg.getSyntax().endOfMessage);
+}
 Communication::~Communication() { delete(dispatcher); }
 
 

@@ -138,7 +138,7 @@ include_directories(
    communication src/communication.cpp
   )
  add_library(
-   threadfactory src/threadfactory.cpp
+   communicationconfig src/communicationconfig.cpp
   )
 
 ## Declare a C++ executable
@@ -163,9 +163,9 @@ include_directories(
  target_link_libraries(serialinterface ${catkin_LIBRARIES})
  target_link_libraries(readingthread serialinterface)
  target_link_libraries(threaddispatcher readingthread)
- target_link_libraries(communication serialinterface threaddispatcher)
- target_link_libraries(threadfactory yaml-cpp)
- target_link_libraries(uc_bridge ${catkin_LIBRARIES} communication threadfactory)
+ target_link_libraries(communication serialinterface threaddispatcher communicationconfig)
+ target_link_libraries(communicationconfig yaml-cpp)
+ target_link_libraries(uc_bridge ${catkin_LIBRARIES} communication)
 
 #############
 ## Install ##

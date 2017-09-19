@@ -1,5 +1,5 @@
-#ifndef THREADFACTORY_H
-#define THREADFACTORY_H
+#ifndef COMMUNICATIONCONFIG_H
+#define COMMUNICATIONCONFIG_H
 
 #include <string>
 #include <unordered_map>
@@ -7,6 +7,7 @@
 #include <ros/ros.h>
 #include <utility>
 #include <vector>
+#include <boost/algorithm/string.hpp>
 
 namespace Params
 {
@@ -14,20 +15,29 @@ namespace Params
 class Parameter
 {
 public:
-  Parameter(const std::string& name) : name(name) {}
+  Parameter(const std::string& name, const std::string& type)
+      : name(name), type(type)
+  {
+  }
   const std::string& getName() const { return name; }
+  const std::string& getType() const { return type; }
 
 private:
   std::string name;
+  std::string type;
 };
 
-template <typename T> class GenericParameter : Params::Parameter
+template <typename T> class GenericParameter : public Params::Parameter
 {
 public:
-  GenericParameter(const std::string& name, const T& data)
-      : Parameter(name), m_data(data)
+  GenericParameter(const std::string& name, const std::string& type)
+      : Parameter(name, type)
   {
-    s_data = std::string(data);
+  }
+  void setData(const T& m_data, const std::string& s_data)
+  {
+    this->m_data = m_data;
+    this->s_data = s_data;
   }
   const T& getData() const { return m_data; }
   const std::string& toString() const { return s_data; }
@@ -71,6 +81,15 @@ public:
   {
     conv = std::stod(str);
   }
+  virtual std::shared_ptr<Params::Parameter>
+  generateGenericParameter(const std::string& name, const std::string& type)
+  {
+  }
+  virtual void
+  setGenericParameterData(const std::string& data,
+                          std::shared_ptr<Params::Parameter>& param)
+  {
+  }
 
 private:
   std::string name;
@@ -93,9 +112,25 @@ public:
     conversion = f;
   }
 
-  virtual void stringToDatatype(const std::string& str, T& datatype)
+  void stringToDatatype(const std::string& str, T& datatype)
   {
     (this->*conversion)(str, datatype);
+  }
+
+  std::shared_ptr<Params::Parameter>
+  generateGenericParameter(const std::string& name, const std::string& type)
+  {
+    return std::shared_ptr<Params::Parameter>(
+        new Params::GenericParameter<T>(name, type));
+  }
+
+  void setGenericParameterData(const std::string& data,
+                               std::shared_ptr<Params::Parameter>& param)
+  {
+    T convData;
+    (this->*conversion)(data, convData);
+    //((Params::GenericParameter<T>)(*param)).setData(convData,data);
+    // ROS_INFO_STREAM(convData);
   }
 
 private:
@@ -119,6 +154,7 @@ struct Command
 {
   std::string name;
   bool cmdHasParams;
+  std::vector<std::string> paramsRaw;
   std::vector<std::shared_ptr<Params::Parameter>> params;
   std::string cmd;
   bool cmdHasResponse;
@@ -155,10 +191,8 @@ operator>>(const YAML::Node& node,
   std::shared_ptr<Params::DataType> t;
   if (isSigned && !isFloat && !isString)
   {
-    t = std::shared_ptr<Params::DataType>(
-          new Params::GenericDataType<int>(
-              name, size, isSigned, isFloat, isString,
-              &Params::DataType::strToInt));
+    t = std::shared_ptr<Params::DataType>(new Params::GenericDataType<int>(
+        name, size, isSigned, isFloat, isString, &Params::DataType::strToInt));
   }
   else if (!isSigned && !isFloat && !isString)
   {
@@ -188,20 +222,73 @@ operator>>(const YAML::Node& node,
   }
   dataTypes.insert(std::make_pair(name, t));
 }
+
+// CommandType-Object assign operator
+void operator>>(const YAML::Node& node,
+                std::unordered_map<std::string, Params::Command>& commands)
+{
+  Params::Command cmd;
+  cmd.name = node["cmd_name"].as<std::string>();
+  cmd.cmdHasParams = node["cmd_has_params"].as<bool>();
+  cmd.cmdHasResponse = node["cmd_has_response"].as<bool>();
+  cmd.respHasParams = node["response_contains_params"].as<bool>();
+  if (node["command"].IsScalar() && !node["command"].IsNull())
+  {
+    cmd.cmd = node["command"].as<std::string>();
+  }
+  if (node["response"].IsScalar() && !node["response"].IsNull())
+  {
+    cmd.response = node["command"].as<std::string>();
+  }
+  const YAML::Node& paramsNode = node["params"];
+  if (paramsNode.IsSequence() && paramsNode.size() > 0)
+  {
+    for (auto item : paramsNode)
+    {
+      std::string param = item.as<std::string>();
+      cmd.paramsRaw.push_back(param);
+      /*
+      std::vector<std::string> split;
+      boost::split(split, param, boost::is_any_of(":"));
+      //ROS_INFO_STREAM(split[0]);
+      std::string type = split[0];
+      std::string name = split[1];
+      if(type.find("uint")!=-1){
+        cmd.params.push_back(std::shared_ptr<Params::Parameter>(new
+      Params::GenericParameter<float>(name, type, dataTypes[type])));
+      }else if(type.find("int")!=-1){
+
+      }else if(type.find("float32")!=-1){
+
+      }else if(type.find("float64")!=-1){
+
+      }else{
+
+      }
+      */
+    }
+  }
+
+  commands.insert(std::make_pair(cmd.name, cmd));
+}
 }
 
-class ThreadFactory
+class CommunicationConfig
 {
 public:
-  ThreadFactory(std::string configPath);
+  CommunicationConfig();
+  CommunicationConfig(const CommunicationConfig& other);
+  CommunicationConfig(std::string configPath);
   void readDataTypes();
   void readGeneralSyntax();
+  void readCommands();
+  const Params::Syntax& getSyntax() const;
 
 private:
   std::string configPath;
-  std::unordered_map<std::string, std::shared_ptr<Params::DataType> > dataTypes;
-  std::unordered_map<std::string,  > dataTypes;
+  std::unordered_map<std::string, std::shared_ptr<Params::DataType>> dataTypes;
+  std::unordered_map<std::string, Params::Command> commands;
   Params::Syntax syntax;
 };
 
-#endif // THREADFACTORY_H
+#endif // COMMUNICATIONCONFIG_H
