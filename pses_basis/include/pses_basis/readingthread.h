@@ -15,6 +15,7 @@ public:
   void startThread();
   void stopThread();
   std::string getData();
+  const bool isQueueEmpty() const;
 private:
   std::string delimiter;
   std::queue<std::string> data;

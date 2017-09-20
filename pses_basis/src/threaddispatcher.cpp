@@ -1,37 +1,59 @@
 #include "pses_basis/threaddispatcher.h"
 
-ThreadDispatcher::ThreadDispatcher(std::string delimiter)
+ThreadDispatcher::ThreadDispatcher(const Params::Syntax* syntax)
 {
-  readingThread = new ReadingThread(delimiter, this);
-}
-ThreadDispatcher::~ThreadDispatcher()
-{
-  delete(readingThread);
+  this->syntax = syntax;
 }
 
-void ThreadDispatcher::startThread(){
-  //ROS_INFO_STREAM("ThreadDispatcher starting..");
+void ThreadDispatcher::startThread()
+{
+  // ROS_INFO_STREAM("ThreadDispatcher starting..");
   active = true;
-  worker = std::thread(&ThreadDispatcher::workerFunction,this);
+  worker = std::thread(&ThreadDispatcher::workerFunction, this);
   readingThread->startThread();
-  //ROS_INFO_STREAM("ThreadDispatcher started..");
+  // ROS_INFO_STREAM("ThreadDispatcher started..");
 }
 
-void ThreadDispatcher::stopThread(){
-  //ROS_INFO_STREAM("ThreadDispatcher stopping..");
+void ThreadDispatcher::stopThread()
+{
+  // ROS_INFO_STREAM("ThreadDispatcher stopping..");
   readingThread->stopThread();
   active = false;
   wakeUp();
   worker.join();
-  //ROS_INFO_STREAM("ThreadDispatcher stopped..");
+  // ROS_INFO_STREAM("ThreadDispatcher stopped..");
 }
 
-void ThreadDispatcher::workerFunction(){
-  while(active){
-    //ROS_INFO_STREAM("ThreadDispatcher sleeping..");
+void ThreadDispatcher::workerFunction()
+{
+  while (active)
+  {
+    // ROS_INFO_STREAM("ThreadDispatcher sleeping..");
     sleep();
-    //ROS_INFO_STREAM("ThreadDispatcher woke up..");
-    std::string data = readingThread->getData();
-    ROS_INFO_STREAM(data);
+    // ROS_INFO_STREAM("ThreadDispatcher woke up..");
+    while (!readingThread->isQueueEmpty() && active)
+    {
+      std::string data = readingThread->getData();
+      if (data.find(syntax->cmdErrorPrefix) == 0)
+      {
+        // dispatch error thread
+      }
+      else if (data.find(syntax->channelGrpMsgPrefix) == 0)
+      {
+        // dispatch grp thread
+      }
+      else if (data.find(syntax->answerOnCmdPrefix) == 0)
+      {
+        // dispatch response thread
+      }
+    }
+  }
+}
+
+void ThreadDispatcher::setReadingThread(ReadingThread* rxThread)
+{
+  if (!active)
+  {
+    this->readingThread = rxThread;
   }
 }

@@ -61,3 +61,7 @@ std::string ReadingThread::getData()
     return std::string("");
   }
 }
+
+const bool ReadingThread::isQueueEmpty() const{
+  return data.empty();
+}

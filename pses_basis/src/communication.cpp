@@ -5,10 +5,14 @@ Communication::Communication(const std::string& configPath) {
   comCfg.readDataTypes();
   comCfg.readGeneralSyntax();
   comCfg.readCommands();
-  dispatcher = new ThreadDispatcher(comCfg.getSyntax().endOfMessage);
-  //ROS_INFO_STREAM(comCfg.getSyntax().endOfMessage);
+  dispatcher = new ThreadDispatcher(&comCfg.getSyntax());
+  rxPolling = new ReadingThread(comCfg.getSyntax().endOfMessage, dispatcher);
+  dispatcher->setReadingThread(rxPolling);
 }
-Communication::~Communication() { delete(dispatcher); }
+Communication::~Communication() {
+  delete(dispatcher);
+  delete(rxPolling);
+}
 
 
 void Communication::connect()

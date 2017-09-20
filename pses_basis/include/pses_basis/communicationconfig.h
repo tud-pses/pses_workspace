@@ -146,7 +146,8 @@ struct Syntax
   std::string answerOnCmdPrefix;
   std::string answerOnReqPrefix;
   std::string channelGrpMsgPrefix;
-  std::string errorPrefix;
+  std::string cmdErrorPrefix;
+  std::string genErrorPrefix;
   std::string optionsPrefix;
 };
 
@@ -173,7 +174,8 @@ void operator>>(const YAML::Node& node, Syntax& syntax)
   syntax.answerOnReqPrefix = node["answer_on_request_prefix"].as<std::string>();
   syntax.channelGrpMsgPrefix =
       node["channel_group_msg_prefix"].as<std::string>();
-  syntax.errorPrefix = node["error_prefix"].as<std::string>();
+  syntax.cmdErrorPrefix = node["cmd_error_prefix"].as<std::string>();
+  syntax.genErrorPrefix = node["gen_error_prefix"].as<std::string>();
   syntax.optionsPrefix = node["options_prefix"].as<std::string>();
 }
 

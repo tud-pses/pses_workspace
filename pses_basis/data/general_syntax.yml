@@ -10,5 +10,6 @@ answer_on_request_prefix: ':'
 
 # advanced prefixes
 channel_group_msg_prefix: '#'
-error_prefix: 'err'
+cmd_error_prefix: ':ERR'
+gen_error_prefix: "'ERR"
 options_prefix: '~'

@@ -5,6 +5,7 @@
 #include <pses_basis/threaddispatcher.h>
 #include <pses_basis/serialinterface.h>
 #include <pses_basis/communicationconfig.h>
+#include "pses_basis/readingthread.h"
 #include <ros/ros.h>
 
 
@@ -21,6 +22,8 @@ public:
 private:
   CommunicationConfig comCfg;
   ThreadDispatcher* dispatcher;
+  ReadingThread* rxPolling;
+
 
 
 };
