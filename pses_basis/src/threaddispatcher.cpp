@@ -1,8 +1,9 @@
 #include "pses_basis/threaddispatcher.h"
 
-ThreadDispatcher::ThreadDispatcher(const Params::Syntax* syntax)
+ThreadDispatcher::ThreadDispatcher(const Syntax* syntax)
 {
   this->syntax = syntax;
+  commandResponse = std::queue<std::string>();
 }
 
 void ThreadDispatcher::startThread()
@@ -34,9 +35,15 @@ void ThreadDispatcher::workerFunction()
     while (!readingThread->isQueueEmpty() && active)
     {
       std::string data = readingThread->getData();
+      // in case of empty string
+      if(data.size() < 1) continue;
+      // check for known prefixes
       if (data.find(syntax->cmdErrorPrefix) == 0)
       {
-        // dispatch error thread
+        // dispatch cmd-error thread
+      }else if(data.find(syntax->genErrorPrefix) == 0)
+      {
+        // dispatch general-error thread
       }
       else if (data.find(syntax->channelGrpMsgPrefix) == 0)
       {
@@ -44,7 +51,7 @@ void ThreadDispatcher::workerFunction()
       }
       else if (data.find(syntax->answerOnCmdPrefix) == 0)
       {
-        // dispatch response thread
+        commandResponse.push(data);
       }
     }
   }
@@ -56,4 +63,13 @@ void ThreadDispatcher::setReadingThread(ReadingThread* rxThread)
   {
     this->readingThread = rxThread;
   }
+}
+
+void ThreadDispatcher::dequeueResponse(std::string response){
+  response = commandResponse.front();
+  commandResponse.pop();
+}
+
+const bool ThreadDispatcher::IsResponseQueueEmpty() const {
+  return commandResponse.empty();
 }

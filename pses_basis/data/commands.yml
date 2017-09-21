@@ -1,6 +1,6 @@
 - cmd_name: "Drive Forward"
   cmd_has_params: True
-  params: ['uint16_t:speed']
+  params: ['uint8_t:speed']
   command: "DRV F $speed"
   cmd_has_response: True
   response_contains_params: True
@@ -8,7 +8,7 @@
 
 - cmd_name: "Drive Backward"
   cmd_has_params: True
-  params: ['uint16_t:speed']
+  params: ['uint8_t:speed']
   command: "DRV B $speed"
   cmd_has_response: True
   response_contains_params: True
@@ -32,7 +32,7 @@
 
 - cmd_name: "Set Steering Level"
   cmd_has_params: True
-  params: ['uint16_t:steering']
+  params: ['int16_t:steering']
   command: "DRV F $steering"
   cmd_has_response: True
   response_contains_params: True
@@ -69,6 +69,54 @@
   cmd_has_response: True
   response_contains_params: False
   response: 'OFF'
+
+- cmd_name: "Get Motor Level"
+  cmd_has_params: False
+  params: ['string_t:direction', 'uint_16:level']
+  command: "DRV"
+  cmd_has_response: True
+  response_contains_params: True
+  response: "$direction $level"
+
+- cmd_name: "Get Steering Level"
+  cmd_has_params: False
+  params: ['uint_16:level']
+  command: "STEER"
+  cmd_has_response: True
+  response_contains_params: True
+  response: "$level"
+
+- cmd_name: "Get Controller ID"
+  cmd_has_params: False
+  params: ['string_t:ID']
+  command: "ID"
+  cmd_has_response: True
+  response_contains_params: True
+  response: "$ID"
+
+- cmd_name: "Get Session ID"
+  cmd_has_params: False
+  params: ['string_t:ID']
+  command: "SID"
+  cmd_has_response: True
+  response_contains_params: True
+  response: "$ID"
+
+- cmd_name: "Get Firmware Version"
+  cmd_has_params: False
+  params: ['string_t:version']
+  command: "VER"
+  cmd_has_response: True
+  response_contains_params: True
+  response: "$version"
+
+- cmd_name: "Get Kinect Status"
+  cmd_has_params: False
+  params: ['string_t:kinect_stat']
+  command: "VOUT"
+  cmd_has_response: True
+  response_contains_params: True
+  response: "$kinect_stat"
 
 # hier fehlen noch jede Menge sachen...
 

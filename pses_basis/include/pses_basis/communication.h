@@ -7,7 +7,7 @@
 #include <pses_basis/communicationconfig.h>
 #include "pses_basis/readingthread.h"
 #include <ros/ros.h>
-
+#include <pses_basis/parameter.h>
 
 class Communication
 {
@@ -18,14 +18,14 @@ public:
   void startCommunication();
   void stopCommunication();
   void disconnect();
+  bool sendCommand(const std::string& command,
+                   const Parameter::ParameterMap& inputParams,
+                   Parameter::ParameterMap& outputParams);
 
 private:
   CommunicationConfig comCfg;
   ThreadDispatcher* dispatcher;
   ReadingThread* rxPolling;
-
-
-
 };
 
 #endif // COMMUNICATION_H

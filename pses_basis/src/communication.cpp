@@ -1,19 +1,21 @@
 #include "pses_basis/communication.h"
 
-Communication::Communication(const std::string& configPath) {
+Communication::Communication(const std::string& configPath)
+{
   comCfg = CommunicationConfig(configPath);
-  comCfg.readDataTypes();
+  //comCfg.readDataTypes();
   comCfg.readGeneralSyntax();
   comCfg.readCommands();
   dispatcher = new ThreadDispatcher(&comCfg.getSyntax());
   rxPolling = new ReadingThread(comCfg.getSyntax().endOfMessage, dispatcher);
   dispatcher->setReadingThread(rxPolling);
 }
-Communication::~Communication() {
-  delete(dispatcher);
-  delete(rxPolling);
-}
 
+Communication::~Communication()
+{
+  delete (dispatcher);
+  delete (rxPolling);
+}
 
 void Communication::connect()
 {
@@ -25,6 +27,7 @@ void Communication::startCommunication()
 {
   SerialInterface& si = SerialInterface::instance();
   dispatcher->startThread();
+  /*
   std::string msg = std::string("?ID\n");
   si.send(msg);
   ros::Duration(0.5).sleep();
@@ -34,14 +37,17 @@ void Communication::startCommunication()
   msg = "!DAQ START\n";
   si.send(msg);
   ros::Duration(10.0).sleep();
+  */
 }
 
 void Communication::stopCommunication()
 {
   SerialInterface& si = SerialInterface::instance();
+  /*
   std::string msg = "!DAQ STOP\n";
   si.send(msg);
   ros::Duration(0.5).sleep();
+  */
   dispatcher->stopThread();
   si.disconnect();
 }
@@ -50,4 +56,18 @@ void Communication::disconnect()
 {
   SerialInterface& si = SerialInterface::instance();
   si.disconnect();
+}
+
+bool Communication::sendCommand(const std::string& command,
+                                const Parameter::ParameterMap& inputParams,
+                                Parameter::ParameterMap& outputParams)
+{
+  // std::string cmd = commands[command].generateCommand(inputParams);
+  // std::string response;
+  // SerialInterface& si = SerialInterface::instance();
+  // si.send(cmd);
+  // while(dispatcher->IsResponseQueueEmpty() && !timeout);
+  // dispatcher->
+  // return commands[command].checkResponse(response, inputParams, outputparams);
+  return true;
 }

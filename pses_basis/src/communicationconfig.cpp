@@ -16,9 +16,8 @@ void CommunicationConfig::readGeneralSyntax()
 {
   YAML::Node syntaxYaml = YAML::LoadFile(configPath + "general_syntax.yml");
   syntaxYaml >> syntax;
-  // ROS_INFO_STREAM(syntaxYaml);
 }
-
+/*
 void CommunicationConfig::readDataTypes()
 {
   YAML::Node typesYaml = YAML::LoadFile(configPath + "data_types.yml");
@@ -28,7 +27,7 @@ void CommunicationConfig::readDataTypes()
     node >> dataTypes;
   }
 }
-
+*/
 void CommunicationConfig::readCommands()
 {
   YAML::Node commandsYaml = YAML::LoadFile(configPath + "commands.yml");
@@ -37,24 +36,6 @@ void CommunicationConfig::readCommands()
   {
     node >> commands;
   }
-  for (auto cmd : commands)
-  {
-    for (std::string param : cmd.second.paramsRaw)
-    {
-      std::vector<std::string> split;
-      boost::split(split, param, boost::is_any_of(":"));
-      std::string type = split[0];
-      std::string name = split[1];
-      cmd.second.params.push_back(
-          dataTypes[type]->generateGenericParameter(name, type));
-    }
-  }
-  /*
-  auto& prm = commands["Drive Forward"].params[0];
-  auto& dt = dataTypes[prm->getType()];
-  dt->setGenericParameterData("16", prm);
-  //ROS_INFO_STREAM();
-  */
 }
 
-const Params::Syntax& CommunicationConfig::getSyntax() const { return syntax; }
+const Syntax& CommunicationConfig::getSyntax() const { return syntax; }

@@ -14,16 +14,19 @@ class ReadingThread;
 class ThreadDispatcher : public CommunicationThread
 {
 public:
-  ThreadDispatcher(const Params::Syntax* syntax);
+  ThreadDispatcher(const Syntax* syntax);
   void startThread();
   void stopThread();
 
   void setReadingThread(ReadingThread* rxThread);
+  void dequeueResponse(std::string response);
+  const bool IsResponseQueueEmpty() const;
 
 private:
   void workerFunction();
   ReadingThread* readingThread;
-  const Params::Syntax* syntax;
+  const Syntax* syntax;
+  std::queue<std::string> commandResponse;
 };
 
 #endif // THREADDISPATCHER_H
