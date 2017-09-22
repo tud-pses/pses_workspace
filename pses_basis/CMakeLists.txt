@@ -144,11 +144,13 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
   add_executable(uc_bridge src/uc_bridge.cpp)
+  add_executable(test_node src/test.cpp)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
   add_dependencies(uc_bridge ${PROJECT_NAME}_gencpp)
+  add_dependencies(test_node ${PROJECT_NAME}_gencpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -166,7 +168,7 @@ include_directories(
  #target_link_libraries(communication serialinterface threaddispatcher communicationconfig)
  #target_link_libraries(uc_bridge ${catkin_LIBRARIES} communication)
  target_link_libraries(uc_bridge allfiles yaml-cpp ${catkin_LIBRARIES})
-
+ target_link_libraries(test_node ${catkin_LIBRARIES})
 #############
 ## Install ##
 #############

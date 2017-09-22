@@ -41,11 +41,12 @@ void operator>>(const YAML::Node& node,
       std::string type = split[0];
       std::string name = split[1];
       cmd.params.push_back(std::make_pair(name, type));
-
     }
   }
   // instead of inserting the struct -> build a command object directly
-  //commands.insert(std::make_pair(cmd.name, cmd));
+  // commands.insert(std::make_pair(cmd.name, cmd));
+  commands.insert(std::make_pair(cmd.name, Command(cmd)));
+  //ROS_INFO_STREAM("Command: "<<cmd.name<<" inserted!");
 }
 
 CommunicationConfig::CommunicationConfig() {}
@@ -86,4 +87,10 @@ void CommunicationConfig::readCommands()
   }
 }
 
-const Syntax& CommunicationConfig::getSyntax() const { return syntax; }
+const Syntax* CommunicationConfig::getSyntax() const { return &syntax; }
+
+const std::unordered_map<std::string, Command>&
+CommunicationConfig::getCommands() const
+{
+  return commands;
+}

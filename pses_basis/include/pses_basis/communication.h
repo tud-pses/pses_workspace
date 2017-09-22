@@ -8,6 +8,7 @@
 #include <pses_basis/readingthread.h>
 #include <ros/ros.h>
 #include <pses_basis/parameter.h>
+#include <pses_basis/command.h>
 
 class Communication
 {
@@ -21,10 +22,11 @@ public:
   bool sendCommand(const std::string& command,
                    const Parameter::ParameterMap& inputParams,
                    Parameter::ParameterMap& outputParams,
-                   unsigned int timeout=10);
+                   unsigned int timeout=10000);
 
 private:
   CommunicationConfig comCfg;
+  std::unordered_map<std::string, Command> commands;
   ThreadDispatcher* dispatcher;
   ReadingThread* rxPolling;
   mutable std::mutex mtx;

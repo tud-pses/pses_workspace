@@ -6,8 +6,9 @@ Communication::Communication(const std::string& configPath)
   //comCfg.readDataTypes();
   comCfg.readGeneralSyntax();
   comCfg.readCommands();
-  dispatcher = new ThreadDispatcher(&comCfg.getSyntax());
-  rxPolling = new ReadingThread(comCfg.getSyntax().endOfMessage, dispatcher);
+  commands = comCfg.getCommands();
+  dispatcher = new ThreadDispatcher(comCfg.getSyntax());
+  rxPolling = new ReadingThread(comCfg.getSyntax()->endOfMessage, dispatcher);
   dispatcher->setReadingThread(rxPolling);
   dispatcher->setCommunicationCondVar(&cv);
 }
@@ -66,12 +67,15 @@ bool Communication::sendCommand(const std::string& command,
 {
   SerialInterface& si = SerialInterface::instance();
   std::unique_lock<std::mutex> lck(mtx);
-  // std::string cmd = commands[command].generateCommand(inputParams);
-  // std::string response;
+  std::string cmd;
+  std::string response;
+  commands[command].generateCommand(inputParams, cmd);
   dispatcher->setCommunicationWakeUp(true);
   // si.send(cmd);
   cv.wait_for(lck, std::chrono::microseconds(timeout));
-  // danach: ergebnis checken, falls leer -> return false
+  //if(dispatcher->IsResponseQueueEmpty()) return false;
+  //dispatcher->dequeueResponse(response);
+
   // return commands[command].checkResponse(response, inputParams, outputparams);
   return true;
 }

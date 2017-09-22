@@ -30,7 +30,8 @@ public:
   //void readDataTypes();
   void readGeneralSyntax();
   void readCommands();
-  const Syntax& getSyntax() const;
+  const Syntax* getSyntax() const;
+  const std::unordered_map<std::string, Command>& getCommands() const;
 
 
 private:
