@@ -1,4 +1,4 @@
-#include "pses_basis/readingthread.h"
+#include <pses_basis/readingthread.h>
 
 ReadingThread::ReadingThread(std::string delimiter,
                              ThreadDispatcher* dispatcher)

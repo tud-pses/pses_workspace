@@ -5,7 +5,7 @@
 #include <pses_basis/threaddispatcher.h>
 #include <pses_basis/serialinterface.h>
 #include <pses_basis/communicationconfig.h>
-#include "pses_basis/readingthread.h"
+#include <pses_basis/readingthread.h>
 #include <ros/ros.h>
 #include <pses_basis/parameter.h>
 
@@ -20,12 +20,15 @@ public:
   void disconnect();
   bool sendCommand(const std::string& command,
                    const Parameter::ParameterMap& inputParams,
-                   Parameter::ParameterMap& outputParams);
+                   Parameter::ParameterMap& outputParams,
+                   unsigned int timeout=10);
 
 private:
   CommunicationConfig comCfg;
   ThreadDispatcher* dispatcher;
   ReadingThread* rxPolling;
+  mutable std::mutex mtx;
+  std::condition_variable cv;
 };
 
 #endif // COMMUNICATION_H

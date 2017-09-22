@@ -1,7 +1,7 @@
 - cmd_name: "Drive Forward"
   cmd_has_params: True
   params: ['uint8_t:speed']
-  command: "DRV F $speed"
+  command: "!DRV F $speed"
   cmd_has_response: True
   response_contains_params: True
   response: "F $speed"
@@ -9,7 +9,7 @@
 - cmd_name: "Drive Backward"
   cmd_has_params: True
   params: ['uint8_t:speed']
-  command: "DRV B $speed"
+  command: "!DRV B $speed"
   cmd_has_response: True
   response_contains_params: True
   response: "B $speed"
@@ -17,7 +17,7 @@
 - cmd_name: "Full Stop"
   cmd_has_params: False
   params:
-  command: "DRV B -500"
+  command: "!DRV B -500"
   cmd_has_response: True
   response_contains_params: False
   response: "B -500"
@@ -25,7 +25,7 @@
 - cmd_name: "Motor Off"
   cmd_has_params: False
   params:
-  command: "DRV OFF"
+  command: "!DRV OFF"
   cmd_has_response: True
   response_contains_params: False
   response: "OFF"
@@ -33,7 +33,7 @@
 - cmd_name: "Set Steering Level"
   cmd_has_params: True
   params: ['int16_t:steering']
-  command: "DRV F $steering"
+  command: "!DRV F $steering"
   cmd_has_response: True
   response_contains_params: True
   response: "STEER $steering"
@@ -41,7 +41,7 @@
 - cmd_name: "Set Session ID"
   cmd_has_params: True
   params: ['string_t:ID']
-  command: "SID $ID"
+  command: "!SID $ID"
   cmd_has_response: True
   response_contains_params: True
   response: "SID $ID"
@@ -49,7 +49,7 @@
 - cmd_name: "Reset Controller"
   cmd_has_params: False
   params:
-  command: "RESET NOW"
+  command: "!RESET NOW"
   cmd_has_response: False
   response_contains_params: False
   response:
@@ -57,7 +57,7 @@
 - cmd_name: "Toggle Kinect On"
   cmd_has_params: False
   params:
-  command: "VOUT ON"
+  command: "!VOUT ON"
   cmd_has_response: True
   response_contains_params: False
   response: 'ON'
@@ -65,7 +65,7 @@
 - cmd_name: "Toggle Kinect Off"
   cmd_has_params: False
   params:
-  command: "VOUT OFF"
+  command: "!VOUT OFF"
   cmd_has_response: True
   response_contains_params: False
   response: 'OFF'
@@ -73,7 +73,7 @@
 - cmd_name: "Get Motor Level"
   cmd_has_params: False
   params: ['string_t:direction', 'uint_16:level']
-  command: "DRV"
+  command: "?DRV"
   cmd_has_response: True
   response_contains_params: True
   response: "$direction $level"
@@ -81,7 +81,7 @@
 - cmd_name: "Get Steering Level"
   cmd_has_params: False
   params: ['uint_16:level']
-  command: "STEER"
+  command: "?STEER"
   cmd_has_response: True
   response_contains_params: True
   response: "$level"
@@ -89,7 +89,7 @@
 - cmd_name: "Get Controller ID"
   cmd_has_params: False
   params: ['string_t:ID']
-  command: "ID"
+  command: "?ID"
   cmd_has_response: True
   response_contains_params: True
   response: "$ID"
@@ -97,7 +97,7 @@
 - cmd_name: "Get Session ID"
   cmd_has_params: False
   params: ['string_t:ID']
-  command: "SID"
+  command: "?SID"
   cmd_has_response: True
   response_contains_params: True
   response: "$ID"
@@ -105,7 +105,7 @@
 - cmd_name: "Get Firmware Version"
   cmd_has_params: False
   params: ['string_t:version']
-  command: "VER"
+  command: "?VER"
   cmd_has_response: True
   response_contains_params: True
   response: "$version"
@@ -113,7 +113,7 @@
 - cmd_name: "Get Kinect Status"
   cmd_has_params: False
   params: ['string_t:kinect_stat']
-  command: "VOUT"
+  command: "?VOUT"
   cmd_has_response: True
   response_contains_params: True
   response: "$kinect_stat"

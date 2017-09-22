@@ -1,9 +1,10 @@
-#include "pses_basis/threaddispatcher.h"
+#include <pses_basis/threaddispatcher.h>
 
 ThreadDispatcher::ThreadDispatcher(const Syntax* syntax)
 {
   this->syntax = syntax;
   commandResponse = std::queue<std::string>();
+  wakeUpCommunication = false;
 }
 
 void ThreadDispatcher::startThread()
@@ -36,12 +37,14 @@ void ThreadDispatcher::workerFunction()
     {
       std::string data = readingThread->getData();
       // in case of empty string
-      if(data.size() < 1) continue;
+      if (data.size() < 1)
+        continue;
       // check for known prefixes
       if (data.find(syntax->cmdErrorPrefix) == 0)
       {
         // dispatch cmd-error thread
-      }else if(data.find(syntax->genErrorPrefix) == 0)
+      }
+      else if (data.find(syntax->genErrorPrefix) == 0)
       {
         // dispatch general-error thread
       }
@@ -52,6 +55,11 @@ void ThreadDispatcher::workerFunction()
       else if (data.find(syntax->answerOnCmdPrefix) == 0)
       {
         commandResponse.push(data);
+        if (wakeUpCommunication)
+        {
+          comCV->notify_one();
+          wakeUpCommunication = false;
+        }
       }
     }
   }
@@ -64,12 +72,23 @@ void ThreadDispatcher::setReadingThread(ReadingThread* rxThread)
     this->readingThread = rxThread;
   }
 }
+void ThreadDispatcher::setCommunicationCondVar(std::condition_variable* condVar)
+{
+  this->comCV = condVar;
+}
 
-void ThreadDispatcher::dequeueResponse(std::string response){
+void ThreadDispatcher::dequeueResponse(std::string response)
+{
   response = commandResponse.front();
   commandResponse.pop();
 }
 
-const bool ThreadDispatcher::IsResponseQueueEmpty() const {
+const bool ThreadDispatcher::IsResponseQueueEmpty() const
+{
   return commandResponse.empty();
+}
+
+void ThreadDispatcher::setCommunicationWakeUp(bool wakeUp)
+{
+  wakeUpCommunication = wakeUp;
 }

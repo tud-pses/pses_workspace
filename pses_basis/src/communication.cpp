@@ -1,4 +1,4 @@
-#include "pses_basis/communication.h"
+#include <pses_basis/communication.h>
 
 Communication::Communication(const std::string& configPath)
 {
@@ -9,6 +9,7 @@ Communication::Communication(const std::string& configPath)
   dispatcher = new ThreadDispatcher(&comCfg.getSyntax());
   rxPolling = new ReadingThread(comCfg.getSyntax().endOfMessage, dispatcher);
   dispatcher->setReadingThread(rxPolling);
+  dispatcher->setCommunicationCondVar(&cv);
 }
 
 Communication::~Communication()
@@ -57,17 +58,20 @@ void Communication::disconnect()
   SerialInterface& si = SerialInterface::instance();
   si.disconnect();
 }
-
+//timeout in microseconds
 bool Communication::sendCommand(const std::string& command,
                                 const Parameter::ParameterMap& inputParams,
-                                Parameter::ParameterMap& outputParams)
+                                Parameter::ParameterMap& outputParams,
+                                unsigned int timeout)
 {
+  SerialInterface& si = SerialInterface::instance();
+  std::unique_lock<std::mutex> lck(mtx);
   // std::string cmd = commands[command].generateCommand(inputParams);
   // std::string response;
-  // SerialInterface& si = SerialInterface::instance();
+  dispatcher->setCommunicationWakeUp(true);
   // si.send(cmd);
-  // while(dispatcher->IsResponseQueueEmpty() && !timeout);
-  // dispatcher->
+  cv.wait_for(lck, std::chrono::microseconds(timeout));
+  // danach: ergebnis checken, falls leer -> return false
   // return commands[command].checkResponse(response, inputParams, outputparams);
   return true;
 }

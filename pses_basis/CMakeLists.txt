@@ -125,20 +125,19 @@ include_directories(
 )
 
 ## Declare a C++ library
- add_library(
-   readingthread src/readingthread.cpp
-  )
- add_library(
-   threaddispatcher src/threaddispatcher.cpp
-  )
- add_library(
-   serialinterface src/serialinterface.cpp
-  )
- add_library(
-   communication src/communication.cpp
-  )
- add_library(
-   communicationconfig src/communicationconfig.cpp
+ #add_library(command src/command.cpp)
+ #add_library(readingthread src/readingthread.cpp)
+ #add_library(threaddispatcher src/threaddispatcher.cpp)
+ #add_library(serialinterface src/serialinterface.cpp)
+ #add_library(communication src/communication.cpp)
+ #add_library(communicationconfig src/communicationconfig.cpp)
+ add_library(allfiles
+   src/command.cpp
+   src/readingthread.cpp
+   src/threaddispatcher.cpp
+   src/serialinterface.cpp
+   src/communication.cpp
+   src/communicationconfig.cpp
   )
 
 ## Declare a C++ executable
@@ -160,12 +159,13 @@ include_directories(
 ## same as for the library above
 
 ## Specify libraries to link a library or executable target against
- target_link_libraries(serialinterface ${catkin_LIBRARIES})
- target_link_libraries(readingthread serialinterface)
- target_link_libraries(threaddispatcher readingthread)
- target_link_libraries(communication serialinterface threaddispatcher communicationconfig)
- target_link_libraries(communicationconfig yaml-cpp)
- target_link_libraries(uc_bridge ${catkin_LIBRARIES} communication)
+ #target_link_libraries(serialinterface ${catkin_LIBRARIES})
+ #target_link_libraries(readingthread serialinterface)
+ #target_link_libraries(threaddispatcher readingthread)
+ #target_link_libraries(communicationconfig yaml-cpp command)
+ #target_link_libraries(communication serialinterface threaddispatcher communicationconfig)
+ #target_link_libraries(uc_bridge ${catkin_LIBRARIES} communication)
+ target_link_libraries(uc_bridge allfiles yaml-cpp ${catkin_LIBRARIES})
 
 #############
 ## Install ##

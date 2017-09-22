@@ -19,14 +19,18 @@ public:
   void stopThread();
 
   void setReadingThread(ReadingThread* rxThread);
+  void setCommunicationCondVar(std::condition_variable* condVar);
   void dequeueResponse(std::string response);
   const bool IsResponseQueueEmpty() const;
+  void setCommunicationWakeUp(bool wakeUp);
 
 private:
   void workerFunction();
   ReadingThread* readingThread;
   const Syntax* syntax;
   std::queue<std::string> commandResponse;
+  bool wakeUpCommunication;
+  std::condition_variable* comCV;
 };
 
 #endif // THREADDISPATCHER_H
