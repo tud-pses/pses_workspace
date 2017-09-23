@@ -28,7 +28,7 @@ void operator>>(const YAML::Node& node,
   }
   if (node["response"].IsScalar() && !node["response"].IsNull())
   {
-    cmd.response = node["command"].as<std::string>();
+    cmd.response = node["response"].as<std::string>();
   }
   const YAML::Node& paramsNode = node["params"];
   if (paramsNode.IsSequence() && paramsNode.size() > 0)

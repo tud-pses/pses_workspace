@@ -8,11 +8,16 @@ bool setMotorLevel(pses_basis::SetMotorLevel::Request& req,
                    pses_basis::SetMotorLevel::Response& res, Communication* com)
 {
   std::string cmd = "Drive Forward";
+  short level = req.level;
   if (req.level < 0)
+  {
     cmd = "Drive Backward";
+    level = -req.level;
+  }
+
   Parameter::ParameterMap input;
   Parameter::ParameterMap output;
-  input.insertParameter("speed", "uint8_t", req.level);
+  input.insertParameter("speed", "int16_t", level);
   res.was_set = com->sendCommand(cmd, input, output);
   return true;
 }
@@ -55,7 +60,6 @@ int main(int argc, char** argv)
   */
 
   ros::spin();
-
 
   return 0;
 }

@@ -54,7 +54,7 @@ void ThreadDispatcher::workerFunction()
       }
       else if (data.find(syntax->answerOnCmdPrefix) == 0)
       {
-        commandResponse.push(data);
+        commandResponse.push(data.substr(syntax->answerOnCmdPrefix.size(),std::string::npos));
         if (wakeUpCommunication)
         {
           comCV->notify_one();

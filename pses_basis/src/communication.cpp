@@ -68,14 +68,13 @@ bool Communication::sendCommand(const std::string& command,
   SerialInterface& si = SerialInterface::instance();
   std::unique_lock<std::mutex> lck(mtx);
   std::string cmd;
-  std::string response;
+  std::string response = "F 6";
   commands[command].generateCommand(inputParams, cmd);
+  ROS_INFO_STREAM(cmd);
   dispatcher->setCommunicationWakeUp(true);
   // si.send(cmd);
   cv.wait_for(lck, std::chrono::microseconds(timeout));
   //if(dispatcher->IsResponseQueueEmpty()) return false;
   //dispatcher->dequeueResponse(response);
-
-  // return commands[command].checkResponse(response, inputParams, outputparams);
-  return true;
+  return commands[command].verifyResponse(inputParams, response, outputParams);
 }

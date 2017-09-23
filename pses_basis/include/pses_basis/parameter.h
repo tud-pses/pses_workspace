@@ -172,6 +172,108 @@ public:
     }
   }
 
+  void setParameterValueAsString(const std::string& name,
+                                 const std::string& input)
+  {
+    const std::string& type = parameters.at(name)->getType();
+    int size = getParameter(name)->getTypeByteSize();
+    if (type.compare("int8_t") == 0)
+    {
+      if (size > 1)
+        return; // wichtig hier sollte eine exception wegen type mismatch
+                // geworfen werden
+      int value = std::stoi(input);
+      std::dynamic_pointer_cast<GenericParameter<char>>(parameters[name])
+              ->setData(static_cast<char>(value));
+    }
+    else if (type.compare("uint8_t") == 0)
+    {
+      if (size > 1)
+        return; // wichtig hier sollte eine exception wegen type mismatch
+                // geworfen werden
+      unsigned long value = std::stoul(input);
+      std::dynamic_pointer_cast<GenericParameter<unsigned char>>(parameters[name])
+              ->setData(static_cast<unsigned char>(value));
+    }
+    else if (type.compare("int16_t") == 0)
+    {
+      if (size > 2)
+        return; // wichtig hier sollte eine exception wegen type mismatch
+                // geworfen werden
+      int value = std::stoi(input);
+      std::dynamic_pointer_cast<GenericParameter<short>>(parameters[name])
+              ->setData(static_cast<short>(value));
+    }
+    else if (type.compare("uint16_t") == 0)
+    {
+      if (size > 2)
+        return; // wichtig hier sollte eine exception wegen type mismatch
+                // geworfen werden
+      unsigned long value = std::stoul(input);
+      std::dynamic_pointer_cast<GenericParameter<unsigned short>>(parameters[name])
+              ->setData(static_cast<unsigned short>(value));
+    }
+    else if (type.compare("int32_t") == 0)
+    {
+      if (size > 4)
+        return; // wichtig hier sollte eine exception wegen type mismatch
+                // geworfen werden
+      int value = std::stoi(input);
+      std::dynamic_pointer_cast<GenericParameter<int>>(parameters[name])
+              ->setData(value);
+    }
+    else if (type.compare("uint32_t") == 0)
+    {
+      if (size > 4)
+        return; // wichtig hier sollte eine exception wegen type mismatch
+                // geworfen werden
+      unsigned long value = std::stoul(input);
+      std::dynamic_pointer_cast<GenericParameter<unsigned int>>(parameters[name])
+              ->setData(value);
+    }
+    else if (type.compare("int64_t") == 0)
+    {
+      if (size > 8)
+        return; // wichtig hier sollte eine exception wegen type mismatch
+                // geworfen werden
+      long value = std::stol(input);
+      std::dynamic_pointer_cast<GenericParameter<long long>>(parameters[name])
+              ->setData(value);
+    }
+    else if (type.compare("uint64_t") == 0)
+    {
+      if (size > 8)
+        return; // wichtig hier sollte eine exception wegen type mismatch
+                // geworfen werden
+      unsigned long value = std::stoul(input);
+      std::dynamic_pointer_cast<GenericParameter<unsigned long long>>(parameters[name])
+              ->setData(value);
+    }
+    else if (type.compare("float32_t") == 0)
+    {
+      if (size > 4)
+        return; // wichtig hier sollte eine exception wegen type mismatch
+                // geworfen werden
+      float value = std::stof(input);
+      std::dynamic_pointer_cast<GenericParameter<float>>(parameters[name])
+              ->setData(value);
+    }
+    else if (type.compare("float64_t") == 0)
+    {
+      if (size > 8)
+        return; // wichtig hier sollte eine exception wegen type mismatch
+                // geworfen werden
+      double value = std::stod(input);
+      std::dynamic_pointer_cast<GenericParameter<double>>(parameters[name])
+              ->setData(value);
+    }
+    else if (type.compare("string_t") == 0)
+    {
+      std::dynamic_pointer_cast<GenericParameter<std::string>>(parameters[name])
+              ->setData(input);
+    }
+  }
+
 private:
   std::unordered_map<std::string, std::shared_ptr<Parameter>> parameters;
 };

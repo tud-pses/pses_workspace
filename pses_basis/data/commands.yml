@@ -1,6 +1,6 @@
 - cmd_name: "Drive Forward"
   cmd_has_params: True
-  params: ['uint8_t:speed']
+  params: ['int16_t:speed']
   command: "!DRV F $speed"
   cmd_has_response: True
   response_contains_params: True
@@ -8,7 +8,7 @@
 
 - cmd_name: "Drive Backward"
   cmd_has_params: True
-  params: ['uint8_t:speed']
+  params: ['int16_t:speed']
   command: "!DRV B $speed"
   cmd_has_response: True
   response_contains_params: True

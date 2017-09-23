@@ -2,6 +2,8 @@
 #define COMMAND_H
 
 #include <string>
+#include <unordered_set>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 #include <pses_basis/parameter.h>
@@ -34,6 +36,9 @@ public:
   Command(const CommandParams& cmdParams);
   void generateCommand(const Parameter::ParameterMap& inputParams,
                        std::string& out);
+  const bool verifyResponse(const Parameter::ParameterMap& inputParams,
+                      const std::string& response,
+                      Parameter::ParameterMap& outputParams);
   const std::string& getName() const;
 
 private:
@@ -41,24 +46,23 @@ private:
   bool cmdHasParams;
   bool cmdHasResponse;
   bool respHasParams;
+  // first: name, second: type
   std::unordered_map<std::string, std::string> parameterTypes;
+
+  std::unordered_set<std::string> cmdParameterSet;
   std::vector<std::string> cmdKeyWords;
   std::vector<std::string> cmdParameter;
-  std::vector<std::string> respKeyWords;
-  std::vector<std::string> respParameter;
   std::vector<std::pair<int, insertInstruction>> commandTemplate;
-  std::vector<std::pair<int, insertInstruction>> responseTemplate;
+
+  std::string simpleResponse;
+  // string contains a keyWord if bool=false, else string contains paramName
+  std::vector<std::pair<std::string, bool> > responseTemplate;
 
   void insertCmdKeyword(const int& index, const Parameter::ParameterMap& input,
                         std::string& out);
-  void insertRespKeyword(const int& index, const Parameter::ParameterMap& input,
-                         std::string& out);
   void insertCmdParameter(const int& index,
                           const Parameter::ParameterMap& input,
                           std::string& out);
-  void insertRespParameter(const int& index,
-                           const Parameter::ParameterMap& input,
-                           std::string& out);
 };
 
 #endif // COMMAND_H
