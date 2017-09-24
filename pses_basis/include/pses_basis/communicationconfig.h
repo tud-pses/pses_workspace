@@ -21,24 +21,50 @@ struct Syntax
   std::string optionsPrefix;
 };
 
+struct Channel
+{
+  std::string chName;
+  std::string dataType;
+  bool conversionNeeded;
+  double conversionFactor;
+};
+
+struct SensorGroups
+{
+  std::string grpName;
+  unsigned char grpNumber;
+  // hier ein Channel Objekt ?
+  // hier ein Options Objekt ?
+};
+
 class CommunicationConfig
 {
 public:
   CommunicationConfig();
   CommunicationConfig(const CommunicationConfig& other);
   CommunicationConfig(std::string configPath);
-  //void readDataTypes();
-  void readGeneralSyntax();
-  void readCommands();
+  friend void operator>>(const YAML::Node& node, Syntax& syntax);
+  friend void operator>>(const YAML::Node& node,
+                         std::unordered_map<std::string, Channel>& channels);
+  friend void
+  operator>>(const YAML::Node& node,
+             std::unordered_map<std::string, CommandOptions>& options);
+
   const Syntax* getSyntax() const;
   const std::unordered_map<std::string, Command>& getCommands() const;
 
-
 private:
   std::string configPath;
-  //std::unordered_map<std::string, std::shared_ptr<Parameter::DataType>> dataTypes;
   std::unordered_map<std::string, Command> commands;
+  std::unordered_map<std::string, Channel> channels;
+  std::unordered_map<std::string, CommandOptions> options;
   Syntax syntax;
+
+  void insertCommand(const YAML::Node& node);
+  void readGeneralSyntax();
+  void readChannels();
+  void readOptions();
+  void readCommands();
 };
 
 #endif // COMMUNICATIONCONFIG_H

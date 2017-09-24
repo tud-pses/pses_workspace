@@ -1,3 +1,5 @@
+# command definitions:
+
 - cmd_name: "Drive Forward"
   cmd_has_params: True
   params: ['int16_t:speed']
@@ -119,4 +121,78 @@
   response: "$kinect_stat"
 
 # hier fehlen noch jede Menge sachen...
+
+# basic grouping functions:
+
+- cmd_name: "Set Group"
+  cmd_has_params: True
+  params: ['uint8_t:grp_nr', 'string_t[]:channels']
+  command: "!DAQ GRP $grp_nr $channels"
+  cmd_has_response: True
+  response_contains_params: False
+  response: "ok"
+
+- cmd_name: "Start DAQ"
+  cmd_has_params: False
+  params:
+  command: "!DAQ START"
+  cmd_has_response: True
+  response_contains_params: False
+  response: "started"
+
+- cmd_name: "Stop DAQ"
+  cmd_has_params: False
+  params:
+  command: "!DAQ STOP"
+  cmd_has_response: True
+  response_contains_params: False
+  response: "stopped"
+
+- cmd_name: "All Groups Info"
+  cmd_has_params: False
+  params: ['string_t:info']
+  command: "?DAQ GRPS"
+  cmd_has_response: True
+  response_contains_params: True
+  response: "$info"
+
+- cmd_name: "Is DAQ Started"
+  cmd_has_params: False
+  params: ['string_t:info']
+  command: "?DAQ"
+  cmd_has_response: True
+  response_contains_params: True
+  response: "$info"
+
+- cmd_name: "Group Info"
+  cmd_has_params: True
+  params: ['uint8_t:grp_nr', 'string_t:info']
+  command: "?DAQ GRP $grp_nr"
+  cmd_has_response: True
+  response_contains_params: True
+  response: "$info"
+
+- cmd_name: "Delete Group"
+  cmd_has_params: True
+  params: ['uint8_t:grp_nr']
+  command: "!DAQ GRP $grp_nr ~DELETE"
+  cmd_has_response: True
+  response_contains_params: False
+  response: "ok"
+
+- cmd_name: "Deactivate Group"
+  cmd_has_params: True
+  params: ['uint8_t:grp_nr']
+  command: "!DAQ GRP $grp_nr ~DEACTIVATE"
+  cmd_has_response: True
+  response_contains_params: False
+  response: "ok"
+
+- cmd_name: "Activate Group"
+  cmd_has_params: True
+  params: ['uint8_t:grp_nr']
+  command: "!DAQ GRP $grp_nr ~ACTIVATE"
+  cmd_has_response: True
+  response_contains_params: False
+  response: "ok"
 

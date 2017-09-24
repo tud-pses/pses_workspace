@@ -1,0 +1,9 @@
+- name: "Ultra Sound Sensors"
+  grp_nr: 1
+  channels: ['USL', 'USF', 'USR']
+  options: ['Wait_For_All', 'Channel_Polling_Interval:10', 'Average_Over_Interval:10']
+
+- name: "Gyro Sensors"
+  grp_nr: 2
+  channels: ['GX', 'GY', 'GZ']
+  options: ['Wait_For_All', 'Channel_Polling_Interval:10', 'Average_Over_Interval']

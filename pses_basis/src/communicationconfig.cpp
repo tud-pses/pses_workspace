@@ -1,6 +1,22 @@
 #include <pses_basis/communicationconfig.h>
 
-// syntax struct assign operator
+CommunicationConfig::CommunicationConfig() {}
+
+CommunicationConfig::CommunicationConfig(const CommunicationConfig& other)
+    : configPath(other.configPath)
+{
+}
+
+CommunicationConfig::CommunicationConfig(std::string configPath)
+    : configPath(configPath)
+{
+  readGeneralSyntax();
+  readChannels();
+  // readOptions();
+  readCommands();
+}
+
+// Syntax-struct assign operator
 void operator>>(const YAML::Node& node, Syntax& syntax)
 {
   syntax.endOfMessage = node["end_of_message"].as<std::string>();
@@ -13,9 +29,58 @@ void operator>>(const YAML::Node& node, Syntax& syntax)
   syntax.optionsPrefix = node["options_prefix"].as<std::string>();
 }
 
-// CommandType-Struct assign operator
+// Channel-struct assign operator
 void operator>>(const YAML::Node& node,
-                std::unordered_map<std::string, Command>& commands)
+                std::unordered_map<std::string, Channel>& channels)
+{
+  Channel ch;
+  ch.chName = node["ch_name"].as<std::string>();
+  ch.dataType = node["datatype"].as<std::string>();
+  ch.conversionNeeded = node["conversion_needed"].as<bool>();
+  ch.conversionFactor = 1.0;
+  if (node["conversion_factor"].IsScalar() &&
+      !node["conversion_factor"].IsNull())
+  {
+    ch.conversionFactor = node["conversion_factor"].as<double>();
+  }
+  channels.insert(std::make_pair(ch.chName, ch));
+}
+
+// CommandOptions-struct assign operator
+void operator>>(const YAML::Node& node,
+                std::unordered_map<std::string, CommandOptions>& options)
+{
+  CommandOptions cmdOpt;
+  cmdOpt.optName = node["name"].as<std::string>();
+  cmdOpt.optHasParams = node["opt_has_params"].as<bool>();
+  cmdOpt.optReturnsParams = node["opt_returns_params"].as<bool>();
+  cmdOpt.addsRespToGrps = node["adds_response_to_groups"].as<bool>();
+  if (node["opt"].IsScalar() && !node["opt"].IsNull())
+  {
+    cmdOpt.opt = node["opt"].as<std::string>();
+  }
+  if (node["response"].IsScalar() && !node["response"].IsNull())
+  {
+    cmdOpt.response = node["response"].as<std::string>();
+  }
+  const YAML::Node& paramsNode = node["params"];
+  if (paramsNode.IsSequence() && paramsNode.size() > 0)
+  {
+    for (auto item : paramsNode)
+    {
+      std::string param = item.as<std::string>();
+      std::vector<std::string> split;
+      boost::split(split, param, boost::is_any_of(":"));
+      std::string type = split[0];
+      std::string name = split[1];
+      cmdOpt.params.push_back(std::make_pair(name, type));
+    }
+  }
+  options.insert(std::make_pair(cmdOpt.optName, cmdOpt));
+}
+
+// CommandType-Struct assign operator
+void CommunicationConfig::insertCommand(const YAML::Node& node)
 {
   CommandParams cmd;
   cmd.name = node["cmd_name"].as<std::string>();
@@ -43,22 +108,9 @@ void operator>>(const YAML::Node& node,
       cmd.params.push_back(std::make_pair(name, type));
     }
   }
-  // instead of inserting the struct -> build a command object directly
-  // commands.insert(std::make_pair(cmd.name, cmd));
-  commands.insert(std::make_pair(cmd.name, Command(cmd)));
-  //ROS_INFO_STREAM("Command: "<<cmd.name<<" inserted!");
-}
-
-CommunicationConfig::CommunicationConfig() {}
-
-CommunicationConfig::CommunicationConfig(const CommunicationConfig& other)
-    : configPath(other.configPath)
-{
-}
-
-CommunicationConfig::CommunicationConfig(std::string configPath)
-    : configPath(configPath)
-{
+  commands.insert(
+      std::make_pair(cmd.name, Command(cmd, syntax.answerOnCmdPrefix, &options,
+                                       syntax.optionsPrefix)));
 }
 
 void CommunicationConfig::readGeneralSyntax()
@@ -66,24 +118,34 @@ void CommunicationConfig::readGeneralSyntax()
   YAML::Node syntaxYaml = YAML::LoadFile(configPath + "general_syntax.yml");
   syntaxYaml >> syntax;
 }
-/*
-void CommunicationConfig::readDataTypes()
-{
-  YAML::Node typesYaml = YAML::LoadFile(configPath + "data_types.yml");
 
-  for (auto node : typesYaml)
+void CommunicationConfig::readChannels()
+{
+  YAML::Node channelsYaml = YAML::LoadFile(configPath + "channels.yml");
+
+  for (auto node : channelsYaml)
   {
-    node >> dataTypes;
+    node >> channels;
   }
 }
-*/
+
+void CommunicationConfig::readOptions()
+{
+  YAML::Node commandOpt = YAML::LoadFile(configPath + "command_options.yml");
+
+  for (auto node : commandOpt)
+  {
+    node >> options;
+  }
+}
+
 void CommunicationConfig::readCommands()
 {
   YAML::Node commandsYaml = YAML::LoadFile(configPath + "commands.yml");
 
   for (auto node : commandsYaml)
   {
-    node >> commands;
+    insertCommand(node);
   }
 }
 

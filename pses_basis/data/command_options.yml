@@ -1,0 +1,87 @@
+- name: "CRC_16"
+  opt_has_params: False
+  params:
+  opt: 'CRC'
+  opt_returns_params: False
+  response:
+  adds_response_to_groups: False
+
+- name: "Encoding_ASCII"
+  opt_has_params: False
+  params:
+  opt: 'ASCII'
+  opt_returns_params: False
+  response:
+  adds_response_to_groups: False
+
+- name: "Encoding_B64"
+  opt_has_params: False
+  params:
+  opt: 'ENC=B64'
+  opt_returns_params: False
+  response:
+  adds_response_to_groups: False
+
+- name: "Encoding_HEX"
+  opt_has_params: False
+  params:
+  opt: 'ENC=HEX'
+  opt_returns_params: False
+  response:
+  adds_response_to_groups: False
+
+- name: "Wait_For_All"
+  opt_has_params: True
+  params: ['uint16_t:wait']
+  opt: 'ALL=$wait'
+  opt_returns_params: False
+  response:
+  adds_response_to_groups: False
+
+- name: "Wait_For_Any"
+  opt_has_params: False
+  params:
+  opt: "ANY"
+  opt_returns_params: False
+  response:
+  adds_response_to_groups: False
+
+- name: "Channel_Polling_Interval"
+  opt_has_params: True
+  params: ['uint16_t:interval']
+  opt: "TS=$interval"
+  opt_returns_params: False
+  response:
+  adds_response_to_groups: False
+
+- name: "Average_Over_Interval"
+  opt_has_params: True
+  params: ['uint16_t:average']
+  opt: "AVG=$average"
+  opt_returns_params: False
+  response:
+  adds_response_to_groups: False
+
+- name: "Skip_Polling_Intervalls"
+  opt_has_params: True
+  params: ['uint16_t:skips']
+  opt: "SKIP=$skips"
+  opt_returns_params: False
+  response:
+  adds_response_to_groups: False
+
+- name: "Age"
+  opt_has_params: False
+  params: ['uint32_t:age']
+  opt: "AGE"
+  opt_returns_params: False
+  response: "$age"
+  adds_response_to_groups: True
+
+- name: "Tics"
+  opt_has_params: False
+  params: ['uint32_t:tics']
+  opt: "TICS"
+  opt_returns_params: False
+  response: "$tics"
+  adds_response_to_groups: True

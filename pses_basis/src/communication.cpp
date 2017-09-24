@@ -3,9 +3,6 @@
 Communication::Communication(const std::string& configPath)
 {
   comCfg = CommunicationConfig(configPath);
-  //comCfg.readDataTypes();
-  comCfg.readGeneralSyntax();
-  comCfg.readCommands();
   commands = comCfg.getCommands();
   dispatcher = new ThreadDispatcher(comCfg.getSyntax());
   rxPolling = new ReadingThread(comCfg.getSyntax()->endOfMessage, dispatcher);
@@ -77,4 +74,24 @@ bool Communication::sendCommand(const std::string& command,
   //if(dispatcher->IsResponseQueueEmpty()) return false;
   //dispatcher->dequeueResponse(response);
   return commands[command].verifyResponse(inputParams, response, outputParams);
+}
+//timeout in microseconds
+bool Communication::sendCommand(const std::string& command,
+                                const std::vector<std::string>& options,
+                                const Parameter::ParameterMap& inputParams,
+                                Parameter::ParameterMap& outputParams,
+                                unsigned int timeout)
+{
+  SerialInterface& si = SerialInterface::instance();
+  std::unique_lock<std::mutex> lck(mtx);
+  std::string cmd;
+  std::string response = "F 6";
+  commands[command].generateCommand(inputParams, options, cmd);
+  ROS_INFO_STREAM(cmd);
+  dispatcher->setCommunicationWakeUp(true);
+  // si.send(cmd);
+  cv.wait_for(lck, std::chrono::microseconds(timeout));
+  //if(dispatcher->IsResponseQueueEmpty()) return false;
+  //dispatcher->dequeueResponse(response);
+  return commands[command].verifyResponse(inputParams, options,response, outputParams);
 }

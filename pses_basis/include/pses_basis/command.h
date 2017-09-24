@@ -16,11 +16,22 @@ struct CommandParams
   bool cmdHasParams;
   // first: name, second: type
   std::vector<std::pair<std::string, std::string>> params;
-  // std::vector<std::shared_ptr<Parameter>> params;
   std::string cmd;
   bool cmdHasResponse;
   bool respHasParams;
   std::string response;
+};
+
+struct CommandOptions
+{
+  std::string optName;
+  bool optHasParams;
+  // first: name, second: type
+  std::vector<std::pair<std::string, std::string>> params;
+  std::string opt;
+  bool optReturnsParams;
+  std::string response;
+  bool addsRespToGrps;
 };
 
 class Command
@@ -31,14 +42,24 @@ class Command
 
 public:
   Command();
-  Command(const Command& other);
-  Command(Command&& other) = delete;
-  Command(const CommandParams& cmdParams);
+  //Command(const Command& other);
+  //Command(Command&& other) = delete;
+  Command(const CommandParams& cmdParams,
+          const std::string& cmdResponsePrefix,
+          std::unordered_map<std::string, CommandOptions>* options,
+          const std::string& optionsPrefix);
   void generateCommand(const Parameter::ParameterMap& inputParams,
                        std::string& out);
+  void generateCommand(const Parameter::ParameterMap& inputParams,
+                       const std::vector<std::string>& options,
+                       std::string& out);
   const bool verifyResponse(const Parameter::ParameterMap& inputParams,
-                      const std::string& response,
-                      Parameter::ParameterMap& outputParams);
+                            const std::string& response,
+                            Parameter::ParameterMap& outputParams);
+  const bool verifyResponse(const Parameter::ParameterMap& inputParams,
+                            const std::vector<std::string>& options,
+                            const std::string& response,
+                            Parameter::ParameterMap& outputParams);
   const std::string& getName() const;
 
 private:
@@ -46,9 +67,12 @@ private:
   bool cmdHasParams;
   bool cmdHasResponse;
   bool respHasParams;
+  std::unordered_map<std::string, CommandOptions>* options;
+  std::string optionsPrefix;
   // first: name, second: type
   std::unordered_map<std::string, std::string> parameterTypes;
 
+  std::string cmdResponsePrefix;
   std::unordered_set<std::string> cmdParameterSet;
   std::vector<std::string> cmdKeyWords;
   std::vector<std::string> cmdParameter;
@@ -56,7 +80,7 @@ private:
 
   std::string simpleResponse;
   // string contains a keyWord if bool=false, else string contains paramName
-  std::vector<std::pair<std::string, bool> > responseTemplate;
+  std::vector<std::pair<std::string, bool>> responseTemplate;
 
   void insertCmdKeyword(const int& index, const Parameter::ParameterMap& input,
                         std::string& out);
