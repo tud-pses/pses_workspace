@@ -42,10 +42,9 @@ class Command
 
 public:
   Command();
-  //Command(const Command& other);
-  //Command(Command&& other) = delete;
-  Command(const CommandParams& cmdParams,
-          const std::string& cmdResponsePrefix,
+  // Command(const Command& other);
+  // Command(Command&& other) = delete;
+  Command(const CommandParams& cmdParams, const std::string& cmdResponsePrefix,
           std::unordered_map<std::string, CommandOptions>* options,
           const std::string& optionsPrefix);
   void generateCommand(const Parameter::ParameterMap& inputParams,

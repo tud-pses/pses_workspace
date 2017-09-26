@@ -50,6 +50,10 @@ public:
   {
     parameters = std::unordered_map<std::string, std::shared_ptr<Parameter>>();
   }
+  const bool isParamInMap(const std::string& name) const{
+    return parameters.find(name)!=parameters.end();
+  }
+
   template <typename T>
   void insertParameter(const std::string& name, const std::string& type,
                        const T& value)

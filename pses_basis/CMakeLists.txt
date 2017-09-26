@@ -131,13 +131,14 @@ include_directories(
  #add_library(serialinterface src/serialinterface.cpp)
  #add_library(communication src/communication.cpp)
  #add_library(communicationconfig src/communicationconfig.cpp)
- add_library(allfiles
+ add_library(project
    src/command.cpp
    src/readingthread.cpp
    src/threaddispatcher.cpp
    src/serialinterface.cpp
    src/communication.cpp
    src/communicationconfig.cpp
+   src/sensorgroup.cpp
   )
 
 ## Declare a C++ executable
@@ -167,7 +168,7 @@ include_directories(
  #target_link_libraries(communicationconfig yaml-cpp command)
  #target_link_libraries(communication serialinterface threaddispatcher communicationconfig)
  #target_link_libraries(uc_bridge ${catkin_LIBRARIES} communication)
- target_link_libraries(uc_bridge allfiles yaml-cpp ${catkin_LIBRARIES})
+ target_link_libraries(uc_bridge project yaml-cpp ${catkin_LIBRARIES})
  target_link_libraries(test_node ${catkin_LIBRARIES})
 #############
 ## Install ##

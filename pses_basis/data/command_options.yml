@@ -1,3 +1,22 @@
+# options that modify a response to a command
+
+- name: "Age(Cmd)"
+  opt_has_params: False
+  params: ['uint32_t:age']
+  opt: "AGE"
+  opt_returns_params: True
+  response: "$age"
+  adds_response_to_groups: False
+
+- name: "Tics(Cmd)"
+  opt_has_params: False
+  params: ['uint32_t:tics']
+  opt: "TICS"
+  opt_returns_params: True
+  response: "$tics"
+  adds_response_to_groups: False
+
+# options that modify a sensor group message
 - name: "CRC_16"
   opt_has_params: False
   params:
@@ -70,7 +89,7 @@
   response:
   adds_response_to_groups: False
 
-- name: "Age"
+- name: "Age(Group)"
   opt_has_params: False
   params: ['uint32_t:age']
   opt: "AGE"
@@ -78,7 +97,7 @@
   response: "$age"
   adds_response_to_groups: True
 
-- name: "Tics"
+- name: "Tics(Group)"
   opt_has_params: False
   params: ['uint32_t:tics']
   opt: "TICS"
