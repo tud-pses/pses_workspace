@@ -54,6 +54,19 @@ public:
     return parameters.find(name)!=parameters.end();
   }
 
+  const int size() const{
+    return parameters.size();
+  }
+
+  std::string toString() const {
+    std::stringstream ss = std::stringstream();
+    for(auto item : parameters){
+      ss<<"Name: "<<item.first<<", Type: "<<item.second->getType()<<"\n";
+    }
+    ss<<"List size: "<<size();
+    return ss.str();
+  }
+
   template <typename T>
   void insertParameter(const std::string& name, const std::string& type,
                        const T& value)
@@ -293,6 +306,86 @@ public:
       std::dynamic_pointer_cast<GenericParameter<std::vector<std::string> > >(parameters[name])
               ->setData(split);
     }
+  }
+
+  void insertParameter(const std::string& name, const std::string& type)
+  {
+    std::shared_ptr<Parameter> param;
+
+    if (type.compare("int8_t") == 0)
+    {
+      char value = 0;
+      param = std::shared_ptr<Parameter>(new GenericParameter<char>(name, type));
+      std::dynamic_pointer_cast<GenericParameter<char>>(param)->setData(value);
+
+    }
+    else if (type.compare("uint8_t") == 0)
+    {
+      unsigned char value = 0;
+      param = std::shared_ptr<Parameter>(new GenericParameter<unsigned char>(name, type));
+      std::dynamic_pointer_cast<GenericParameter<unsigned char>>(param)->setData(value);
+    }
+    else if (type.compare("int16_t") == 0)
+    {
+      short value = 0;
+      param = std::shared_ptr<Parameter>(new GenericParameter<short>(name, type));
+      std::dynamic_pointer_cast<GenericParameter<short>>(param)->setData(value);
+    }
+    else if (type.compare("uint16_t") == 0)
+    {
+      unsigned short value = 0;
+      param = std::shared_ptr<Parameter>(new GenericParameter<unsigned short>(name, type));
+      std::dynamic_pointer_cast<GenericParameter<unsigned short>>(param)->setData(value);
+    }
+    else if (type.compare("int32_t") == 0)
+    {
+      int value = 0;
+      param = std::shared_ptr<Parameter>(new GenericParameter<int>(name, type));
+      std::dynamic_pointer_cast<GenericParameter<int>>(param)->setData(value);
+    }
+    else if (type.compare("uint32_t") == 0)
+    {
+      unsigned int value = 0;
+      param = std::shared_ptr<Parameter>(new GenericParameter<unsigned int>(name, type));
+      std::dynamic_pointer_cast<GenericParameter<unsigned int>>(param)->setData(value);
+    }
+    else if (type.compare("int64_t") == 0)
+    {
+      long value = 0;
+      param = std::shared_ptr<Parameter>(new GenericParameter<long>(name, type));
+      std::dynamic_pointer_cast<GenericParameter<long>>(param)->setData(value);
+    }
+    else if (type.compare("uint64_t") == 0)
+    {
+      unsigned long value = 0;
+      param = std::shared_ptr<Parameter>(new GenericParameter<unsigned long>(name, type));
+      std::dynamic_pointer_cast<GenericParameter<unsigned long>>(param)->setData(value);
+    }
+    else if (type.compare("float32_t") == 0)
+    {
+      float value = 0.0;
+      param = std::shared_ptr<Parameter>(new GenericParameter<float>(name, type));
+      std::dynamic_pointer_cast<GenericParameter<float>>(param)->setData(value);
+    }
+    else if (type.compare("float64_t") == 0)
+    {
+      double value = 0.0;
+      param = std::shared_ptr<Parameter>(new GenericParameter<double>(name, type));
+      std::dynamic_pointer_cast<GenericParameter<double>>(param)->setData(value);
+    }
+    else if (type.compare("string_t") == 0)
+    {
+      param = std::shared_ptr<Parameter>(new GenericParameter<std::string>(name, type));
+      std::dynamic_pointer_cast<GenericParameter<std::string>>(param)->setData("no value");
+    }
+    else if (type.compare("string_t[]") == 0)
+    {
+      std::vector<std::string> value;
+      param = std::shared_ptr<Parameter>(new GenericParameter<std::vector<std::string> >(name, type));
+      std::dynamic_pointer_cast<GenericParameter<std::vector<std::string> > >(param)->setData(value);
+    }
+
+    parameters.insert(std::make_pair(name, param));
   }
 
 private:

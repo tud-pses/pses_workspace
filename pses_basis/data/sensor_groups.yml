@@ -1,9 +1,15 @@
-- name: "Ultra Sound Sensors"
-  grp_nr: 1
-  channels: ['USL', 'USF', 'USR']
-  options: ['Wait_For_All', 'Channel_Polling_Interval:10', 'Average_Over_Interval:10']
+# Group numbers have to be unique (unsigned char type), names are optional (mostly for debugging purposes)
+# If an option has more than one parameter, simply add additional parameters by separating them with a comma.
+# Possible encoding types: ASCII, HEX (hexadecimal), B64 (base 64 encoding)
 
-- name: "Gyro Sensors"
-  grp_nr: 2
+- grp_nr: 1
+  name: "Ultra Sound Sensors"
+  channels: ['USL']
+  options: ['Wait_For_All:10', 'Channel_Polling_Interval:10', 'Average_Over_Interval:10']
+  encoding: "ASCII"
+
+- grp_nr: 2
+  name: "Gyro Sensors"
   channels: ['GX', 'GY', 'GZ']
-  options: ['Wait_For_All', 'Channel_Polling_Interval:10', 'Average_Over_Interval']
+  options: ['Wait_For_All:10', 'Channel_Polling_Interval:10', 'Average_Over_Interval:10']
+  encoding: "ASCII"

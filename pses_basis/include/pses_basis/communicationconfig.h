@@ -2,6 +2,7 @@
 #define COMMUNICATIONCONFIG_H
 
 #include <pses_basis/command.h>
+#include <pses_basis/sensorgroup.h>
 #include <string>
 #include <unordered_map>
 #include <yaml-cpp/yaml.h>
@@ -21,22 +22,6 @@ struct Syntax
   std::string optionsPrefix;
 };
 
-struct Channel
-{
-  std::string chName;
-  std::string dataType;
-  bool conversionNeeded;
-  double conversionFactor;
-};
-
-struct SensorGroups
-{
-  std::string grpName;
-  unsigned char grpNumber;
-  // hier ein Channel Objekt ?
-  // hier ein Options Objekt ?
-};
-
 class CommunicationConfig
 {
 public:
@@ -52,19 +37,23 @@ public:
 
   const Syntax* getSyntax() const;
   const std::unordered_map<std::string, Command>& getCommands() const;
+  const std::unordered_map<unsigned char, SensorGroup>& getSensorGroups() const;
 
 private:
   std::string configPath;
   std::unordered_map<std::string, Command> commands;
+  std::unordered_map<unsigned char, SensorGroup> sensorGroups;
   std::unordered_map<std::string, Channel> channels;
   std::unordered_map<std::string, CommandOptions> options;
   Syntax syntax;
 
   void insertCommand(const YAML::Node& node);
+  void insertSensorGroup(const YAML::Node& node);
   void readGeneralSyntax();
   void readChannels();
   void readOptions();
   void readCommands();
+  void readSensorGroups();
 };
 
 #endif // COMMUNICATIONCONFIG_H

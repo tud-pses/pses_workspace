@@ -2,23 +2,9 @@
 
 Command::Command() {}
 
-/*
-Command::Command(const Command& other)
-    : name(other.name), cmdHasParams(other.cmdHasParams),
-      cmdHasResponse(other.cmdHasResponse), respHasParams(other.respHasParams),
-      parameterTypes(other.parameterTypes), cmdKeyWords(other.cmdKeyWords),
-      cmdParameter(other.cmdParameter), commandTemplate(other.commandTemplate),
-      simpleResponse(other.simpleResponse),
-      cmdParameterSet(other.cmdParameterSet),
-      responseTemplate(other.responseTemplate)
-
-{
-}
-*/
-
 Command::Command(const CommandParams& cmdParams,
                  const std::string& cmdResponsePrefix,
-                 std::unordered_map<std::string, CommandOptions>* options,
+                 const std::unordered_map<std::string, CommandOptions>& options,
                  const std::string& optionsPrefix)
 {
   name = cmdParams.name;
@@ -111,26 +97,33 @@ void Command::generateCommand(const Parameter::ParameterMap& inputParams,
 }
 
 void Command::generateCommand(const Parameter::ParameterMap& inputParams,
-                              const std::vector<std::string>& options,
+                              const std::vector<std::string>& optionsList,
                               std::string& out)
 {
   std::string cmd = "";
   generateCommand(inputParams, cmd);
   std::stringstream ss = std::stringstream();
   ss << cmd;
-  for (std::string s : options)
+  for (std::string s : optionsList)
   {
-    const CommandOptions& cmdopt = (*this->options)[s];
+    bool bla = options.find(s)!=options.end();
+
+    const CommandOptions& cmdopt = options[s];
     std::vector<std::string> split;
-    boost::split(split, cmdopt.opt, boost::is_any_of(" "));
+    boost::split(split, cmdopt.opt, boost::is_any_of(" ="));
+    ROS_INFO_STREAM("cmd: "<<name<<" opt: "<<cmdopt.opt);
     for (std::string s1 : split)
     {
+      ROS_INFO_STREAM(s1);
       if (s1.at(0) == '$')
       {
         std::string value = "";
+        ROS_INFO_STREAM("fetching param");
+        ROS_INFO_STREAM(inputParams.toString());
         inputParams.getParameterValueAsString(s1.substr(1, std::string::npos),
                                               value);
-        ss << " " << value;
+        ROS_INFO_STREAM(value);
+        ss << "=" << value;
       }
       else
       {
@@ -213,10 +206,10 @@ const bool Command::verifyResponse(const Parameter::ParameterMap& inputParams,
   std::vector<CommandOptions*> optWithResponse = std::vector<CommandOptions*>();
   for (std::string opt : options)
   {
-    if ((*this->options)[opt].optReturnsParams)
+    if (this->options[opt].optReturnsParams)
     {
       // gather all options that provoke an additional parameter in the response
-      optWithResponse.push_back(&(*this->options)[opt]);
+      optWithResponse.push_back(&(this->options[opt]));
     }
   }
   std::vector<std::string> split;

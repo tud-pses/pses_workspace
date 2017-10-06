@@ -4,6 +4,7 @@ Communication::Communication(const std::string& configPath)
 {
   comCfg = CommunicationConfig(configPath);
   commands = comCfg.getCommands();
+  sensorGroups = comCfg.getSensorGroups();
   dispatcher = new ThreadDispatcher(comCfg.getSyntax());
   rxPolling = new ReadingThread(comCfg.getSyntax()->endOfMessage, dispatcher);
   dispatcher->setReadingThread(rxPolling);
@@ -94,4 +95,28 @@ bool Communication::sendCommand(const std::string& command,
   //if(dispatcher->IsResponseQueueEmpty()) return false;
   //dispatcher->dequeueResponse(response);
   return commands[command].verifyResponse(inputParams, options,response, outputParams);
+}
+
+bool Communication::registerSensorGroups(const std::string& cmdName, unsigned int timeout){
+  bool succes = true;
+  SerialInterface& si = SerialInterface::instance();
+  for(auto grp : sensorGroups){
+    std::unique_lock<std::mutex> lck(mtx);
+    std::string cmd;
+    std::string response;
+    ROS_INFO_STREAM("Setting cmd for: " <<grp.second.getName());
+    grp.second.createSensorGroupCommand(commands[cmdName], cmd);
+    ROS_INFO_STREAM(cmd);
+    dispatcher->setCommunicationWakeUp(true);
+    // si.send(cmd);
+    cv.wait_for(lck, std::chrono::microseconds(timeout));
+    //if(dispatcher->IsResponseQueueEmpty()) return false;
+    //dispatcher->dequeueResponse(response);
+    succes = grp.second.verifyResponseOnComand(commands[cmdName], response);
+  }
+  return succes;
+}
+
+void Communication::registerSensorGroupCallback(const unsigned char& grpNumber, responseCallback cbPtr){
+  sensorGroups[grpNumber].setResponseCallback(cbPtr);
 }

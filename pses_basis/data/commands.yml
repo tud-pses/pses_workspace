@@ -124,6 +124,8 @@
 
 # basic grouping functions:
 
+#IMPORTANT: This command is mandatory and musn't be changed!
+# The command and response syntax however may be changed, but the variables have to be kept.
 - cmd_name: "Set Group"
   cmd_has_params: True
   params: ['uint8_t:grp_nr', 'string_t[]:channels']

@@ -12,8 +12,9 @@ CommunicationConfig::CommunicationConfig(std::string configPath)
 {
   readGeneralSyntax();
   readChannels();
-  // readOptions();
+  readOptions();
   readCommands();
+  readSensorGroups();
 }
 
 // Syntax-struct assign operator
@@ -79,7 +80,7 @@ void operator>>(const YAML::Node& node,
   options.insert(std::make_pair(cmdOpt.optName, cmdOpt));
 }
 
-// CommandType-Struct assign operator
+// CommandObject insertion/creation method
 void CommunicationConfig::insertCommand(const YAML::Node& node)
 {
   CommandParams cmd;
@@ -109,8 +110,61 @@ void CommunicationConfig::insertCommand(const YAML::Node& node)
     }
   }
   commands.insert(
-      std::make_pair(cmd.name, Command(cmd, syntax.answerOnCmdPrefix, &options,
+      std::make_pair(cmd.name, Command(cmd, syntax.answerOnCmdPrefix, options,
                                        syntax.optionsPrefix)));
+}
+
+// SensorGroupObject insertion/creation method
+void CommunicationConfig::insertSensorGroup(const YAML::Node& node)
+{
+  SensorGroupParameter grp;
+  grp.grpNumber = node["grp_nr"].as<unsigned int>();
+  if (node["name"].IsScalar() && !node["name"].IsNull())
+  {
+    grp.grpName = node["name"].as<std::string>();
+  }
+  else
+  {
+    grp.grpName = "Unspecified Group";
+  }
+  const YAML::Node& channelNode = node["channels"];
+  if (channelNode.IsSequence() && channelNode.size() > 0)
+  {
+    for (auto item : channelNode)
+    {
+      std::string channelName = item.as<std::string>();
+      // insert check if channel exists later ..
+      grp.channels.push_back(channels[channelName]);
+    }
+  }
+  const YAML::Node& optionsNode = node["options"];
+  if (optionsNode.IsSequence() && optionsNode.size() > 0)
+  {
+    for (auto item : optionsNode)
+    {
+      std::string option = item.as<std::string>();
+      std::string name = "";
+      std::string params = "";
+      ROS_INFO_STREAM(option);
+      if(option.find(':')!=std::string::npos){
+        std::vector<std::string> split;
+        boost::split(split, option, boost::is_any_of(":"));
+        name = split[0];
+        params = split[1];
+      }else{
+        name = option;
+      }
+
+      grp.options.push_back(std::make_pair(options[name], params));
+    }
+  }
+  std::string encoding = node["encoding"].as<std::string>();
+  if (encoding.compare(SensorGroup::ENCODING_ASCII) == 0 ||
+      encoding.compare(SensorGroup::ENCODING_B64) == 0 ||
+      encoding.compare(SensorGroup::ENCODING_HEX) == 0)
+    grp.encoding = encoding;
+  // else: unkonwn encoding for grp nr xy <- should be an error/exception
+  sensorGroups.insert(std::make_pair(grp.grpNumber, SensorGroup(grp)));
 }
 
 void CommunicationConfig::readGeneralSyntax()
@@ -149,10 +203,26 @@ void CommunicationConfig::readCommands()
   }
 }
 
+void CommunicationConfig::readSensorGroups()
+{
+  YAML::Node groupsYaml = YAML::LoadFile(configPath + "sensor_groups.yml");
+
+  for (auto node : groupsYaml)
+  {
+    insertSensorGroup(node);
+  }
+}
+
 const Syntax* CommunicationConfig::getSyntax() const { return &syntax; }
 
 const std::unordered_map<std::string, Command>&
 CommunicationConfig::getCommands() const
 {
   return commands;
+}
+
+const std::unordered_map<unsigned char, SensorGroup>&
+CommunicationConfig::getSensorGroups() const
+{
+  return sensorGroups;
 }
