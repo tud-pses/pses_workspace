@@ -1,0 +1,5 @@
+bool DAQ_on
+---
+bool was_set
+
+

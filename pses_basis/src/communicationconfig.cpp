@@ -110,8 +110,8 @@ void CommunicationConfig::insertCommand(const YAML::Node& node)
     }
   }
   commands.insert(
-      std::make_pair(cmd.name, Command(cmd, syntax.answerOnCmdPrefix, options,
-                                       syntax.optionsPrefix)));
+      std::make_pair(cmd.name, std::make_shared<Command>(Command(cmd, syntax.answerOnCmdPrefix, options,
+                                       syntax.optionsPrefix))));
 }
 
 // SensorGroupObject insertion/creation method
@@ -145,7 +145,7 @@ void CommunicationConfig::insertSensorGroup(const YAML::Node& node)
       std::string option = item.as<std::string>();
       std::string name = "";
       std::string params = "";
-      ROS_INFO_STREAM(option);
+     // ROS_INFO_STREAM(option);
       if(option.find(':')!=std::string::npos){
         std::vector<std::string> split;
         boost::split(split, option, boost::is_any_of(":"));
@@ -164,7 +164,7 @@ void CommunicationConfig::insertSensorGroup(const YAML::Node& node)
       encoding.compare(SensorGroup::ENCODING_HEX) == 0)
     grp.encoding = encoding;
   // else: unkonwn encoding for grp nr xy <- should be an error/exception
-  sensorGroups.insert(std::make_pair(grp.grpNumber, SensorGroup(grp)));
+  sensorGroups.insert(std::make_pair(grp.grpNumber, std::make_shared<SensorGroup>(SensorGroup(grp))));
 }
 
 void CommunicationConfig::readGeneralSyntax()
@@ -213,15 +213,15 @@ void CommunicationConfig::readSensorGroups()
   }
 }
 
-const Syntax* CommunicationConfig::getSyntax() const { return &syntax; }
+const std::shared_ptr<Syntax> CommunicationConfig::getSyntax() const { return std::make_shared<Syntax>(syntax); }
 
-const std::unordered_map<std::string, Command>&
+const std::unordered_map<std::string, std::shared_ptr<Command> >&
 CommunicationConfig::getCommands() const
 {
   return commands;
 }
 
-const std::unordered_map<unsigned char, SensorGroup>&
+const std::unordered_map<unsigned char, std::shared_ptr<SensorGroup> >&
 CommunicationConfig::getSensorGroups() const
 {
   return sensorGroups;

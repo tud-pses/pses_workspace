@@ -42,14 +42,14 @@ SensorGroup::SensorGroup(const SensorGroupParameter& sensorParams)
     for (auto param : option.first.params)
     {
       tempPm.insertParameter(param.first, param.second);
-      ROS_INFO_STREAM("oh boy.. "<<param.first<<" "<<param.second);
+      //ROS_INFO_STREAM("oh boy.. "<<param.first<<" "<<param.second);
     }
     // the first part is later needed for the command string
     optionsList.push_back(option.first.optName);
     std::vector<std::string> optionSplit;
     boost::split(optionSplit, option.first.opt, boost::is_any_of(" ="));
     std::vector<std::string> splitParamValues;
-    ROS_INFO_STREAM(option.second);
+    //ROS_INFO_STREAM(option.second);
     if(option.second.find(',')!=std::string::npos){
       boost::split(splitParamValues, option.second, boost::is_any_of(","));
     }else{
@@ -62,7 +62,7 @@ SensorGroup::SensorGroup(const SensorGroupParameter& sensorParams)
       if (optString.at(0) == '$')
       {
         std::string paramName = optString.substr(1, std::string::npos);
-        ROS_INFO_STREAM("oh boy.. wtf .."<<paramName<<" "<<tempPm.getParameter(paramName)->getType()<<" "<<splitParamValues[valueCounter]);
+        //ROS_INFO_STREAM("oh boy.. wtf .."<<paramName<<" "<<tempPm.getParameter(paramName)->getType()<<" "<<splitParamValues[valueCounter]);
         cmdInputParams.insertParameter(
             paramName, tempPm.getParameter(paramName)->getType());
         if (valueCounter >= splitParamValues.size())
@@ -108,15 +108,19 @@ void SensorGroup::parseResponse(const std::string& response)
     int splitIndex = 0;
     for (std::string s : split)
     {
+      if(s.find(' ')!=std::string::npos) continue;
       if (splitIndex >= channelList.size())
         break;
+      //ROS_INFO_STREAM("Parsing: "<<s<<" from response: "<<response);
       channelValues.setParameterValueAsString(channelList[splitIndex].chName,
                                               s);
       splitIndex++;
     }
+    //ROS_INFO_STREAM("Nani?");
     // check for options
     if (optionVariableList.size() <= 0)
       return;
+    //ROS_INFO_STREAM("Nani?????");
     // parse options with returns
     for (; splitIndex < optionVariableList.size(); splitIndex++)
     {

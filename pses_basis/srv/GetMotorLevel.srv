@@ -1,0 +1,5 @@
+
+---
+bool answer_received
+int16 level
+

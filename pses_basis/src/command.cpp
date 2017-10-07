@@ -111,18 +111,18 @@ void Command::generateCommand(const Parameter::ParameterMap& inputParams,
     const CommandOptions& cmdopt = options[s];
     std::vector<std::string> split;
     boost::split(split, cmdopt.opt, boost::is_any_of(" ="));
-    ROS_INFO_STREAM("cmd: "<<name<<" opt: "<<cmdopt.opt);
+    //ROS_INFO_STREAM("cmd: "<<name<<" opt: "<<cmdopt.opt);
     for (std::string s1 : split)
     {
-      ROS_INFO_STREAM(s1);
+      //ROS_INFO_STREAM(s1);
       if (s1.at(0) == '$')
       {
         std::string value = "";
-        ROS_INFO_STREAM("fetching param");
-        ROS_INFO_STREAM(inputParams.toString());
+        //ROS_INFO_STREAM("fetching param");
+        //ROS_INFO_STREAM(inputParams.toString());
         inputParams.getParameterValueAsString(s1.substr(1, std::string::npos),
                                               value);
-        ROS_INFO_STREAM(value);
+        //ROS_INFO_STREAM(value);
         ss << "=" << value;
       }
       else

@@ -3,11 +3,14 @@
 Communication::Communication(const std::string& configPath)
 {
   comCfg = CommunicationConfig(configPath);
+  syntax = comCfg.getSyntax();
   commands = comCfg.getCommands();
   sensorGroups = comCfg.getSensorGroups();
-  dispatcher = new ThreadDispatcher(comCfg.getSyntax());
-  rxPolling = new ReadingThread(comCfg.getSyntax()->endOfMessage, dispatcher);
+  dispatcher = new ThreadDispatcher(syntax);
+  rxPolling = new ReadingThread(syntax->endOfMessage, dispatcher);
+  sensorGroupThread = new SensorGroupThread(syntax->channelGrpMsgPrefix, dispatcher, sensorGroups);
   dispatcher->setReadingThread(rxPolling);
+  dispatcher->setSensorGroupThread(sensorGroupThread);
   dispatcher->setCommunicationCondVar(&cv);
 }
 
@@ -15,6 +18,7 @@ Communication::~Communication()
 {
   delete (dispatcher);
   delete (rxPolling);
+  delete (sensorGroupThread);
 }
 
 void Communication::connect()
@@ -67,14 +71,14 @@ bool Communication::sendCommand(const std::string& command,
   std::unique_lock<std::mutex> lck(mtx);
   std::string cmd;
   std::string response = "F 6";
-  commands[command].generateCommand(inputParams, cmd);
-  ROS_INFO_STREAM(cmd);
+  commands[command]->generateCommand(inputParams, cmd);
+  //ROS_INFO_STREAM(cmd);
   dispatcher->setCommunicationWakeUp(true);
   // si.send(cmd);
   cv.wait_for(lck, std::chrono::microseconds(timeout));
   //if(dispatcher->IsResponseQueueEmpty()) return false;
   //dispatcher->dequeueResponse(response);
-  return commands[command].verifyResponse(inputParams, response, outputParams);
+  return commands[command]->verifyResponse(inputParams, response, outputParams);
 }
 //timeout in microseconds
 bool Communication::sendCommand(const std::string& command,
@@ -87,14 +91,14 @@ bool Communication::sendCommand(const std::string& command,
   std::unique_lock<std::mutex> lck(mtx);
   std::string cmd;
   std::string response = "F 6";
-  commands[command].generateCommand(inputParams, options, cmd);
-  ROS_INFO_STREAM(cmd);
+  commands[command]->generateCommand(inputParams, options, cmd);
+  //ROS_INFO_STREAM(cmd);
   dispatcher->setCommunicationWakeUp(true);
   // si.send(cmd);
   cv.wait_for(lck, std::chrono::microseconds(timeout));
   //if(dispatcher->IsResponseQueueEmpty()) return false;
   //dispatcher->dequeueResponse(response);
-  return commands[command].verifyResponse(inputParams, options,response, outputParams);
+  return commands[command]->verifyResponse(inputParams, options,response, outputParams);
 }
 
 bool Communication::registerSensorGroups(const std::string& cmdName, unsigned int timeout){
@@ -104,19 +108,19 @@ bool Communication::registerSensorGroups(const std::string& cmdName, unsigned in
     std::unique_lock<std::mutex> lck(mtx);
     std::string cmd;
     std::string response;
-    ROS_INFO_STREAM("Setting cmd for: " <<grp.second.getName());
-    grp.second.createSensorGroupCommand(commands[cmdName], cmd);
-    ROS_INFO_STREAM(cmd);
+    //ROS_INFO_STREAM("Setting cmd for: " <<grp.second->getName());
+    grp.second->createSensorGroupCommand(*commands[cmdName], cmd);
+    //ROS_INFO_STREAM(cmd);
     dispatcher->setCommunicationWakeUp(true);
     // si.send(cmd);
     cv.wait_for(lck, std::chrono::microseconds(timeout));
     //if(dispatcher->IsResponseQueueEmpty()) return false;
     //dispatcher->dequeueResponse(response);
-    succes = grp.second.verifyResponseOnComand(commands[cmdName], response);
+    succes = grp.second->verifyResponseOnComand(*commands[cmdName], response);
   }
   return succes;
 }
 
 void Communication::registerSensorGroupCallback(const unsigned char& grpNumber, responseCallback cbPtr){
-  sensorGroups[grpNumber].setResponseCallback(cbPtr);
+  sensorGroups[grpNumber]->setResponseCallback(cbPtr);
 }

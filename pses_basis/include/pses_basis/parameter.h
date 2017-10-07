@@ -77,9 +77,9 @@ public:
     parameters.insert(std::make_pair(name, param));
   }
   template <typename T>
-  const T& getParameterValue(const std::string& name) const
+  void getParameterValue(const std::string& name, T& value) const
   {
-    return std::dynamic_pointer_cast<GenericParameter<T>>(parameters.at(name))
+    value = std::dynamic_pointer_cast<GenericParameter<T>>(parameters.at(name))
         ->getData();
   }
   template <typename T>
@@ -102,7 +102,8 @@ public:
       if (size > 1)
         return; // wichtig hier sollte eine exception wegen type mismatch
                 // geworfen werden
-      char value = getParameterValue<char>(name);
+      char value;
+      getParameterValue(name, value);
       out = std::to_string(static_cast<int>(value));
     }
     else if (type.compare("uint8_t") == 0)
@@ -110,7 +111,8 @@ public:
       if (size > 1)
         return; // wichtig hier sollte eine exception wegen type mismatch
                 // geworfen werden
-      unsigned char value = getParameterValue<unsigned char>(name);
+      unsigned char value;
+      getParameterValue(name, value);
       out = std::to_string(static_cast<unsigned int>(value));
     }
     else if (type.compare("int16_t") == 0)
@@ -118,7 +120,8 @@ public:
       if (size > 2)
         return; // wichtig hier sollte eine exception wegen type mismatch
                 // geworfen werden
-      short value = getParameterValue<short>(name);
+      short value;
+      getParameterValue(name, value);
       out = std::to_string(static_cast<int>(value));
     }
     else if (type.compare("uint16_t") == 0)
@@ -126,7 +129,8 @@ public:
       if (size > 2)
         return; // wichtig hier sollte eine exception wegen type mismatch
                 // geworfen werden
-      unsigned short value = getParameterValue<unsigned short>(name);
+      unsigned short value;
+      getParameterValue(name, value);
       out = std::to_string(static_cast<unsigned int>(value));
     }
     else if (type.compare("int32_t") == 0)
@@ -134,7 +138,8 @@ public:
       if (size > 4)
         return; // wichtig hier sollte eine exception wegen type mismatch
                 // geworfen werden
-      int value = getParameterValue<int>(name);
+      int value;
+      getParameterValue(name, value);
       out = std::to_string(value);
     }
     else if (type.compare("uint32_t") == 0)
@@ -142,7 +147,8 @@ public:
       if (size > 4)
         return; // wichtig hier sollte eine exception wegen type mismatch
                 // geworfen werden
-      unsigned int value = getParameterValue<unsigned int>(name);
+      unsigned int value;
+      getParameterValue(name, value);
       out = std::to_string(value);
     }
     else if (type.compare("int64_t") == 0)
@@ -150,7 +156,8 @@ public:
       if (size > 8)
         return; // wichtig hier sollte eine exception wegen type mismatch
                 // geworfen werden
-      long value = getParameterValue<long>(name);
+      long value;
+      getParameterValue(name, value);
       out = std::to_string(value);
     }
     else if (type.compare("uint64_t") == 0)
@@ -158,7 +165,8 @@ public:
       if (size > 8)
         return; // wichtig hier sollte eine exception wegen type mismatch
                 // geworfen werden
-      unsigned long value = getParameterValue<unsigned long>(name);
+      unsigned long value;
+      getParameterValue(name, value);
       out = std::to_string(value);
     }
     else if (type.compare("float32_t") == 0)
@@ -166,7 +174,8 @@ public:
       if (size > 4)
         return; // wichtig hier sollte eine exception wegen type mismatch
                 // geworfen werden
-      float value = getParameterValue<float>(name);
+      float value;
+      getParameterValue(name, value);
       out = std::to_string(value);
     }
     else if (type.compare("float64_t") == 0)
@@ -174,18 +183,20 @@ public:
       if (size > 8)
         return; // wichtig hier sollte eine exception wegen type mismatch
                 // geworfen werden
-      double value = getParameterValue<double>(name);
+      double value;
+      getParameterValue(name, value);
       out = std::to_string(value);
     }
     else if (type.compare("string_t") == 0)
     {
       // wie string type mismatch bestimmen ?
-      out = getParameterValue<std::string>(name);
+      getParameterValue(name, out);
     }
     else if (type.compare("string_t[]") == 0)
     {
       // wie string type mismatch bestimmen ?
-      const std::vector<std::string>& sArray = getParameterValue<std::vector<std::string>>(name);
+      std::vector<std::string> sArray;
+      getParameterValue(name, sArray);
       std::stringstream ss = std::stringstream();
       for(std::string s : sArray){
         ss<<" "<<s;

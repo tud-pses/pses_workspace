@@ -1,41 +1,46 @@
 #include <pses_basis/threaddispatcher.h>
 
-ThreadDispatcher::ThreadDispatcher(const Syntax* syntax)
+ThreadDispatcher::ThreadDispatcher(const std::shared_ptr<Syntax>& syntax)
 {
   this->syntax = syntax;
   commandResponse = std::queue<std::string>();
+  sensorGroupMessage = std::queue<std::string>();
   wakeUpCommunication = false;
 }
 
 void ThreadDispatcher::startThread()
 {
-  // ROS_INFO_STREAM("ThreadDispatcher starting..");
+   //ROS_INFO_STREAM("ThreadDispatcher starting..");
   active = true;
   worker = std::thread(&ThreadDispatcher::workerFunction, this);
+  sensorGroupThread->startThread();
   readingThread->startThread();
-  // ROS_INFO_STREAM("ThreadDispatcher started..");
+
+   //ROS_INFO_STREAM("ThreadDispatcher started..");
 }
 
 void ThreadDispatcher::stopThread()
 {
-  // ROS_INFO_STREAM("ThreadDispatcher stopping..");
+   //ROS_INFO_STREAM("ThreadDispatcher stopping..");
   readingThread->stopThread();
+  sensorGroupThread->stopThread();
   active = false;
   wakeUp();
   worker.join();
-  // ROS_INFO_STREAM("ThreadDispatcher stopped..");
+   //ROS_INFO_STREAM("ThreadDispatcher stopped..");
 }
 
 void ThreadDispatcher::workerFunction()
 {
   while (active)
   {
-    // ROS_INFO_STREAM("ThreadDispatcher sleeping..");
+     //ROS_INFO_STREAM("ThreadDispatcher sleeping..");
     sleep();
-    // ROS_INFO_STREAM("ThreadDispatcher woke up..");
+     //ROS_INFO_STREAM("ThreadDispatcher woke up..");
     while (!readingThread->isQueueEmpty() && active)
     {
       std::string data = readingThread->getData();
+      //ROS_INFO_STREAM("Msg in dispatch: "<<data);
       // in case of empty string
       if (data.size() < 1)
         continue;
@@ -50,7 +55,10 @@ void ThreadDispatcher::workerFunction()
       }
       else if (data.find(syntax->channelGrpMsgPrefix) == 0)
       {
-        // dispatch grp thread
+        //ROS_INFO_STREAM("Msg in dispatch pre push: "<<data<<" "<<sensorGroupMessage.size());
+        sensorGroupMessage.push(data);
+        sensorGroupThread->wakeUp();
+        //ROS_INFO_STREAM("Msg in dispatch post push: "<<sensorGroupMessage.front()<<" "<<sensorGroupMessage.size());
       }
       else if (data.find(syntax->answerOnCmdPrefix) == 0)
       {
@@ -72,20 +80,40 @@ void ThreadDispatcher::setReadingThread(ReadingThread* rxThread)
     this->readingThread = rxThread;
   }
 }
+
+void ThreadDispatcher::setSensorGroupThread(SensorGroupThread* grpThread)
+{
+  if (!active)
+  {
+    this->sensorGroupThread = grpThread;
+  }
+}
+
 void ThreadDispatcher::setCommunicationCondVar(std::condition_variable* condVar)
 {
   this->comCV = condVar;
 }
 
-void ThreadDispatcher::dequeueResponse(std::string response)
+void ThreadDispatcher::dequeueResponse(std::string& response)
 {
   response = commandResponse.front();
   commandResponse.pop();
 }
 
+void ThreadDispatcher::dequeueSensorGroupMessage(std::string& response)
+{
+  response = sensorGroupMessage.front();
+  sensorGroupMessage.pop();
+}
+
 const bool ThreadDispatcher::IsResponseQueueEmpty() const
 {
   return commandResponse.empty();
+}
+
+const bool ThreadDispatcher::IsMessageQueueEmpty() const
+{
+  return sensorGroupMessage.empty();
 }
 
 void ThreadDispatcher::setCommunicationWakeUp(bool wakeUp)

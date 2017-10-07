@@ -4,7 +4,7 @@
 
 - grp_nr: 1
   name: "Ultra Sound Sensors"
-  channels: ['USL']
+  channels: ['USL', 'USF', 'USR']
   options: ['Wait_For_All:10', 'Channel_Polling_Interval:10', 'Average_Over_Interval:10']
   encoding: "ASCII"
 

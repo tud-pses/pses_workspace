@@ -35,14 +35,14 @@ public:
   operator>>(const YAML::Node& node,
              std::unordered_map<std::string, CommandOptions>& options);
 
-  const Syntax* getSyntax() const;
-  const std::unordered_map<std::string, Command>& getCommands() const;
-  const std::unordered_map<unsigned char, SensorGroup>& getSensorGroups() const;
+  const std::shared_ptr<Syntax> getSyntax() const;
+  const std::unordered_map<std::string, std::shared_ptr<Command> >& getCommands() const;
+  const std::unordered_map<unsigned char, std::shared_ptr<SensorGroup> >& getSensorGroups() const;
 
 private:
   std::string configPath;
-  std::unordered_map<std::string, Command> commands;
-  std::unordered_map<unsigned char, SensorGroup> sensorGroups;
+  std::unordered_map<std::string, std::shared_ptr<Command> > commands;
+  std::unordered_map<unsigned char, std::shared_ptr<SensorGroup> > sensorGroups;
   std::unordered_map<std::string, Channel> channels;
   std::unordered_map<std::string, CommandOptions> options;
   Syntax syntax;

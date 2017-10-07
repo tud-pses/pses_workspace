@@ -32,14 +32,14 @@ public:
                             unsigned int timeout = 10000);
   void registerSensorGroupCallback(const unsigned char& grpNumber,
                                    responseCallback cbPtr);
-  std::unordered_map<unsigned char, SensorGroup> sensorGroups;
-
 private:
   CommunicationConfig comCfg;
-  std::unordered_map<std::string, Command> commands;
-
+  std::shared_ptr<Syntax> syntax;
+  std::unordered_map<std::string, std::shared_ptr<Command> > commands;
+  std::unordered_map<unsigned char, std::shared_ptr<SensorGroup> > sensorGroups;
   ThreadDispatcher* dispatcher;
   ReadingThread* rxPolling;
+  SensorGroupThread* sensorGroupThread;
   mutable std::mutex mtx;
   std::condition_variable cv;
 };

@@ -7,30 +7,39 @@
 #include <pses_basis/communicationthread.h>
 #include <pses_basis/readingthread.h>
 #include <pses_basis/communicationconfig.h>
+#include <pses_basis/sensorgroupthread.h>
 #include <ros/ros.h>
 
 class ReadingThread;
+class SensorGroupThread;
 
 class ThreadDispatcher : public CommunicationThread
 {
 public:
-  ThreadDispatcher(const Syntax* syntax);
+  ThreadDispatcher(const std::shared_ptr<Syntax>& syntax);
   void startThread();
   void stopThread();
 
   void setReadingThread(ReadingThread* rxThread);
+  void setSensorGroupThread(SensorGroupThread* grpThread);
   void setCommunicationCondVar(std::condition_variable* condVar);
-  void dequeueResponse(std::string response);
+  void dequeueResponse(std::string& response);
+  void dequeueSensorGroupMessage(std::string& response);
   const bool IsResponseQueueEmpty() const;
+  const bool IsMessageQueueEmpty() const;
   void setCommunicationWakeUp(bool wakeUp);
 
 private:
-  void workerFunction();
+
   ReadingThread* readingThread;
-  const Syntax* syntax;
+  SensorGroupThread* sensorGroupThread;
+  std::shared_ptr<Syntax> syntax;
   std::queue<std::string> commandResponse;
-  bool wakeUpCommunication;
   std::condition_variable* comCV;
+  std::queue<std::string> sensorGroupMessage;
+
+  void workerFunction();
+  bool wakeUpCommunication;
 };
 
 #endif // THREADDISPATCHER_H

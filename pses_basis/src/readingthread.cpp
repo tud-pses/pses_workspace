@@ -27,6 +27,7 @@ void ReadingThread::stopThread()
 void ReadingThread::workerFunction()
 {
   SerialInterface& si = SerialInterface::instance();
+
   while (active)
   {
     std::string message;
@@ -42,8 +43,22 @@ void ReadingThread::workerFunction()
     }
     catch (std::exception& e)
     {
-      ROS_ERROR("%s", e.what());
+      //ROS_ERROR("%s", e.what());
+      //use proper exception handling, avoid ros libraries!
     }
+
+    /*
+
+    // test area:
+    std::string msg = "# 2 243 432 242";
+    data.push(msg);
+    msg = "# 1 2243 3432 1242";
+    data.push(msg);
+    dispatcher->wakeUp();
+    ros::Duration(0.002).sleep();
+    //end
+    */
+
   }
 }
 

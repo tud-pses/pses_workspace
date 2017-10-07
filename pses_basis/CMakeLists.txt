@@ -62,6 +62,24 @@ find_package(catkin REQUIRED COMPONENTS
  add_service_files(
    FILES
    SetMotorLevel.srv
+   SetSteering.srv
+   DeleteGroup.srv
+   GetControllerID.srv
+   GetDAQStatus.srv
+   GetFirmwareVersion.srv
+   GetInfoGroup.srv
+   GetInfoAllGroups.srv
+   GetKinectStatus.srv
+   GetMotorLevel.srv
+   GetSessionID.srv
+   GetSteeringLevel.srv
+   ResetController.srv
+   ToggleBrakes.srv
+   ToggleMotor.srv
+   SetSessionID.srv
+   ToggleDAQ.srv
+   ToggleGroup.srv
+   ToggleKinect.srv
  )
 
 ## Generate actions in the 'action' folder
@@ -139,6 +157,7 @@ include_directories(
    src/communication.cpp
    src/communicationconfig.cpp
    src/sensorgroup.cpp
+   src/sensorgroupthread.cpp
   )
 
 ## Declare a C++ executable

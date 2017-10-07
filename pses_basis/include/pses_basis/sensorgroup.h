@@ -46,7 +46,7 @@ public:
   {
     if (!channelValues.isParamInMap(name))
       return false;
-    value = channelValues.getParameterValue<T>(name);
+    channelValues.getParameterValue(name, value);
     return true;
   }
 
