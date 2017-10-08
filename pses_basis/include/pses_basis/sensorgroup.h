@@ -5,6 +5,7 @@
 #include <string>
 #include <pses_basis/parameter.h>
 #include <pses_basis/command.h>
+#include <boost/range/algorithm/remove_if.hpp>
 #include <ros/ros.h>
 
 struct Channel

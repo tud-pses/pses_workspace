@@ -33,31 +33,42 @@ void ReadingThread::workerFunction()
     std::string message;
     try
     {
-      si.read(message, delimiter);
+      std::string bla = "\n";
+      si.read(message, bla);
       if (message.size() > 1)
       {
-        //ROS_INFO_STREAM("ReadingThread pushing msg and waking ThreadDispatcher..");
+        //ROS_INFO_STREAM("ReadingThread pushing msg and waking ThreadDispatcher.. msg: "<<message);
         data.push(message);
         dispatcher->wakeUp();
       }
     }
     catch (std::exception& e)
     {
-      //ROS_ERROR("%s", e.what());
+      ROS_ERROR("%s", e.what());
       //use proper exception handling, avoid ros libraries!
     }
 
-    /*
+
 
     // test area:
-    std::string msg = "# 2 243 432 242";
+    /*
+    std::string msg = "# 3 123 | 456 | 789";
     data.push(msg);
-    msg = "# 1 2243 3432 1242";
+
+    msg = "# 2 1123 | 4456 | 7789 | 9877 | 6544 | 3211";
     data.push(msg);
+    msg = "# 3 112 | 445 | 778";
+    data.push(msg);
+    msg = "# 4 123 | 456 | 789";
+    data.push(msg);
+    msg = "# 5 23 | 56";
+    data.push(msg);
+
     dispatcher->wakeUp();
-    ros::Duration(0.002).sleep();
-    //end
+    ros::Duration(0.005).sleep();
     */
+    //end
+
 
   }
 }

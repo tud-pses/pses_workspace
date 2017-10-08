@@ -108,7 +108,8 @@ void SensorGroup::parseResponse(const std::string& response)
     int splitIndex = 0;
     for (std::string s : split)
     {
-      if(s.find(' ')!=std::string::npos) continue;
+      s.erase(boost::remove_if(s, boost::is_any_of(" | ")), s.end());
+      if(s.size()<=0) continue;
       if (splitIndex >= channelList.size())
         break;
       //ROS_INFO_STREAM("Parsing: "<<s<<" from response: "<<response);
@@ -116,7 +117,7 @@ void SensorGroup::parseResponse(const std::string& response)
                                               s);
       splitIndex++;
     }
-    //ROS_INFO_STREAM("Nani?");
+    //ROS_INFO_STREAM("looking for options: "<<optionVariableList.size());
     // check for options
     if (optionVariableList.size() <= 0)
       return;

@@ -29,31 +29,12 @@ void Communication::connect()
 
 void Communication::startCommunication()
 {
-  SerialInterface& si = SerialInterface::instance();
   dispatcher->startThread();
-  /*
-  std::string msg = std::string("?ID\n");
-  si.send(msg);
-  ros::Duration(0.5).sleep();
-  msg = "!DAQ GRP 1 ~TS=10 ~AVG AX AY AZ\n";
-  si.send(msg);
-  ros::Duration(0.5).sleep();
-  msg = "!DAQ START\n";
-  si.send(msg);
-  ros::Duration(10.0).sleep();
-  */
 }
 
 void Communication::stopCommunication()
 {
-  SerialInterface& si = SerialInterface::instance();
-  /*
-  std::string msg = "!DAQ STOP\n";
-  si.send(msg);
-  ros::Duration(0.5).sleep();
-  */
   dispatcher->stopThread();
-  si.disconnect();
 }
 
 void Communication::disconnect()
@@ -70,15 +51,19 @@ bool Communication::sendCommand(const std::string& command,
   SerialInterface& si = SerialInterface::instance();
   std::unique_lock<std::mutex> lck(mtx);
   std::string cmd;
-  std::string response = "F 6";
+  std::string response;
   commands[command]->generateCommand(inputParams, cmd);
-  //ROS_INFO_STREAM(cmd);
+  ROS_INFO_STREAM(cmd);
   dispatcher->setCommunicationWakeUp(true);
-  // si.send(cmd);
+  cmd = cmd+"\n";
+  si.send(cmd);
   cv.wait_for(lck, std::chrono::microseconds(timeout));
-  //if(dispatcher->IsResponseQueueEmpty()) return false;
-  //dispatcher->dequeueResponse(response);
-  return commands[command]->verifyResponse(inputParams, response, outputParams);
+  if(dispatcher->IsResponseQueueEmpty()) return false;
+  while(!dispatcher->IsResponseQueueEmpty()){
+    dispatcher->dequeueResponse(response);
+    ROS_INFO_STREAM(response);
+    if(commands[command]->verifyResponse(inputParams, response, outputParams)) return true;
+  }
 }
 //timeout in microseconds
 bool Communication::sendCommand(const std::string& command,
@@ -94,15 +79,17 @@ bool Communication::sendCommand(const std::string& command,
   commands[command]->generateCommand(inputParams, options, cmd);
   //ROS_INFO_STREAM(cmd);
   dispatcher->setCommunicationWakeUp(true);
+  cmd = cmd+"\n";
   // si.send(cmd);
   cv.wait_for(lck, std::chrono::microseconds(timeout));
   //if(dispatcher->IsResponseQueueEmpty()) return false;
   //dispatcher->dequeueResponse(response);
-  return commands[command]->verifyResponse(inputParams, options,response, outputParams);
+  //return commands[command]->verifyResponse(inputParams, options,response, outputParams);
+  return true;
 }
 
 bool Communication::registerSensorGroups(const std::string& cmdName, unsigned int timeout){
-  bool succes = true;
+  bool success = true;
   SerialInterface& si = SerialInterface::instance();
   for(auto grp : sensorGroups){
     std::unique_lock<std::mutex> lck(mtx);
@@ -110,15 +97,23 @@ bool Communication::registerSensorGroups(const std::string& cmdName, unsigned in
     std::string response;
     //ROS_INFO_STREAM("Setting cmd for: " <<grp.second->getName());
     grp.second->createSensorGroupCommand(*commands[cmdName], cmd);
-    //ROS_INFO_STREAM(cmd);
+    ROS_INFO_STREAM(cmd);
     dispatcher->setCommunicationWakeUp(true);
-    // si.send(cmd);
+    cmd = cmd+"\n";
+    ros::Time t = ros::Time::now();
+    si.send(cmd);
     cv.wait_for(lck, std::chrono::microseconds(timeout));
-    //if(dispatcher->IsResponseQueueEmpty()) return false;
-    //dispatcher->dequeueResponse(response);
-    succes = grp.second->verifyResponseOnComand(*commands[cmdName], response);
+    ROS_INFO_STREAM("Round trip t: "<<(ros::Time::now()-t).toSec());
+    if(dispatcher->IsResponseQueueEmpty()){
+      ROS_INFO_STREAM("Response queue empty");
+      success = false;
+      continue;
+    }
+    dispatcher->dequeueResponse(response);
+    ROS_INFO_STREAM(response);
+    if(!grp.second->verifyResponseOnComand(*commands[cmdName], response)) success = false;
   }
-  return succes;
+  return success;
 }
 
 void Communication::registerSensorGroupCallback(const unsigned char& grpNumber, responseCallback cbPtr){

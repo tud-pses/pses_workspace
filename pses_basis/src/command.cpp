@@ -21,6 +21,7 @@ Command::Command(const CommandParams& cmdParams,
     for (std::pair<std::string, std::string> param : cmdParams.params)
     {
       parameterTypes.insert(param);
+      //ROS_INFO_STREAM("Command: "<<name<<", Param: "<<param.first<<" "<<param.second);
     }
   }
 
@@ -135,9 +136,14 @@ void Command::generateCommand(const Parameter::ParameterMap& inputParams,
 }
 
 const bool Command::verifyResponse(const Parameter::ParameterMap& inputParams,
-                                   const std::string& response,
+                                   const std::string& responseOrig,
                                    Parameter::ParameterMap& outputParams)
 {
+  // preprocessing
+  std::string response = responseOrig;
+  response.erase(boost::remove_if(response, boost::is_any_of(cmdResponsePrefix+"\x03"+"\n")), response.end());
+  boost::trim(response);
+  // start
   outputParams = Parameter::ParameterMap();
   ROS_INFO_STREAM("Response: " << response);
   // first case -> no response
@@ -147,19 +153,24 @@ const bool Command::verifyResponse(const Parameter::ParameterMap& inputParams,
   // second case -> static response
   if (!respHasParams)
   {
+    ROS_INFO_STREAM(response << "  expected: "<<simpleResponse);
     return response.compare(simpleResponse) == 0;
   }
   ROS_INFO_STREAM("passed second case");
   // third case -> response contains any amount of parameter
   std::vector<std::string> split;
   boost::split(split, response, boost::is_any_of(" "));
-  for (int i = 0; i < split.size(); i++)
+  // response contains not enough tokens/params
+  if(split.size()<responseTemplate.size()) return false;
+  // continue
+  for (int i= 0; i < split.size(); i++)
   {
     // exit if the response contains more elements than expected
     ROS_INFO_STREAM("component index: " << i << " num. of components: "
                                         << responseTemplate.size());
     if (i >= responseTemplate.size())
       return false;
+    ROS_INFO_STREAM("did it died?");
     // check if this component is a variable
     const std::string& param = responseTemplate[i].first;
     ROS_INFO_STREAM("expected component: " << param << " got: " << split[i]);
@@ -177,7 +188,15 @@ const bool Command::verifyResponse(const Parameter::ParameterMap& inputParams,
       // if param doesn't appear in cmd. -> indicates request for data
       else
       {
+        //int bla = parameterTypes.find(param)!=parameterTypes.end();
+        //ROS_INFO_STREAM("Getting param: "<<bla);
+        //outputParams.insertParameter("bla", "int32_t", 3);
+        outputParams.insertParameter(param, parameterTypes[param]);
         outputParams.setParameterValueAsString(param, split[i]);
+        //outputParams.setParameterValueAsString(param, split[i]);
+        //short bla;
+        //outputParams.getParameterValue(param, bla);
+        //ROS_INFO_STREAM("After insertion"<<bla);
       }
     }
     // check if keyWord equals the expected response keyWord
@@ -193,15 +212,20 @@ const bool Command::verifyResponse(const Parameter::ParameterMap& inputParams,
 
 const bool Command::verifyResponse(const Parameter::ParameterMap& inputParams,
                                    const std::vector<std::string>& options,
-                                   const std::string& response,
+                                   const std::string& responseOrig,
                                    Parameter::ParameterMap& outputParams)
 {
+  // preprocessing
+  std::string response = responseOrig;
+  response.erase(boost::remove_if(response, boost::is_any_of(cmdResponsePrefix)), response.end());
+  boost::trim(response);
+  // start
   outputParams = Parameter::ParameterMap();
-  ROS_INFO_STREAM("Response: " << response);
+  //ROS_INFO_STREAM("Response: " << response);
   // first case -> no response
   if (!cmdHasResponse)
     return true;
-  ROS_INFO_STREAM("passed first case");
+  //ROS_INFO_STREAM("passed first case");
   // second case -> there may be a response of some kind
   std::vector<CommandOptions*> optWithResponse = std::vector<CommandOptions*>();
   for (std::string opt : options)

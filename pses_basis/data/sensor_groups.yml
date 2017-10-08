@@ -2,14 +2,32 @@
 # If an option has more than one parameter, simply add additional parameters by separating them with a comma.
 # Possible encoding types: ASCII, HEX (hexadecimal), B64 (base 64 encoding)
 
-- grp_nr: 1
-  name: "Ultra Sound Sensors"
-  channels: ['USL', 'USF', 'USR']
-  options: ['Wait_For_All:10', 'Channel_Polling_Interval:10', 'Average_Over_Interval:10']
-  encoding: "ASCII"
+#- grp_nr: 1
+#  name: "Ultra Sound Sensors"
+#  channels: ['USL', 'USF', 'USR']
+#  options: ['Wait_For_All:10']
+#  encoding: "ASCII"
 
 - grp_nr: 2
-  name: "Gyro Sensors"
+  name: "IMU"
   channels: ['GX', 'GY', 'GZ']
-  options: ['Wait_For_All:10', 'Channel_Polling_Interval:10', 'Average_Over_Interval:10']
+  options: ['Channel_Polling_Interval:2']
   encoding: "ASCII"
+
+#- grp_nr: 3
+#  name: "Hall Sensor"
+#  channels: ['HALL_CNT', 'HALL_DT', 'HALL_DT8']
+#  options: ['Wait_For_All:10']
+#  encoding: "ASCII"
+
+#- grp_nr: 4
+#  name: "Magnetometer"
+#  channels: ['MX', 'MY', 'MZ']
+#  options: []
+#  encoding: "ASCII"
+
+#- grp_nr: 5
+#  name: "Battery"
+#  channels: ['VDBAT', 'VSBAT']
+#  options: ['Wait_For_All:500']
+#  encoding: "ASCII"

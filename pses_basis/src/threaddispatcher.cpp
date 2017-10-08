@@ -40,11 +40,12 @@ void ThreadDispatcher::workerFunction()
     while (!readingThread->isQueueEmpty() && active)
     {
       std::string data = readingThread->getData();
-      //ROS_INFO_STREAM("Msg in dispatch: "<<data);
+      //ROS_INFO_STREAM("Msg in dispatch:\n"<<data);
       // in case of empty string
       if (data.size() < 1)
         continue;
       // check for known prefixes
+      //ROS_INFO_STREAM("cmd queue size: "<<commandResponse.size()<<" msg queue size: "<<sensorGroupMessage.size());
       if (data.find(syntax->cmdErrorPrefix) == 0)
       {
         // dispatch cmd-error thread
@@ -62,7 +63,7 @@ void ThreadDispatcher::workerFunction()
       }
       else if (data.find(syntax->answerOnCmdPrefix) == 0)
       {
-        commandResponse.push(data.substr(syntax->answerOnCmdPrefix.size(),std::string::npos));
+        commandResponse.push(data);
         if (wakeUpCommunication)
         {
           comCV->notify_one();

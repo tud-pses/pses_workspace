@@ -35,10 +35,10 @@
 - cmd_name: "Set Steering Level"
   cmd_has_params: True
   params: ['int16_t:steering']
-  command: "!DRV F $steering"
+  command: "!STEER $steering"
   cmd_has_response: True
   response_contains_params: True
-  response: "STEER $steering"
+  response: "$steering"
 
 - cmd_name: "Set Session ID"
   cmd_has_params: True
@@ -74,7 +74,7 @@
 
 - cmd_name: "Get Motor Level"
   cmd_has_params: False
-  params: ['string_t:direction', 'int_16:level']
+  params: ['string_t:direction', 'int16_t:level']
   command: "?DRV"
   cmd_has_response: True
   response_contains_params: True
@@ -82,7 +82,7 @@
 
 - cmd_name: "Get Steering Level"
   cmd_has_params: False
-  params: ['int_16:level']
+  params: ['int16_t:level']
   command: "?STEER"
   cmd_has_response: True
   response_contains_params: True

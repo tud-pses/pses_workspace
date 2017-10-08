@@ -8,6 +8,8 @@
 #include <vector>
 #include <pses_basis/parameter.h>
 #include <boost/algorithm/string.hpp>
+#include <boost/range/algorithm/remove_if.hpp>
+#include <boost/algorithm/string/trim.hpp>
 #include <ros/ros.h>
 
 struct CommandParams
@@ -51,11 +53,11 @@ public:
                        const std::vector<std::string>& options,
                        std::string& out);
   const bool verifyResponse(const Parameter::ParameterMap& inputParams,
-                            const std::string& response,
+                            const std::string& responseOrig,
                             Parameter::ParameterMap& outputParams);
   const bool verifyResponse(const Parameter::ParameterMap& inputParams,
                             const std::vector<std::string>& options,
-                            const std::string& response,
+                            const std::string& responseOrig,
                             Parameter::ParameterMap& outputParams);
   const std::string& getName() const;
 

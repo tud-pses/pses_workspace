@@ -22,14 +22,14 @@ public:
   bool sendCommand(const std::string& command,
                    const Parameter::ParameterMap& inputParams,
                    Parameter::ParameterMap& outputParams,
-                   unsigned int timeout = 10000);
+                   unsigned int timeout = 100000);
   bool sendCommand(const std::string& command,
                    const std::vector<std::string>& options,
                    const Parameter::ParameterMap& inputParams,
                    Parameter::ParameterMap& outputParams,
-                   unsigned int timeout = 10000);
+                   unsigned int timeout = 100000);
   bool registerSensorGroups(const std::string& cmdName,
-                            unsigned int timeout = 10000);
+                            unsigned int timeout = 100000);
   void registerSensorGroupCallback(const unsigned char& grpNumber,
                                    responseCallback cbPtr);
 private:
