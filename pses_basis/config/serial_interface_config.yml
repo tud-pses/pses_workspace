@@ -1,0 +1,13 @@
+baudrate: 921600
+
+#device_tag -> is the ID shared by every pses board
+device_tag: "usb-FTDI_FT232R_USB_UART"
+
+#serial_timeout -> max. time (ms) to wait for activity on the serial (rx) connection
+serial_timeout: 1000
+
+#max_line_length -> maximum number of symbols that can be retrieved from the input buffer
+max_line_length: 65536
+
+#serial_devices_folder -> linux folder that contains your devices e.g. usb, serial, etc..
+serial_devices_folder: "/dev/serial/by-id/"

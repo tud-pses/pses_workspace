@@ -17,11 +17,11 @@ void ReadingThread::startThread()
 
 void ReadingThread::stopThread()
 {
-  // ROS_INFO_STREAM("ReadingThread stopping..");
+  //ROS_INFO_STREAM("ReadingThread stopping..");
   active = false;
   wakeUp();
   worker.join();
-  // ROS_INFO_STREAM("ReadingThread stopped..");
+  //ROS_INFO_STREAM("ReadingThread stopped..");
 }
 
 void ReadingThread::workerFunction()
@@ -53,25 +53,6 @@ void ReadingThread::workerFunction()
       ROS_ERROR("%s", e.what());
       // use proper exception handling, avoid ros libraries!
     }
-
-    // test area:
-    /*
-    std::string msg = "# 3 123 | 456 | 789";
-    data.push(msg);
-
-    msg = "# 2 1123 | 4456 | 7789 | 9877 | 6544 | 3211";
-    data.push(msg);
-    msg = "# 3 112 | 445 | 778";
-    data.push(msg);
-    msg = "# 4 123 | 456 | 789";
-    data.push(msg);
-    msg = "# 5 23 | 56";
-    data.push(msg);
-
-    dispatcher->wakeUp();
-    ros::Duration(0.005).sleep();
-    */
-    // end
   }
 }
 

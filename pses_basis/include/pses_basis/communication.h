@@ -34,6 +34,7 @@ public:
                                    responseCallback cbPtr);
 private:
   CommunicationConfig comCfg;
+  std::shared_ptr<SerialInterfaceParams> serialParams;
   std::shared_ptr<Syntax> syntax;
   std::unordered_map<std::string, std::shared_ptr<Command> > commands;
   std::unordered_map<unsigned char, std::shared_ptr<SensorGroup> > sensorGroups;
@@ -42,6 +43,8 @@ private:
   SensorGroupThread* sensorGroupThread;
   mutable std::mutex mtx;
   std::condition_variable cv;
+
+  void configSerialInterface();
 };
 
 #endif // COMMUNICATION_H

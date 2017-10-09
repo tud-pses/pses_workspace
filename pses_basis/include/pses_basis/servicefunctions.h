@@ -233,9 +233,10 @@ bool resetController(pses_basis::ResetController::Request& req,
   Parameter::ParameterMap input;
   Parameter::ParameterMap output;
   try{
-    res.was_set = com->sendCommand(cmd, input, output);
+    com->sendCommand(cmd, input, output);
+    res.was_set = true;
   }catch(std::exception& e){
-    ROS_WARN_STREAM("An error in Service 'Get Steering Level' occured!\n Description: "<<e.what());
+    ROS_WARN_STREAM("An error in Service 'Reset Controller' occured!\n Description: "<<e.what());
     res.was_set = false;
     return false;
   }

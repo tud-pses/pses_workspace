@@ -15,11 +15,11 @@ void SensorGroupThread::startThread()
 
 void SensorGroupThread::stopThread()
 {
-  // ROS_INFO_STREAM("ReadingThread stopping..");
+  //ROS_INFO_STREAM("SensorGroupThread stopping..");
   active = false;
   wakeUp();
   worker.join();
-  // ROS_INFO_STREAM("ReadingThread stopped..");
+  //ROS_INFO_STREAM("SensorGroupThread stopped..");
 }
 
 void SensorGroupThread::workerFunction()

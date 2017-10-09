@@ -10,6 +10,7 @@ CommunicationConfig::CommunicationConfig(const CommunicationConfig& other)
 CommunicationConfig::CommunicationConfig(std::string configPath)
     : configPath(configPath)
 {
+  readSerialInterfaceConfig();
   readGeneralSyntax();
   readChannels();
   readOptions();
@@ -28,6 +29,17 @@ void operator>>(const YAML::Node& node, Syntax& syntax)
   syntax.cmdErrorPrefix = node["cmd_error_prefix"].as<std::string>();
   syntax.genErrorPrefix = node["gen_error_prefix"].as<std::string>();
   syntax.optionsPrefix = node["options_prefix"].as<std::string>();
+}
+
+// SerialInferfaceConfig-struct assign operator
+void operator>>(const YAML::Node& node, SerialInterfaceParams& serialParams)
+{
+  serialParams.baudRate = node["baudrate"].as<unsigned int>();
+  serialParams.deviceTag = node["device_tag"].as<std::string>();
+  serialParams.serialTimeout = node["serial_timeout"].as<unsigned int>();
+  serialParams.maxLineLength  = node["max_line_length"].as<unsigned int>();
+  serialParams.serialDevicesFolder =
+      node["serial_devices_folder"].as<std::string>();
 }
 
 // Channel-struct assign operator
@@ -109,9 +121,10 @@ void CommunicationConfig::insertCommand(const YAML::Node& node)
       cmd.params.push_back(std::make_pair(name, type));
     }
   }
-  commands.insert(
-      std::make_pair(cmd.name, std::make_shared<Command>(Command(cmd, syntax.answerOnCmdPrefix, options,
-                                       syntax.optionsPrefix))));
+  commands.insert(std::make_pair(
+      cmd.name,
+      std::make_shared<Command>(Command(cmd, syntax.answerOnCmdPrefix, options,
+                                        syntax.optionsPrefix))));
 }
 
 // SensorGroupObject insertion/creation method
@@ -145,13 +158,16 @@ void CommunicationConfig::insertSensorGroup(const YAML::Node& node)
       std::string option = item.as<std::string>();
       std::string name = "";
       std::string params = "";
-     // ROS_INFO_STREAM(option);
-      if(option.find(':')!=std::string::npos){
+      // ROS_INFO_STREAM(option);
+      if (option.find(':') != std::string::npos)
+      {
         std::vector<std::string> split;
         boost::split(split, option, boost::is_any_of(":"));
         name = split[0];
         params = split[1];
-      }else{
+      }
+      else
+      {
         name = option;
       }
 
@@ -164,7 +180,14 @@ void CommunicationConfig::insertSensorGroup(const YAML::Node& node)
       encoding.compare(SensorGroup::ENCODING_HEX) == 0)
     grp.encoding = encoding;
   // else: unkonwn encoding for grp nr xy <- should be an error/exception
-  sensorGroups.insert(std::make_pair(grp.grpNumber, std::make_shared<SensorGroup>(SensorGroup(grp))));
+  sensorGroups.insert(std::make_pair(
+      grp.grpNumber, std::make_shared<SensorGroup>(SensorGroup(grp))));
+}
+
+void CommunicationConfig::readSerialInterfaceConfig()
+{
+  YAML::Node interfaceYaml = YAML::LoadFile(configPath + "serial_interface_config.yml");
+  interfaceYaml >> serialParams;
 }
 
 void CommunicationConfig::readGeneralSyntax()
@@ -213,15 +236,23 @@ void CommunicationConfig::readSensorGroups()
   }
 }
 
-const std::shared_ptr<Syntax> CommunicationConfig::getSyntax() const { return std::make_shared<Syntax>(syntax); }
+const std::shared_ptr<Syntax> CommunicationConfig::getSyntax() const
+{
+  return std::make_shared<Syntax>(syntax);
+}
+const std::shared_ptr<SerialInterfaceParams>
+CommunicationConfig::getSerialInterfaceParams() const
+{
+  return std::make_shared<SerialInterfaceParams>(serialParams);
+}
 
-const std::unordered_map<std::string, std::shared_ptr<Command> >&
+const std::unordered_map<std::string, std::shared_ptr<Command>>&
 CommunicationConfig::getCommands() const
 {
   return commands;
 }
 
-const std::unordered_map<unsigned char, std::shared_ptr<SensorGroup> >&
+const std::unordered_map<unsigned char, std::shared_ptr<SensorGroup>>&
 CommunicationConfig::getSensorGroups() const
 {
   return sensorGroups;

@@ -21,13 +21,13 @@ void ThreadDispatcher::startThread()
 
 void ThreadDispatcher::stopThread()
 {
-   //ROS_INFO_STREAM("ThreadDispatcher stopping..");
+  //ROS_INFO_STREAM("ThreadDispatcher stopping..");
   readingThread->stopThread();
   sensorGroupThread->stopThread();
   active = false;
   wakeUp();
   worker.join();
-   //ROS_INFO_STREAM("ThreadDispatcher stopped..");
+  //ROS_INFO_STREAM("ThreadDispatcher stopped..");
 }
 
 void ThreadDispatcher::workerFunction()

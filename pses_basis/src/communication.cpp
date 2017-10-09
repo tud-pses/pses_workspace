@@ -2,7 +2,10 @@
 
 Communication::Communication(const std::string& configPath)
 {
+  // load config files
   comCfg = CommunicationConfig(configPath);
+  serialParams = comCfg.getSerialInterfaceParams();
+  configSerialInterface();
   syntax = comCfg.getSyntax();
   commands = comCfg.getCommands();
   sensorGroups = comCfg.getSensorGroups();
@@ -19,6 +22,15 @@ Communication::~Communication()
   delete (dispatcher);
   delete (rxPolling);
   delete (sensorGroupThread);
+}
+
+void Communication::configSerialInterface(){
+  SerialInterface& si = SerialInterface::instance();
+  si.setBaudRate(serialParams->baudRate);
+  si.setDeviceTag(serialParams->deviceTag);
+  si.setMaxLineLength(serialParams->maxLineLength);
+  si.setSerialDevicesFolder(serialParams->serialDevicesFolder);
+  si.setSerialTimeout(serialParams->serialTimeout);
 }
 
 void Communication::connect()

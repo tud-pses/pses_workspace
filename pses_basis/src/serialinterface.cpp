@@ -4,15 +4,32 @@ SerialInterface::SerialInterface()
 {
   baudRate = 921600;
   deviceTag = "usb-FTDI_FT232R_USB_UART";
+  serialTimeout = 1000;
+  maxLineLength = 65536;
+  serialDevicesFolder = "/dev/serial/by-id/";
 }
 
-void SerialInterface::configure(unsigned int baudRate, std::string deviceTag)
-{
+void SerialInterface::setBaudRate(unsigned int baudRate){
   this->baudRate = baudRate;
+}
+
+void SerialInterface::setDeviceTag(const std::string& deviceTag){
   this->deviceTag = deviceTag;
 }
 
-void SerialInterface::connect(const unsigned int serialTimeout)
+void SerialInterface::setSerialTimeout(unsigned int serialTimeout){
+  this->serialTimeout = serialTimeout;
+}
+
+void SerialInterface::setMaxLineLength(unsigned int maxLineLength){
+  this->maxLineLength = maxLineLength;
+}
+
+void SerialInterface::setSerialDevicesFolder(const std::string& serialDevicesFolder){
+  this->serialDevicesFolder = serialDevicesFolder;
+}
+
+void SerialInterface::connect()
 {
   if (serialConnection.isOpen())
     return;
@@ -35,8 +52,7 @@ void SerialInterface::send(std::string& message)
 // be careful when using this method, it will block the calling thread until
 // something has been
 // received or the request took longer than a certain timeout threshold
-void SerialInterface::read(std::string& message, std::string& delimiter,
-                           unsigned int maxLineLength)
+void SerialInterface::read(std::string& message, std::string& delimiter)
 {
   if (!serialConnection.isOpen())
     throw std::runtime_error("UC-board connection not established/lost.");
@@ -53,7 +69,7 @@ void SerialInterface::disconnect()
 
 void SerialInterface::findDeviceName(std::string& deviceName)
 {
-  std::string serialDevices = "/dev/serial/by-id/";
+  std::string serialDevices = serialDevicesFolder;
   std::string devicePath;
 
   struct dirent** fileList;

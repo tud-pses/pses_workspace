@@ -26,6 +26,130 @@ int main(int argc, char **argv)
   ros::NodeHandle nh;
 
   ros::Duration(1.0).sleep();
+  //test set_steering_level
+  pses_basis::SetSteering::Request req13;
+  req13.steering = 500;
+  pses_basis::SetSteering::Response res13;
+  ROS_INFO_STREAM("Sending Set Steering Level 500..");
+  ros::Time t = ros::Time::now();
+  ros::service::call("set_steering_level", req13, res13);
+  ROS_INFO_STREAM("Round trip t: "<<(ros::Time::now()-t).toSec());
+  int result13 = res13.was_set;
+  ROS_INFO_STREAM("Received Set Steering Level, Answer: "<<result13);
+  ros::Duration(0.01).sleep();
+  req13.steering = 0;
+  t = ros::Time::now();
+  ros::service::call("set_steering_level", req13, res13);
+  ROS_INFO_STREAM("Round trip t: "<<(ros::Time::now()-t).toSec());
+  result13 = res13.was_set;
+  ROS_INFO_STREAM("Received Set Steering Level, Answer: "<<result13);
+  ros::Duration(0.01).sleep();
+  req13.steering = -500;
+  t = ros::Time::now();
+  ros::service::call("set_steering_level", req13, res13);
+  ROS_INFO_STREAM("Round trip t: "<<(ros::Time::now()-t).toSec());
+  result13 = res13.was_set;
+  ROS_INFO_STREAM("Received Set Steering Level, Answer: "<<result13);
+  ros::Duration(0.01).sleep();
+  req13.steering = 0;
+  t = ros::Time::now();
+  ros::service::call("set_steering_level", req13, res13);
+  ROS_INFO_STREAM("Round trip t: "<<(ros::Time::now()-t).toSec());
+  result13 = res13.was_set;
+  ROS_INFO_STREAM("Received Set Steering Level, Answer: "<<result13);
+  ros::Duration(0.01).sleep();
+  req13.steering = 500;
+  t = ros::Time::now();
+  ros::service::call("set_steering_level", req13, res13);
+  ROS_INFO_STREAM("Round trip t: "<<(ros::Time::now()-t).toSec());
+  result13 = res13.was_set;
+  ROS_INFO_STREAM("Received Set Steering Level, Answer: "<<result13);
+  ros::Duration(0.01).sleep();
+  req13.steering = 0;
+  t = ros::Time::now();
+  ros::service::call("set_steering_level", req13, res13);
+  ROS_INFO_STREAM("Round trip t: "<<(ros::Time::now()-t).toSec());
+  result13 = res13.was_set;
+  ROS_INFO_STREAM("Received Set Steering Level, Answer: "<<result13);
+  ros::Duration(0.01).sleep();
+  req13.steering = -500;
+  t = ros::Time::now();
+  ros::service::call("set_steering_level", req13, res13);
+  ROS_INFO_STREAM("Round trip t: "<<(ros::Time::now()-t).toSec());
+  result13 = res13.was_set;
+  ROS_INFO_STREAM("Received Set Steering Level, Answer: "<<result13);
+  ros::Duration(0.01).sleep();
+  req13.steering = 0;
+  t = ros::Time::now();
+  ros::service::call("set_steering_level", req13, res13);
+  ROS_INFO_STREAM("Round trip t: "<<(ros::Time::now()-t).toSec());
+  result13 = res13.was_set;
+  ROS_INFO_STREAM("Received Set Steering Level, Answer: "<<result13);
+  ros::Duration(0.01).sleep();
+  req13.steering = 500;
+  t = ros::Time::now();
+  ros::service::call("set_steering_level", req13, res13);
+  ROS_INFO_STREAM("Round trip t: "<<(ros::Time::now()-t).toSec());
+  result13 = res13.was_set;
+  ROS_INFO_STREAM("Received Set Steering Level, Answer: "<<result13);
+  ros::Duration(0.01).sleep();
+  req13.steering = 0;
+  t = ros::Time::now();
+  ros::service::call("set_steering_level", req13, res13);
+  ROS_INFO_STREAM("Round trip t: "<<(ros::Time::now()-t).toSec());
+  result13 = res13.was_set;
+  ROS_INFO_STREAM("Received Set Steering Level, Answer: "<<result13);
+  ros::Duration(0.01).sleep();
+  req13.steering = -500;
+  t = ros::Time::now();
+  ros::service::call("set_steering_level", req13, res13);
+  ROS_INFO_STREAM("Round trip t: "<<(ros::Time::now()-t).toSec());
+  result13 = res13.was_set;
+  ROS_INFO_STREAM("Received Set Steering Level, Answer: "<<result13);
+  ros::Duration(0.01).sleep();
+  req13.steering = 0;
+  t = ros::Time::now();
+  ros::service::call("set_steering_level", req13, res13);
+  ROS_INFO_STREAM("Round trip t: "<<(ros::Time::now()-t).toSec());
+  result13 = res13.was_set;
+  ROS_INFO_STREAM("Received Set Steering Level, Answer: "<<result13);
+  ros::Duration(0.01).sleep();
+  req13.steering = 500;
+  t = ros::Time::now();
+  ros::service::call("set_steering_level", req13, res13);
+  ROS_INFO_STREAM("Round trip t: "<<(ros::Time::now()-t).toSec());
+  result13 = res13.was_set;
+  ROS_INFO_STREAM("Received Set Steering Level, Answer: "<<result13);
+  ros::Duration(0.01).sleep();
+  req13.steering = 0;
+  t = ros::Time::now();
+  ros::service::call("set_steering_level", req13, res13);
+  ROS_INFO_STREAM("Round trip t: "<<(ros::Time::now()-t).toSec());
+  result13 = res13.was_set;
+  ROS_INFO_STREAM("Received Set Steering Level, Answer: "<<result13);
+  ros::Duration(0.01).sleep();
+  req13.steering = -500;
+  t = ros::Time::now();
+  ros::service::call("set_steering_level", req13, res13);
+  ROS_INFO_STREAM("Round trip t: "<<(ros::Time::now()-t).toSec());
+  result13 = res13.was_set;
+  ROS_INFO_STREAM("Received Set Steering Level, Answer: "<<result13);
+  ros::Duration(0.01).sleep();
+  req13.steering = 0;
+  t = ros::Time::now();
+  ros::service::call("set_steering_level", req13, res13);
+  ROS_INFO_STREAM("Round trip t: "<<(ros::Time::now()-t).toSec());
+  result13 = res13.was_set;
+  ROS_INFO_STREAM("Received Set Steering Level, Answer: "<<result13);
+  ros::Duration(0.01).sleep();
+  req13.steering = 500;
+  t = ros::Time::now();
+  ros::service::call("set_steering_level", req13, res13);
+  ROS_INFO_STREAM("Round trip t: "<<(ros::Time::now()-t).toSec());
+  result13 = res13.was_set;
+  ROS_INFO_STREAM("Received Set Steering Level, Answer: "<<result13);
+  ros::Duration(0.01).sleep();
+
   /*
   //test delete_group
   pses_basis::DeleteGroup::Request req1;
@@ -183,7 +307,7 @@ int main(int argc, char **argv)
   ROS_INFO_STREAM("Received toggle brakes, Answer: "<<result14);
   ros::Duration(1.0).sleep();
   */
-
+  /*
   //test toggle_group
   pses_basis::ToggleGroup::Request req16;
   req16.group_on = false;
@@ -222,7 +346,7 @@ int main(int argc, char **argv)
   pses_basis::ToggleDAQ::Response res15;
   ROS_INFO_STREAM("Sending Toggle DAQ true..");
   ros::service::call("toggle_daq", req15, res15);
-  int result15;// = res15.was_set;
+  int result15 = res15.was_set;
   ROS_INFO_STREAM("Received toggle daq, Answer: "<<result15);
   ros::Duration(10).sleep();
 
@@ -233,7 +357,6 @@ int main(int argc, char **argv)
   ROS_INFO_STREAM("Received toggle daq, Answer: "<<result15);
   ros::Duration(1).sleep();
 
-  /*
   //test toggle_kinect
   pses_basis::ToggleKinect::Request req17;
   req17.kinect_on = false;
