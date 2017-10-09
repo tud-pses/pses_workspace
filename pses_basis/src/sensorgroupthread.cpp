@@ -1,7 +1,7 @@
 #include <pses_basis/sensorgroupthread.h>
 
-SensorGroupThread::SensorGroupThread(const std::string& grpMessagePrefix, ThreadDispatcher* dispatcher, const std::unordered_map<unsigned char, std::shared_ptr<SensorGroup> >& sensorGroups)
-    : dispatcher(dispatcher), grpMessagePrefix(grpMessagePrefix), sensorGroups(sensorGroups)
+SensorGroupThread::SensorGroupThread(std::shared_ptr<Syntax> syntax, ThreadDispatcher* dispatcher, const std::unordered_map<unsigned char, std::shared_ptr<SensorGroup> >& sensorGroups)
+    : dispatcher(dispatcher), syntax(syntax), sensorGroups(sensorGroups)
 {
 }
 
@@ -29,14 +29,14 @@ void SensorGroupThread::workerFunction()
     sleep();
     //ROS_INFO_STREAM("grp thread: Wakeup..." << dispatcher->IsMessageQueueEmpty());
     while(!dispatcher->IsMessageQueueEmpty() && active){
-      ros::Time t = ros::Time::now();
+      //ros::Time t = ros::Time::now();
       std::string msg;
       dispatcher->dequeueSensorGroupMessage(msg);
       //boost::remove_erase_if(msg, boost::is_any_of(grpMessagePrefix));
       if(msg.size()<1) continue;
-      msg.erase(boost::remove_if(msg, boost::is_any_of(grpMessagePrefix+"\x03"+"\n")), msg.end());
+      msg.erase(boost::remove_if(msg, boost::is_any_of(syntax->channelGrpMsgPrefix)), msg.end());
       //temporärer fix
-      int indx = msg.find(":");
+      int indx = msg.find(syntax->answerOnCmdPrefix);
       if(indx ==std::string::npos) continue;
       msg.at(indx)=' ';
       // fix end

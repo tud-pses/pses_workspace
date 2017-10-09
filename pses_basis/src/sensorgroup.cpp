@@ -65,9 +65,11 @@ SensorGroup::SensorGroup(const SensorGroupParameter& sensorParams)
         //ROS_INFO_STREAM("oh boy.. wtf .."<<paramName<<" "<<tempPm.getParameter(paramName)->getType()<<" "<<splitParamValues[valueCounter]);
         cmdInputParams.insertParameter(
             paramName, tempPm.getParameter(paramName)->getType());
+
         if (valueCounter >= splitParamValues.size())
           break; // DANGER! this has to be treated carefully -> not enough
                  // arguments error!
+
         cmdInputParams.setParameterValueAsString(
             paramName, splitParamValues[valueCounter]);
         valueCounter++;

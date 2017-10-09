@@ -19,10 +19,10 @@
 - cmd_name: "Full Stop"
   cmd_has_params: False
   params:
-  command: "!DRV B -500"
+  command: "!DRV F -500"
   cmd_has_response: True
   response_contains_params: False
-  response: "B -500"
+  response: "F -500"
 
 - cmd_name: "Motor Off"
   cmd_has_params: False
@@ -68,6 +68,22 @@
   cmd_has_params: False
   params:
   command: "!VOUT OFF"
+  cmd_has_response: True
+  response_contains_params: False
+  response: 'OFF'
+
+- cmd_name: "Toggle US On"
+  cmd_has_params: False
+  params:
+  command: "!US ON"
+  cmd_has_response: True
+  response_contains_params: False
+  response: 'ON'
+
+- cmd_name: "Toggle US Off"
+  cmd_has_params: False
+  params:
+  command: "!US OFF"
   cmd_has_response: True
   response_contains_params: False
   response: 'OFF'

@@ -14,13 +14,13 @@ class ThreadDispatcher;
 class SensorGroupThread : public CommunicationThread
 {
 public:
-  SensorGroupThread(const std::string& grpMessagePrefix, ThreadDispatcher* dispatcher, const std::unordered_map<unsigned char, std::shared_ptr<SensorGroup> >& sensorGroups);
+  SensorGroupThread(std::shared_ptr<Syntax> syntax, ThreadDispatcher* dispatcher, const std::unordered_map<unsigned char, std::shared_ptr<SensorGroup> >& sensorGroups);
   void startThread();
   void stopThread();
 
 private:
   ThreadDispatcher* dispatcher;
-  std::string grpMessagePrefix;
+  std::shared_ptr<Syntax> syntax;
   std::unordered_map<unsigned char, std::shared_ptr<SensorGroup> > sensorGroups;
 
   void workerFunction();

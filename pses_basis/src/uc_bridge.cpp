@@ -1,4 +1,5 @@
 #include <ros/ros.h>
+#include <signal.h>
 #include <pses_basis/servicefunctions.h>
 #include <pses_basis/communication.h>
 #include <pses_basis/communicationconfig.h>
@@ -34,7 +35,7 @@ void publishSensorGroupMessage1(
     //ROS_INFO_STREAM(usr);
     pub["USR"]->publish(usr);
   }catch(std::exception& e){
-    ROS_INFO_STREAM("Sensor grp1: "<<e.what());
+    ROS_WARN_STREAM("An error in Message 'Sensor grp1' occured!\n Description: "<<e.what());
   }
 }
 
@@ -49,13 +50,19 @@ void publishSensorGroupMessage2(
     grp->getChannelValue("GX", gx);
     grp->getChannelValue("GY", gy);
     grp->getChannelValue("GZ", gz);
+    grp->getChannelValue("AX", ax);
+    grp->getChannelValue("AY", ay);
+    grp->getChannelValue("AZ", az);
     imu.angular_velocity.x = gx;
     imu.angular_velocity.y = gy;
     imu.angular_velocity.z = gz;
+    imu.linear_acceleration.x = ax;
+    imu.linear_acceleration.y = ay;
+    imu.linear_acceleration.z = az;
     //ROS_INFO_STREAM(imu);
     pub["IMU"]->publish(imu);
   }catch(std::exception& e){
-    ROS_INFO_STREAM("Sensor grp2: "<<e.what());
+    ROS_WARN_STREAM("An error in Message 'Sensor grp2' occured!\n Description: "<<e.what());
   }
 
 }
@@ -76,7 +83,7 @@ void publishSensorGroupMessage3(
     pub["HALL_DT"]->publish(halldt);
     pub["HALL_DT8"]->publish(halldt8);
   }catch(std::exception& e){
-    ROS_INFO_STREAM("Sensor grp3: "<<e.what());
+    ROS_WARN_STREAM("An error in Message 'Sensor grp3' occured!\n Description: "<<e.what());
   }
 }
 
@@ -95,7 +102,7 @@ void publishSensorGroupMessage4(
     //ROS_INFO_STREAM(mag);
     pub["MAG"]->publish(mag);
   }catch(std::exception& e){
-    ROS_INFO_STREAM("Sensor grp4: "<<e.what());
+    ROS_WARN_STREAM("An error in Message 'Sensor grp4' occured!\n Description: "<<e.what());
   }
 
 }
@@ -115,19 +122,35 @@ void publishSensorGroupMessage5(
     pub["VDBAT"]->publish(batVD);
     pub["VSBAT"]->publish(batVS);
   }catch(std::exception& e){
-    ROS_INFO_STREAM("Sensor grp5: "<<e.what());
+    ROS_WARN_STREAM("An error in Message 'Sensor grp5' occured!\n Description: "<<e.what());
   }
 
+}
+
+Communication* com_ptr;
+
+void shutdownSignalHandler(int sig){
+  try
+  {
+    com_ptr->stopCommunication();
+    com_ptr->disconnect();
+  }
+  catch (std::exception& e)
+  {
+    ROS_WARN_STREAM("An error occured while trying to shut down the connection.\n Description: "<<e.what());
+  }
+  ros::shutdown();
 }
 
 int main(int argc, char** argv)
 {
   // set up ros node handle
-  ros::init(argc, argv, "uc_bridge");
+  ros::init(argc, argv, "uc_bridge", ros::init_options::NoSigintHandler);
   ros::NodeHandle nh;
   // load communication config files and init communication
   std::string typesPath = ros::package::getPath("pses_basis") + "/data/";
   Communication com(typesPath);
+  com_ptr = &com;
   // create sensor group publish services
   ros::Publisher grp11 = nh.advertise<sensor_msgs::Range>("USL", 10);
   ros::Publisher grp12 = nh.advertise<sensor_msgs::Range>("USF", 10);
@@ -140,38 +163,47 @@ int main(int argc, char** argv)
   ros::Publisher grp51 = nh.advertise<sensor_msgs::BatteryState>("VDBAT", 10);
   ros::Publisher grp52 = nh.advertise<sensor_msgs::BatteryState>("VSBAT", 10);
   // group publish services by putting them into a map
-  //std::unordered_map<std::string, ros::Publisher*> usGrp;
+  std::unordered_map<std::string, ros::Publisher*> usGrp;
   std::unordered_map<std::string, ros::Publisher*> imuGrp;
-  //std::unordered_map<std::string, ros::Publisher*> hallGrp;
-  //std::unordered_map<std::string, ros::Publisher*> magGrp;
-  //std::unordered_map<std::string, ros::Publisher*> batGrp;
-  //usGrp.insert(std::make_pair("USL", &grp11));
-  //usGrp.insert(std::make_pair("USF", &grp12));
-  //usGrp.insert(std::make_pair("USR", &grp13));
+  std::unordered_map<std::string, ros::Publisher*> hallGrp;
+  std::unordered_map<std::string, ros::Publisher*> magGrp;
+  std::unordered_map<std::string, ros::Publisher*> batGrp;
+  usGrp.insert(std::make_pair("USL", &grp11));
+  usGrp.insert(std::make_pair("USF", &grp12));
+  usGrp.insert(std::make_pair("USR", &grp13));
   imuGrp.insert(std::make_pair("IMU", &grp2));
-  //hallGrp.insert(std::make_pair("HALL_CNT", &grp31));
-  //hallGrp.insert(std::make_pair("HALL_DT", &grp32));
-  //hallGrp.insert(std::make_pair("HALL_DT8", &grp33));
-  //magGrp.insert(std::make_pair("MAG", &grp4));
-  //batGrp.insert(std::make_pair("VDBAT", &grp51));
-  //batGrp.insert(std::make_pair("VSBAT", &grp52));
+  hallGrp.insert(std::make_pair("HALL_CNT", &grp31));
+  hallGrp.insert(std::make_pair("HALL_DT", &grp32));
+  hallGrp.insert(std::make_pair("HALL_DT8", &grp33));
+  magGrp.insert(std::make_pair("MAG", &grp4));
+  batGrp.insert(std::make_pair("VDBAT", &grp51));
+  batGrp.insert(std::make_pair("VSBAT", &grp52));
 
   // register publish callbacks with the uc-board communication framework
-  //com.registerSensorGroupCallback(
-  //    1, boost::bind(&publishSensorGroupMessage1, _1, usGrp));
+  com.registerSensorGroupCallback(
+      1, boost::bind(&publishSensorGroupMessage1, _1, usGrp));
   com.registerSensorGroupCallback(
       2, boost::bind(&publishSensorGroupMessage2, _1, imuGrp));
-  /*
   com.registerSensorGroupCallback(
       3, boost::bind(&publishSensorGroupMessage3, _1, hallGrp));
   com.registerSensorGroupCallback(
       4, boost::bind(&publishSensorGroupMessage4, _1, magGrp));
   com.registerSensorGroupCallback(
       5, boost::bind(&publishSensorGroupMessage5, _1, batGrp));
-  */
-  // Test area
-  //com.registerSensorGroups("Set Group");
-  // end
+
+  // start serial communication
+  try
+  {
+    com.connect();
+    com.startCommunication();
+    ros::Duration(0.1).sleep();
+    // register sensor groups on the uc-board
+    com.registerSensorGroups("Set Group");
+  }
+  catch (std::exception& e)
+  {
+    ROS_WARN_STREAM("An error occured while trying to set up the connection.\n Description: "<<e.what());
+  }
 
   // register uc-board communication services with ros
   ros::ServiceServer deleteGroupService =
@@ -291,24 +323,14 @@ int main(int argc, char** argv)
                           pses_basis::ToggleMotor::Response>(
           "toggle_motor", std::bind(ServiceFunctions::toggleMotor, std::placeholders::_1,
                                     std::placeholders::_2, &com));
+  ros::ServiceServer toggleUSService =
+      nh.advertiseService<pses_basis::ToggleUS::Request,
+                          pses_basis::ToggleUS::Response>(
+          "toggle_us", std::bind(ServiceFunctions::toggleUS, std::placeholders::_1,
+                                    std::placeholders::_2, &com));
 
-  // start serial communication
-  try
-  {
-    com.connect();
-    com.startCommunication();
-    ros::Duration(0.10).sleep();
-    // register sensor groups on the uc-board
-    bool success = com.registerSensorGroups("Set Group");
-    ROS_INFO_STREAM("Success? "<<success);
-    //ros::Duration(7.00).sleep();
-    //com.stopCommunication();
-    //com.disconnect();
-  }
-  catch (std::exception& e)
-  {
-    ROS_ERROR("%s", e.what());
-  }
+  // register shut down signal handler
+  signal(SIGINT, shutdownSignalHandler);
 
   ros::spin();
   return 0;

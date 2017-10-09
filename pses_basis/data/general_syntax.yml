@@ -1,12 +1,12 @@
 # basic communication tokens
-end_of_message: '\x03'
-end_of_frame: '\n'
+end_of_message: "\x03"
+end_of_frame: "\n"
 
 # basic prefixes
-answer_on_command_prefix: ':'
+answer_on_command_prefix: ":"
 
 # advanced prefixes
-channel_group_msg_prefix: '#'
-cmd_error_prefix: ':ERR'
+channel_group_msg_prefix: "#"
+cmd_error_prefix: ":ERR"
 gen_error_prefix: "'ERR"
-options_prefix: '~'
+options_prefix: "~"

@@ -145,18 +145,18 @@ const bool Command::verifyResponse(const Parameter::ParameterMap& inputParams,
   boost::trim(response);
   // start
   outputParams = Parameter::ParameterMap();
-  ROS_INFO_STREAM("Response: " << response);
+  //ROS_INFO_STREAM("Response: " << response);
   // first case -> no response
   if (!cmdHasResponse)
     return true;
-  ROS_INFO_STREAM("passed first case");
+  //ROS_INFO_STREAM("passed first case");
   // second case -> static response
   if (!respHasParams)
   {
-    ROS_INFO_STREAM(response << "  expected: "<<simpleResponse);
+    //ROS_INFO_STREAM(response << "  expected: "<<simpleResponse);
     return response.compare(simpleResponse) == 0;
   }
-  ROS_INFO_STREAM("passed second case");
+  //ROS_INFO_STREAM("passed second case");
   // third case -> response contains any amount of parameter
   std::vector<std::string> split;
   boost::split(split, response, boost::is_any_of(" "));
@@ -166,14 +166,14 @@ const bool Command::verifyResponse(const Parameter::ParameterMap& inputParams,
   for (int i= 0; i < split.size(); i++)
   {
     // exit if the response contains more elements than expected
-    ROS_INFO_STREAM("component index: " << i << " num. of components: "
-                                        << responseTemplate.size());
+    //ROS_INFO_STREAM("component index: " << i << " num. of components: "
+                                        //<< responseTemplate.size());
     if (i >= responseTemplate.size())
       return false;
-    ROS_INFO_STREAM("did it died?");
+    //ROS_INFO_STREAM("did it died?");
     // check if this component is a variable
     const std::string& param = responseTemplate[i].first;
-    ROS_INFO_STREAM("expected component: " << param << " got: " << split[i]);
+    //ROS_INFO_STREAM("expected component: " << param << " got: " << split[i]);
     if (responseTemplate[i].second)
     {
       // if the param appears in cmd. and resp. -> indicates reply on cmd

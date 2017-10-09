@@ -17,7 +17,7 @@ public:
   }
   ~SerialInterface() {}
   void configure(unsigned int baudRate, std::string deviceTag);
-  void connect(const unsigned int serialTimeout = 5);
+  void connect(const unsigned int serialTimeout = 1000);
   void send(std::string& message);
   void read(std::string& message, std::string& delimiter,
             unsigned int maxLineLength = 65536);

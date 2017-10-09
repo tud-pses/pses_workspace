@@ -7,8 +7,8 @@ Communication::Communication(const std::string& configPath)
   commands = comCfg.getCommands();
   sensorGroups = comCfg.getSensorGroups();
   dispatcher = new ThreadDispatcher(syntax);
-  rxPolling = new ReadingThread(syntax->endOfMessage, dispatcher);
-  sensorGroupThread = new SensorGroupThread(syntax->channelGrpMsgPrefix, dispatcher, sensorGroups);
+  rxPolling = new ReadingThread(syntax, dispatcher);
+  sensorGroupThread = new SensorGroupThread(syntax, dispatcher, sensorGroups);
   dispatcher->setReadingThread(rxPolling);
   dispatcher->setSensorGroupThread(sensorGroupThread);
   dispatcher->setCommunicationCondVar(&cv);
@@ -53,15 +53,17 @@ bool Communication::sendCommand(const std::string& command,
   std::string cmd;
   std::string response;
   commands[command]->generateCommand(inputParams, cmd);
-  ROS_INFO_STREAM(cmd);
+  //ROS_INFO_STREAM(cmd);
   dispatcher->setCommunicationWakeUp(true);
-  cmd = cmd+"\n";
+  cmd = cmd+syntax->endOfFrame;
+  //ros::Time t = ros::Time::now();
   si.send(cmd);
   cv.wait_for(lck, std::chrono::microseconds(timeout));
   if(dispatcher->IsResponseQueueEmpty()) return false;
+   //ROS_INFO_STREAM("Round trip t: "<<(ros::Time::now()-t).toSec());
   while(!dispatcher->IsResponseQueueEmpty()){
     dispatcher->dequeueResponse(response);
-    ROS_INFO_STREAM(response);
+    //ROS_INFO_STREAM(response);
     if(commands[command]->verifyResponse(inputParams, response, outputParams)) return true;
   }
 }
@@ -79,7 +81,7 @@ bool Communication::sendCommand(const std::string& command,
   commands[command]->generateCommand(inputParams, options, cmd);
   //ROS_INFO_STREAM(cmd);
   dispatcher->setCommunicationWakeUp(true);
-  cmd = cmd+"\n";
+  cmd = cmd+syntax->endOfFrame;
   // si.send(cmd);
   cv.wait_for(lck, std::chrono::microseconds(timeout));
   //if(dispatcher->IsResponseQueueEmpty()) return false;
@@ -97,20 +99,20 @@ bool Communication::registerSensorGroups(const std::string& cmdName, unsigned in
     std::string response;
     //ROS_INFO_STREAM("Setting cmd for: " <<grp.second->getName());
     grp.second->createSensorGroupCommand(*commands[cmdName], cmd);
-    ROS_INFO_STREAM(cmd);
+    //ROS_INFO_STREAM(cmd);
     dispatcher->setCommunicationWakeUp(true);
-    cmd = cmd+"\n";
-    ros::Time t = ros::Time::now();
+    cmd = cmd+syntax->endOfFrame;
+    //ros::Time t = ros::Time::now();
     si.send(cmd);
     cv.wait_for(lck, std::chrono::microseconds(timeout));
-    ROS_INFO_STREAM("Round trip t: "<<(ros::Time::now()-t).toSec());
+    //ROS_INFO_STREAM("Round trip t: "<<(ros::Time::now()-t).toSec());
     if(dispatcher->IsResponseQueueEmpty()){
-      ROS_INFO_STREAM("Response queue empty");
+      //ROS_INFO_STREAM("Response queue empty");
       success = false;
       continue;
     }
     dispatcher->dequeueResponse(response);
-    ROS_INFO_STREAM(response);
+    //ROS_INFO_STREAM(response);
     if(!grp.second->verifyResponseOnComand(*commands[cmdName], response)) success = false;
   }
   return success;

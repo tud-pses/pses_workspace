@@ -80,6 +80,7 @@ find_package(catkin REQUIRED COMPONENTS
    ToggleDAQ.srv
    ToggleGroup.srv
    ToggleKinect.srv
+   ToggleUS.srv
  )
 
 ## Generate actions in the 'action' folder

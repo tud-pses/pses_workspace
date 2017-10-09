@@ -57,6 +57,14 @@
   response:
   adds_response_to_groups: False
 
+- name: "Wait_For_All_Maxwait"
+  opt_has_params: False
+  params:
+  opt: 'ALL'
+  opt_returns_params: False
+  response:
+  adds_response_to_groups: False
+
 - name: "Wait_For_Any"
   opt_has_params: False
   params:
@@ -77,6 +85,14 @@
   opt_has_params: True
   params: ['uint16_t:average']
   opt: "AVG=$average"
+  opt_returns_params: False
+  response:
+  adds_response_to_groups: False
+
+- name: "Average_Default"
+  opt_has_params: False
+  params:
+  opt: "AVG"
   opt_returns_params: False
   response:
   adds_response_to_groups: False

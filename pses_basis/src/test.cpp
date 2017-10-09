@@ -18,12 +18,14 @@
 #include <pses_basis/ToggleGroup.h>
 #include <pses_basis/ToggleKinect.h>
 #include <pses_basis/ToggleMotor.h>
+#include <pses_basis/ToggleUS.h>
 
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "test");
   ros::NodeHandle nh;
 
+  ros::Duration(1.0).sleep();
   /*
   //test delete_group
   pses_basis::DeleteGroup::Request req1;
@@ -34,8 +36,9 @@ int main(int argc, char **argv)
   int result1 = res1.was_set;
   ROS_INFO_STREAM("Received Delete Group, Answer: "<<result1);
   ros::Duration(1.0).sleep();
+  */
 
-
+  /*
   //test get_controller_id
   pses_basis::GetControllerID::Request req2;
   pses_basis::GetControllerID::Response res2;
@@ -68,7 +71,6 @@ int main(int argc, char **argv)
   ROS_INFO_STREAM("Received Get Firmware Version, Answer: "<<result4<<" Version: "<<vers1);
   ros::Duration(1.0).sleep();
 
-
   //test get_info_all_groups
   pses_basis::GetInfoAllGroups::Request req5;
   pses_basis::GetInfoAllGroups::Response res5;
@@ -89,6 +91,7 @@ int main(int argc, char **argv)
   std::string info3 = res6.info;
   ROS_INFO_STREAM("Received Get Info Group 6, Answer: "<<result6<<" Info: "<<info3);
   ros::Duration(1.0).sleep();
+
 
   //test get_kinect_status
   pses_basis::GetKinectStatus::Request req7;
@@ -139,6 +142,7 @@ int main(int argc, char **argv)
   ROS_INFO_STREAM("Received Reset Controller, Answer: "<<result11);
   ros::Duration(1.0).sleep();
 
+
   //test set_motor_level
   pses_basis::SetMotorLevel::Request req12;
   req12.level = 5;
@@ -179,34 +183,57 @@ int main(int argc, char **argv)
   ROS_INFO_STREAM("Received toggle brakes, Answer: "<<result14);
   ros::Duration(1.0).sleep();
   */
-  //test toggle_daq
+
+  //test toggle_group
+  pses_basis::ToggleGroup::Request req16;
+  req16.group_on = false;
+  req16.group_number = 1;
+  pses_basis::ToggleGroup::Response res16;
+  ROS_INFO_STREAM("Sending Toggle Group 1 false..");
+  ros::service::call("toggle_group", req16, res16);
+  int result16 = res16.was_set;
+  ROS_INFO_STREAM("Received Toggle Group, Answer: "<<result16);
   ros::Duration(1.0).sleep();
+
+  req16.group_number = 3;
+  ROS_INFO_STREAM("Sending Toggle Group 1 false..");
+  ros::service::call("toggle_group", req16, res16);
+  result16 = res16.was_set;
+  ROS_INFO_STREAM("Received Toggle Group, Answer: "<<result16);
+  ros::Duration(1.0).sleep();
+
+  req16.group_number = 4;
+  ROS_INFO_STREAM("Sending Toggle Group 1 false..");
+  ros::service::call("toggle_group", req16, res16);
+  result16 = res16.was_set;
+  ROS_INFO_STREAM("Received Toggle Group, Answer: "<<result16);
+  ros::Duration(1.0).sleep();
+
+  req16.group_number = 5;
+  ROS_INFO_STREAM("Sending Toggle Group 1 false..");
+  ros::service::call("toggle_group", req16, res16);
+  result16 = res16.was_set;
+  ROS_INFO_STREAM("Received Toggle Group, Answer: "<<result16);
+  ros::Duration(1.0).sleep();
+
+  //test toggle_daq
   pses_basis::ToggleDAQ::Request req15;
   req15.DAQ_on = true;
   pses_basis::ToggleDAQ::Response res15;
   ROS_INFO_STREAM("Sending Toggle DAQ true..");
   ros::service::call("toggle_daq", req15, res15);
-  int result15 = res15.was_set;
+  int result15;// = res15.was_set;
   ROS_INFO_STREAM("Received toggle daq, Answer: "<<result15);
-  ros::Duration(20).sleep();
+  ros::Duration(10).sleep();
 
   req15.DAQ_on = false;
   ROS_INFO_STREAM("Sending Toggle DAQ true..");
   ros::service::call("toggle_daq", req15, res15);
   result15 = res15.was_set;
   ROS_INFO_STREAM("Received toggle daq, Answer: "<<result15);
-  /*
-  //test toggle_group
-  pses_basis::ToggleGroup::Request req16;
-  req16.group_on = false;
-  req16.group_number = 3;
-  pses_basis::ToggleGroup::Response res16;
-  ROS_INFO_STREAM("Sending Toggle Group false..");
-  ros::service::call("toggle_group", req16, res16);
-  int result16 = res16.was_set;
-  ROS_INFO_STREAM("Received Toggle Group, Answer: "<<result16);
-  ros::Duration(1.0).sleep();
+  ros::Duration(1).sleep();
 
+  /*
   //test toggle_kinect
   pses_basis::ToggleKinect::Request req17;
   req17.kinect_on = false;
@@ -225,6 +252,16 @@ int main(int argc, char **argv)
   ros::service::call("toggle_motor", req18, res18);
   int result18 = res18.was_set;
   ROS_INFO_STREAM("Received Toggle Motor, Answer: "<<result18);
+  ros::Duration(1.0).sleep();
+
+  //test toggle_us
+  pses_basis::ToggleUS::Request req19;
+  req19.us_on = true;
+  pses_basis::ToggleUS::Response res19;
+  ROS_INFO_STREAM("Sending Toggle us true..");
+  ros::service::call("toggle_us", req19, res19);
+  int result19 = res19.was_set;
+  ROS_INFO_STREAM("Received Toggle Motor, Answer: "<<result19);
   ros::Duration(1.0).sleep();
   */
 
