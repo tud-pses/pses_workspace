@@ -5,6 +5,7 @@
 #include <string>
 #include <pses_basis/parameter.h>
 #include <pses_basis/command.h>
+#include <pses_basis/syntax.h>
 #include <boost/range/algorithm/remove_if.hpp>
 #include <ros/ros.h>
 
@@ -29,14 +30,16 @@ struct SensorGroupParameter
 class SensorGroup;
 
 typedef boost::function<void(SensorGroup*)> responseCallback;
+typedef boost::function<void(const std::string&)> valueErrorCallbackPtr;
 
 class SensorGroup
 {
 public:
   SensorGroup();
-  SensorGroup(const SensorGroupParameter& sensorParams);
+  SensorGroup(const SensorGroupParameter& sensorParams, std::shared_ptr<Syntax> syntax);
   void processResponse(const std::string& response);
   void setResponseCallback(responseCallback callbackFunction);
+  void registerErrorCallback(valueErrorCallbackPtr valueError);
   const std::string& getName() const;
   void createSensorGroupCommand(Command& cmd, std::string& command) const;
   const bool verifyResponseOnComand(Command& cmd,
@@ -69,6 +72,9 @@ private:
   bool callbackRegistered;
   Parameter::ParameterMap cmdInputParams;
   std::vector<std::string> optionsList;
+  std::shared_ptr<Syntax> syntax;
+  valueErrorCallbackPtr valueError;
+  bool valueErrorCBSet;
 
   void parseResponse(const std::string& response);
 };

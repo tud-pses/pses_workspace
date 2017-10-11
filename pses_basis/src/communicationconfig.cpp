@@ -23,12 +23,43 @@ void operator>>(const YAML::Node& node, Syntax& syntax)
 {
   syntax.endOfMessage = node["end_of_message"].as<std::string>();
   syntax.endOfFrame = node["end_of_frame"].as<std::string>();
+  syntax.textMsgPrefix = node["text_msg_prefix"].as<std::string>();
   syntax.answerOnCmdPrefix = node["answer_on_command_prefix"].as<std::string>();
   syntax.channelGrpMsgPrefix =
       node["channel_group_msg_prefix"].as<std::string>();
   syntax.cmdErrorPrefix = node["cmd_error_prefix"].as<std::string>();
   syntax.genErrorPrefix = node["gen_error_prefix"].as<std::string>();
   syntax.optionsPrefix = node["options_prefix"].as<std::string>();
+  const YAML::Node& errorAsciiNode = node["grp_errors_ascii"];
+  if (errorAsciiNode.IsSequence() && errorAsciiNode.size() > 0){
+    for(auto item : errorAsciiNode){
+      //ROS_INFO_STREAM(item.as<std::string>());
+      syntax.grpErrorsAscii.insert(item.as<std::string>());
+    }
+  }
+  const YAML::Node& errorBinaryNode = node["grp_errors_binary"];
+  if (errorBinaryNode.IsSequence() && errorBinaryNode.size() > 0){
+    for(auto item : errorBinaryNode){
+      int c = 0;
+      if (item.IsSequence() && item.size() > 0){
+        std::string type;
+        std::unordered_set<unsigned int> errorSet;
+        for(auto item2 : item){
+          if(c != 0){
+            errorSet.insert(item2.as<unsigned int>());
+            //ROS_INFO_STREAM(item2.as<unsigned int>());
+            c++;
+          }else{
+            type = item2.as<std::string>();
+            //ROS_INFO_STREAM(item2.as<std::string>());
+            c++;
+          }
+        }
+        syntax.grpErrorsBinary.insert(std::make_pair(type, errorSet));
+      }
+    }
+  }
+
 }
 
 // SerialInferfaceConfig-struct assign operator
@@ -181,7 +212,7 @@ void CommunicationConfig::insertSensorGroup(const YAML::Node& node)
     grp.encoding = encoding;
   // else: unkonwn encoding for grp nr xy <- should be an error/exception
   sensorGroups.insert(std::make_pair(
-      grp.grpNumber, std::make_shared<SensorGroup>(SensorGroup(grp))));
+      grp.grpNumber, std::make_shared<SensorGroup>(SensorGroup(grp, getSyntax()))));
 }
 
 void CommunicationConfig::readSerialInterfaceConfig()

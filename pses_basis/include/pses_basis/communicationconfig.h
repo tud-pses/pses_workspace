@@ -10,6 +10,8 @@
 #include <utility>
 #include <vector>
 #include <boost/algorithm/string.hpp>
+#include <unordered_set>
+#include <pses_basis/syntax.h>
 
 struct SerialInterfaceParams{
   unsigned int baudRate;
@@ -17,17 +19,6 @@ struct SerialInterfaceParams{
   unsigned int serialTimeout;
   unsigned int maxLineLength;
   std::string serialDevicesFolder;
-};
-
-struct Syntax
-{
-  std::string endOfMessage;
-  std::string endOfFrame;
-  std::string answerOnCmdPrefix;
-  std::string channelGrpMsgPrefix;
-  std::string cmdErrorPrefix;
-  std::string genErrorPrefix;
-  std::string optionsPrefix;
 };
 
 class CommunicationConfig

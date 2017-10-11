@@ -6,13 +6,15 @@ const std::string SensorGroup::ENCODING_HEX = "HEX";
 
 SensorGroup::SensorGroup() {}
 
-SensorGroup::SensorGroup(const SensorGroupParameter& sensorParams)
+SensorGroup::SensorGroup(const SensorGroupParameter& sensorParams,
+                         std::shared_ptr<Syntax> syntax) : syntax(syntax)
 {
   grpNumber = sensorParams.grpNumber;
   grpName = sensorParams.grpName;
   channelList = sensorParams.channels;
   responseEncoding = sensorParams.encoding;
   callbackRegistered = false;
+  valueErrorCBSet = false;
   // init channel values map
   channelValues = Parameter::ParameterMap();
   for (Channel ch : channelList)
@@ -45,17 +47,20 @@ SensorGroup::SensorGroup(const SensorGroupParameter& sensorParams)
     for (auto param : option.first.params)
     {
       tempPm.insertParameter(param.first, param.second);
-      //ROS_INFO_STREAM("oh boy.. "<<param.first<<" "<<param.second);
+      // ROS_INFO_STREAM("oh boy.. "<<param.first<<" "<<param.second);
     }
     // the first part is later needed for the command string
     optionsList.push_back(option.first.optName);
     std::vector<std::string> optionSplit;
     boost::split(optionSplit, option.first.opt, boost::is_any_of(" ="));
     std::vector<std::string> splitParamValues;
-    //ROS_INFO_STREAM(option.second);
-    if(option.second.find(',')!=std::string::npos){
+    // ROS_INFO_STREAM(option.second);
+    if (option.second.find(',') != std::string::npos)
+    {
       boost::split(splitParamValues, option.second, boost::is_any_of(","));
-    }else{
+    }
+    else
+    {
       splitParamValues.push_back(option.second);
     }
 
@@ -65,7 +70,9 @@ SensorGroup::SensorGroup(const SensorGroupParameter& sensorParams)
       if (optString.at(0) == '$')
       {
         std::string paramName = optString.substr(1, std::string::npos);
-        //ROS_INFO_STREAM("oh boy.. wtf .."<<paramName<<" "<<tempPm.getParameter(paramName)->getType()<<" "<<splitParamValues[valueCounter]);
+        // ROS_INFO_STREAM("oh boy.. wtf .."<<paramName<<"
+        // "<<tempPm.getParameter(paramName)->getType()<<"
+        // "<<splitParamValues[valueCounter]);
         cmdInputParams.insertParameter(
             paramName, tempPm.getParameter(paramName)->getType());
 
@@ -114,19 +121,32 @@ void SensorGroup::parseResponse(const std::string& response)
     for (std::string s : split)
     {
       s.erase(boost::remove_if(s, boost::is_any_of(" | ")), s.end());
-      if(s.size()<=0) continue;
+      if (s.size() <= 0)
+        continue;
       if (splitIndex >= channelList.size())
         break;
-      //ROS_INFO_STREAM("Parsing: "<<s<<" from response: "<<response);
-      channelValues.setParameterValueAsString(channelList[splitIndex].chName,
-                                              s);
+      // ROS_INFO_STREAM("Parsing: "<<s<<" from response: "<<response);
+
+      if (syntax->grpErrorsAscii.find(s) != syntax->grpErrorsAscii.end() && valueErrorCBSet)
+      {
+
+        valueError("Group: " + std::to_string(grpNumber) + " ch.: " +
+                       channelList[splitIndex].chName +
+                       " had a faulty value!\n Error Code: "
+                   + s);
+      }
+      else
+      {
+        channelValues.setParameterValueAsString(channelList[splitIndex].chName,
+                                                s);
+      }
       splitIndex++;
     }
-    //ROS_INFO_STREAM("looking for options: "<<optionVariableList.size());
+    // ROS_INFO_STREAM("looking for options: "<<optionVariableList.size());
     // check for options
     if (optionVariableList.size() <= 0)
       return;
-    //ROS_INFO_STREAM("Nani?????");
+    // ROS_INFO_STREAM("Nani?????");
     // parse options with returns
     for (; splitIndex < optionVariableList.size(); splitIndex++)
     {
@@ -142,6 +162,12 @@ void SensorGroup::setResponseCallback(responseCallback callbackFunction)
   callbackRegistered = true;
 }
 
+void SensorGroup::registerErrorCallback(valueErrorCallbackPtr valueError)
+{
+  this->valueError = valueError;
+  valueErrorCBSet = true;
+}
+
 const std::string& SensorGroup::getName() const { return grpName; }
 
 void SensorGroup::createSensorGroupCommand(Command& cmd,
@@ -155,10 +181,13 @@ SensorGroup::verifyResponseOnComand(Command& cmd,
                                     const std::string& response) const
 {
   Parameter::ParameterMap outputParams;
-  return cmd.verifyResponse(cmdInputParams, optionsList, response, outputParams);
+  return cmd.verifyResponse(cmdInputParams, optionsList, response,
+                            outputParams);
 }
 
-const bool SensorGroup::getChannelValueConverted(const std::string& name, double& out) const{
+const bool SensorGroup::getChannelValueConverted(const std::string& name,
+                                                 double& out) const
+{
   if (!channelValues.isParamInMap(name))
     return false;
   const std::string& type = channelValues.getParameter(name)->getType();
@@ -170,7 +199,7 @@ const bool SensorGroup::getChannelValueConverted(const std::string& name, double
                                   "\" doesn't match given variable type!");
     char value;
     channelValues.getParameterValue(name, value);
-    out=value*channelMap.at(name).conversionFactor;
+    out = value * channelMap.at(name).conversionFactor;
   }
   else if (type.compare("uint8_t") == 0)
   {
@@ -179,7 +208,7 @@ const bool SensorGroup::getChannelValueConverted(const std::string& name, double
                                   "\" doesn't match given variable type!");
     unsigned char value;
     channelValues.getParameterValue(name, value);
-    out=value*channelMap.at(name).conversionFactor;
+    out = value * channelMap.at(name).conversionFactor;
   }
   else if (type.compare("int16_t") == 0)
   {
@@ -188,7 +217,7 @@ const bool SensorGroup::getChannelValueConverted(const std::string& name, double
                                   "\" doesn't match given variable type!");
     short value;
     channelValues.getParameterValue(name, value);
-    out=value*channelMap.at(name).conversionFactor;
+    out = value * channelMap.at(name).conversionFactor;
   }
   else if (type.compare("uint16_t") == 0)
   {
@@ -197,7 +226,7 @@ const bool SensorGroup::getChannelValueConverted(const std::string& name, double
                                   "\" doesn't match given variable type!");
     unsigned short value;
     channelValues.getParameterValue(name, value);
-    out=value*channelMap.at(name).conversionFactor;
+    out = value * channelMap.at(name).conversionFactor;
   }
   else if (type.compare("int32_t") == 0)
   {
@@ -206,7 +235,7 @@ const bool SensorGroup::getChannelValueConverted(const std::string& name, double
                                   "\" doesn't match given variable type!");
     int value;
     channelValues.getParameterValue(name, value);
-    out=value*channelMap.at(name).conversionFactor;
+    out = value * channelMap.at(name).conversionFactor;
   }
   else if (type.compare("uint32_t") == 0)
   {
@@ -215,7 +244,7 @@ const bool SensorGroup::getChannelValueConverted(const std::string& name, double
                                   "\" doesn't match given variable type!");
     unsigned int value;
     channelValues.getParameterValue(name, value);
-    out=value*channelMap.at(name).conversionFactor;
+    out = value * channelMap.at(name).conversionFactor;
   }
   else if (type.compare("int64_t") == 0)
   {
@@ -224,7 +253,7 @@ const bool SensorGroup::getChannelValueConverted(const std::string& name, double
                                   "\" doesn't match given variable type!");
     long value;
     channelValues.getParameterValue(name, value);
-    out=value*channelMap.at(name).conversionFactor;
+    out = value * channelMap.at(name).conversionFactor;
   }
   else if (type.compare("uint64_t") == 0)
   {
@@ -233,7 +262,7 @@ const bool SensorGroup::getChannelValueConverted(const std::string& name, double
                                   "\" doesn't match given variable type!");
     unsigned long value;
     channelValues.getParameterValue(name, value);
-    out=value*channelMap.at(name).conversionFactor;
+    out = value * channelMap.at(name).conversionFactor;
   }
   else if (type.compare("float32_t") == 0)
   {
@@ -242,7 +271,7 @@ const bool SensorGroup::getChannelValueConverted(const std::string& name, double
                                   "\" doesn't match given variable type!");
     float value;
     channelValues.getParameterValue(name, value);
-    out=value*channelMap.at(name).conversionFactor;
+    out = value * channelMap.at(name).conversionFactor;
   }
   else if (type.compare("float64_t") == 0)
   {
@@ -251,8 +280,8 @@ const bool SensorGroup::getChannelValueConverted(const std::string& name, double
                                   "\" doesn't match given variable type!");
     double value;
     channelValues.getParameterValue(name, value);
-    out=value*channelMap.at(name).conversionFactor;
+    out = value * channelMap.at(name).conversionFactor;
   }
-  else return false;
-
+  else
+    return false;
 }

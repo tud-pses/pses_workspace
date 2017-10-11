@@ -174,6 +174,18 @@ void publishSensorGroupMessage5(
   }
 }
 
+void errorCallback(
+    const std::string& msg)
+{
+  ROS_WARN_STREAM("A communication Error occured!\n"<<msg);
+}
+
+void textCallback(
+    const std::string& msg)
+{
+  ROS_INFO_STREAM("UC board sent the following info:\n"<<msg);
+}
+
 void publishDebugMessage(
     const std::string& msg, ros::Publisher* pub)
 {
@@ -465,8 +477,13 @@ int main(int argc, char** argv)
     com.registerSensorGroupCallback(
         5, boost::bind(&publishSensorGroupMessage5, _1, batGrp));
   }
+  // debug special modes
   if(debugMsgOn) com.enableDebugMessages(boost::bind(&publishDebugMessage, _1, &debug));
   if(rawComOn) com.enableRawCommunication();
+
+  //register error/txt-message callbacks
+  com.registerErrorCallback(&errorCallback);
+  com.registerTextCallback(&textCallback);
 
   // start serial communication
   try
@@ -650,6 +667,7 @@ int main(int argc, char** argv)
   // create control subscribers e.g. steering, motorlevel etc.
   ros::Subscriber motorLevelSubscriber = nh.subscribe<std_msgs::Int16>("set_motor_level_msg",10, boost::bind(motorLevelCallback, _1, &com));
   ros::Subscriber steeringLevelSubscriber = nh.subscribe<std_msgs::Int16>("set_steering_level_msg",10, boost::bind(steeringLevelCallback, _1 , &com));
+  // raw mode subscriber
   ros::Subscriber ucBoardMsgSubscriber;
   if(rawComOn) ucBoardMsgSubscriber = nh.subscribe<std_msgs::String>("send_uc_board_msg",10, boost::bind(ucBoardMessageCallback, _1 , &com));
 

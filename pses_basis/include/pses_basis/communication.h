@@ -20,7 +20,7 @@ public:
   void stopCommunication();
   void disconnect();
   void sendRawMessage(const std::string& msg);
-  void enableDebugMessages(debugCallback debug);
+  void enableDebugMessages(debugCallbackPtr debug);
   void enableRawCommunication();
   bool sendCommand(const std::string& command,
                    const Parameter::ParameterMap& inputParams,
@@ -31,6 +31,8 @@ public:
                    const Parameter::ParameterMap& inputParams,
                    Parameter::ParameterMap& outputParams,
                    unsigned int timeout = 100000);
+  void registerErrorCallback(debugCallbackPtr error);
+  void registerTextCallback(debugCallbackPtr text);
   bool registerSensorGroups(const std::string& cmdName,
                             unsigned int timeout = 100000);
   void registerSensorGroupCallback(const unsigned char& grpNumber,

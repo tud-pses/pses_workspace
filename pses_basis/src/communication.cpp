@@ -51,7 +51,7 @@ void Communication::disconnect()
   si.disconnect();
 }
 
-void Communication::enableDebugMessages(debugCallback debug)
+void Communication::enableDebugMessages(debugCallbackPtr debug)
 {
   dispatcher->enableDebugMessages(debug);
   rawCommunicationEnabled = true;
@@ -62,8 +62,10 @@ void Communication::enableRawCommunication()
   dispatcher->enableRawCommunication();
 }
 
-void Communication::sendRawMessage(const std::string& msg){
-  if(!rawCommunicationEnabled) throw std::runtime_error("Raw communication mode not enabled!");
+void Communication::sendRawMessage(const std::string& msg)
+{
+  if (!rawCommunicationEnabled)
+    throw std::runtime_error("Raw communication mode not enabled!");
   SerialInterface& si = SerialInterface::instance();
   std::string send = msg;
   si.send(send);
@@ -159,6 +161,19 @@ bool Communication::registerSensorGroups(const std::string& cmdName,
       success = false;
   }
   return success;
+}
+
+void Communication::registerErrorCallback(debugCallbackPtr error)
+{
+  dispatcher->registerErrorCallback(error);
+  for(auto grp : sensorGroups){
+    grp.second->registerErrorCallback(error);
+  }
+}
+
+void Communication::registerTextCallback(debugCallbackPtr text)
+{
+  dispatcher->registerTextCallback(text);
 }
 
 void Communication::registerSensorGroupCallback(const unsigned char& grpNumber,

@@ -8,36 +8,40 @@ ThreadDispatcher::ThreadDispatcher(const std::shared_ptr<Syntax>& syntax)
   wakeUpCommunication = false;
   debugMsgEnabled = false;
   rawCommunicationEnabled = false;
+  errorCBregistered = false;
+  textCBregistered = false;
 }
 
 void ThreadDispatcher::startThread()
 {
-   //ROS_INFO_STREAM("ThreadDispatcher starting..");
+  // ROS_INFO_STREAM("ThreadDispatcher starting..");
   active = true;
   worker = std::thread(&ThreadDispatcher::workerFunction, this);
   sensorGroupThread->startThread();
   readingThread->startThread();
 
-   //ROS_INFO_STREAM("ThreadDispatcher started..");
+  // ROS_INFO_STREAM("ThreadDispatcher started..");
 }
 
 void ThreadDispatcher::stopThread()
 {
-  //ROS_INFO_STREAM("ThreadDispatcher stopping..");
+  // ROS_INFO_STREAM("ThreadDispatcher stopping..");
   readingThread->stopThread();
   sensorGroupThread->stopThread();
   active = false;
   wakeUp();
   worker.join();
-  //ROS_INFO_STREAM("ThreadDispatcher stopped..");
+  // ROS_INFO_STREAM("ThreadDispatcher stopped..");
 }
 
-void ThreadDispatcher::enableDebugMessages(debugCallback debug){
+void ThreadDispatcher::enableDebugMessages(debugCallbackPtr debug)
+{
   this->debug = debug;
   debugMsgEnabled = true;
 }
 
-void ThreadDispatcher::enableRawCommunication(){
+void ThreadDispatcher::enableRawCommunication()
+{
   rawCommunicationEnabled = true;
 }
 
@@ -45,36 +49,48 @@ void ThreadDispatcher::workerFunction()
 {
   while (active)
   {
-     //ROS_INFO_STREAM("ThreadDispatcher sleeping..");
+    // ROS_INFO_STREAM("ThreadDispatcher sleeping..");
     sleep();
-     //ROS_INFO_STREAM("ThreadDispatcher woke up..");
+    // ROS_INFO_STREAM("ThreadDispatcher woke up..");
     while (!readingThread->isQueueEmpty() && active)
     {
       std::string data = readingThread->getData();
-      //ROS_INFO_STREAM("Msg in dispatch:\n"<<data);
+      // ROS_INFO_STREAM("Msg in dispatch:\n"<<data);
       // in case of empty string
       if (data.size() < 1)
         continue;
-      if (debugMsgEnabled) debug(data);
-      if (rawCommunicationEnabled) {
+      if (debugMsgEnabled)
+        debug(data);
+      if (rawCommunicationEnabled)
+      {
         continue;
       }
       // check for known prefixes
-      //ROS_INFO_STREAM("cmd queue size: "<<commandResponse.size()<<" msg queue size: "<<sensorGroupMessage.size());
+      // ROS_INFO_STREAM("cmd queue size: "<<commandResponse.size()<<" msg queue
+      // size: "<<sensorGroupMessage.size());
       if (data.find(syntax->cmdErrorPrefix) == 0)
       {
-        // dispatch cmd-error thread
+        if (errorCBregistered)
+          error("UC board reported the following command error:\n"+data);
       }
       else if (data.find(syntax->genErrorPrefix) == 0)
       {
-        // dispatch general-error thread
+        if (errorCBregistered)
+          error("UC board reported the following error:\n"+data);
+      }
+      else if (data.find(syntax->textMsgPrefix) == 0)
+      {
+        if (textCBregistered)
+          text(data);
       }
       else if (data.find(syntax->channelGrpMsgPrefix) == 0)
       {
-        //ROS_INFO_STREAM("Msg in dispatch pre push: "<<data<<" "<<sensorGroupMessage.size());
+        // ROS_INFO_STREAM("Msg in dispatch pre push: "<<data<<"
+        // "<<sensorGroupMessage.size());
         sensorGroupMessage.push(data);
         sensorGroupThread->wakeUp();
-        //ROS_INFO_STREAM("Msg in dispatch post push: "<<sensorGroupMessage.front()<<" "<<sensorGroupMessage.size());
+        // ROS_INFO_STREAM("Msg in dispatch post push:
+        // "<<sensorGroupMessage.front()<<" "<<sensorGroupMessage.size());
       }
       else if (data.find(syntax->answerOnCmdPrefix) == 0)
       {
@@ -108,6 +124,18 @@ void ThreadDispatcher::setSensorGroupThread(SensorGroupThread* grpThread)
 void ThreadDispatcher::setCommunicationCondVar(std::condition_variable* condVar)
 {
   this->comCV = condVar;
+}
+
+void ThreadDispatcher::registerErrorCallback(debugCallbackPtr error)
+{
+  this->error = error;
+  errorCBregistered = true;
+  sensorGroupThread->registerErrorCallback(error);
+}
+void ThreadDispatcher::registerTextCallback(debugCallbackPtr text)
+{
+  this->text = text;
+  textCBregistered = true;
 }
 
 void ThreadDispatcher::dequeueResponse(std::string& response)

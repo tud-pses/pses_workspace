@@ -13,7 +13,7 @@
 class ReadingThread;
 class SensorGroupThread;
 
-typedef boost::function<void(const std::string&)> debugCallback;
+typedef boost::function<void(const std::string&)> debugCallbackPtr;
 
 class ThreadDispatcher : public CommunicationThread
 {
@@ -21,11 +21,13 @@ public:
   ThreadDispatcher(const std::shared_ptr<Syntax>& syntax);
   void startThread();
   void stopThread();
-  void enableDebugMessages(debugCallback debug);
+  void enableDebugMessages(debugCallbackPtr debug);
   void enableRawCommunication();
   void setReadingThread(ReadingThread* rxThread);
   void setSensorGroupThread(SensorGroupThread* grpThread);
   void setCommunicationCondVar(std::condition_variable* condVar);
+  void registerErrorCallback(debugCallbackPtr error);
+  void registerTextCallback(debugCallbackPtr text);
   void dequeueResponse(std::string& response);
   void dequeueSensorGroupMessage(std::string& response);
   const bool IsResponseQueueEmpty() const;
@@ -36,9 +38,13 @@ private:
 
   ReadingThread* readingThread;
   SensorGroupThread* sensorGroupThread;
-  debugCallback debug;
+  debugCallbackPtr debug;
+  debugCallbackPtr error;
+  debugCallbackPtr text;
   bool debugMsgEnabled;
   bool rawCommunicationEnabled;
+  bool errorCBregistered;
+  bool textCBregistered;
   std::shared_ptr<Syntax> syntax;
   std::queue<std::string> commandResponse;
   std::condition_variable* comCV;

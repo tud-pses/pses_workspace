@@ -25,7 +25,7 @@ int main(int argc, char **argv)
 {
   ros::init(argc, argv, "test");
   ros::NodeHandle nh;
-
+  /*
   ros::Publisher pub = nh.advertise<std_msgs::String>("send_uc_board_msg", 10);
   std_msgs::String st;
   ros::Duration(1.0).sleep();
@@ -41,7 +41,8 @@ int main(int argc, char **argv)
   st.data = "?DRV\n";
   pub.publish(st);
   ros::spin();
-  /*
+  */
+
   ros::Duration(1.0).sleep();
   //test set_steering_level
   pses_basis::SetSteering::Request req13;
