@@ -50,6 +50,7 @@ public:
     channelValues.getParameterValue(name, value);
     return true;
   }
+  const bool getChannelValueConverted(const std::string& name, double& value) const;
 
   static const std::string ENCODING_ASCII;
   static const std::string ENCODING_B64;
@@ -60,6 +61,7 @@ private:
   std::string grpName;
   std::string responseEncoding;
   std::vector<Channel> channelList;
+  std::unordered_map<std::string, Channel> channelMap;
   Parameter::ParameterMap channelValues;
   std::vector<std::string> optionVariableList;
   Parameter::ParameterMap optionValues;

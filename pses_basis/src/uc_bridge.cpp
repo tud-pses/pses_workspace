@@ -6,6 +6,8 @@
 #include <ros/package.h>
 #include <std_msgs/builtin_uint8.h>
 #include <std_msgs/builtin_uint16.h>
+#include <std_msgs/Float64.h>
+#include <std_msgs/Int16.h>
 #include <sensor_msgs/Range.h>
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/MagneticField.h>
@@ -17,23 +19,43 @@ void publishSensorGroupMessage1(
   // do stuff
   // ROS_INFO_STREAM("doing stuff");
   sensor_msgs::Range usl, usr, usf;
-  unsigned short l, r, f;
+  //unsigned short l, r, f;
+  double l, r, f;
+  ros::Time t = ros::Time::now();
   try
   {
-    grp->getChannelValue("USL", l);
-    grp->getChannelValue("USF", f);
-    grp->getChannelValue("USR", r);
+    grp->getChannelValueConverted("USL", l);
+    grp->getChannelValueConverted("USF", f);
+    grp->getChannelValueConverted("USR", r);
     usl.range = l;
-    usl.max_range = 1;
-    // ROS_INFO_STREAM(usl);
-    pub["USL"]->publish(usl);
     usf.range = f;
-    usf.max_range = 2;
-    // ROS_INFO_STREAM(usf);
-    pub["USF"]->publish(usf);
     usr.range = r;
+    //usl.range = l;
+    usl.max_range = 3;
+    usl.min_range = 0.06;
+    usl.field_of_view = 0.76;
+    usl.radiation_type = 0;
+    usl.header.frame_id = "robot_left_us";
+    usl.header.stamp = t;
+
+    //usf.range = f;
+    usf.max_range = 3;
+    usf.min_range = 0.06;
+    usf.field_of_view = 0.76;
+    usf.radiation_type = 0;
+    usf.header.frame_id = "robot_front_us";
+    usf.header.stamp = t;
+
+    //usr.range = r;
     usr.max_range = 3;
-    // ROS_INFO_STREAM(usr);
+    usr.min_range = 0.06;
+    usr.field_of_view = 0.76;
+    usr.radiation_type = 0;
+    usr.header.frame_id = "robot_right_us";
+    usr.header.stamp = t;
+
+    pub["USL"]->publish(usl);
+    pub["USF"]->publish(usf);
     pub["USR"]->publish(usr);
   }
   catch (std::exception& e)
@@ -49,22 +71,25 @@ void publishSensorGroupMessage2(
   // do stuff
   // ROS_INFO_STREAM("doing stuff");
   sensor_msgs::Imu imu;
-  short gx, gy, gz, ax, ay, az;
+  //short gx, gy, gz, ax, ay, az;
+  ros::Time t = ros::Time::now();
   try
   {
-    grp->getChannelValue("GX", gx);
-    grp->getChannelValue("GY", gy);
-    grp->getChannelValue("GZ", gz);
-    grp->getChannelValue("AX", ax);
-    grp->getChannelValue("AY", ay);
-    grp->getChannelValue("AZ", az);
-    imu.angular_velocity.x = gx;
-    imu.angular_velocity.y = gy;
-    imu.angular_velocity.z = gz;
-    imu.linear_acceleration.x = ax;
-    imu.linear_acceleration.y = ay;
-    imu.linear_acceleration.z = az;
-    // ROS_INFO_STREAM(imu);
+    grp->getChannelValueConverted("GX", imu.angular_velocity.x);
+    grp->getChannelValueConverted("GY", imu.angular_velocity.y);
+    grp->getChannelValueConverted("GZ", imu.angular_velocity.z);
+    grp->getChannelValueConverted("AX", imu.linear_acceleration.x);
+    grp->getChannelValueConverted("AY", imu.linear_acceleration.y);
+    grp->getChannelValueConverted("AZ", imu.linear_acceleration.z);
+    //imu.angular_velocity.x = gx;
+    //imu.angular_velocity.y = gy;
+    //imu.angular_velocity.z = gz;
+    //imu.linear_acceleration.x = ax;
+    //imu.linear_acceleration.y = ay;
+    //imu.linear_acceleration.z = az;
+    imu.header.stamp = t;
+    imu.header.frame_id = "robot_imu";
+
     pub["IMU"]->publish(imu);
   }
   catch (std::exception& e)
@@ -78,15 +103,12 @@ void publishSensorGroupMessage3(
     SensorGroup* grp, std::unordered_map<std::string, ros::Publisher*>& pub)
 {
   std_msgs::UInt8 hallcnt;
-  std_msgs::UInt16 halldt, halldt8;
+  std_msgs::Float64 halldt, halldt8;
   try
   {
     grp->getChannelValue("HALL_CNT", hallcnt.data);
-    grp->getChannelValue("HALL_DT", halldt.data);
-    grp->getChannelValue("HALL_DT8", halldt8.data);
-    // ROS_INFO_STREAM(hallcnt);
-    // ROS_INFO_STREAM(halldt);
-    // ROS_INFO_STREAM(halldt8);
+    grp->getChannelValueConverted("HALL_DT", halldt.data);
+    grp->getChannelValueConverted("HALL_DT8", halldt8.data);
     pub["HALL_CNT"]->publish(hallcnt);
     pub["HALL_DT"]->publish(halldt);
     pub["HALL_DT8"]->publish(halldt8);
@@ -102,16 +124,18 @@ void publishSensorGroupMessage4(
     SensorGroup* grp, std::unordered_map<std::string, ros::Publisher*>& pub)
 {
   sensor_msgs::MagneticField mag;
-  short mx, my, mz;
+  //short mx, my, mz;
+  ros::Time t = ros::Time::now();
   try
   {
-    grp->getChannelValue("MX", mx);
-    grp->getChannelValue("MY", my);
-    grp->getChannelValue("MZ", mz);
-    mag.magnetic_field.x = mx;
-    mag.magnetic_field.y = my;
-    mag.magnetic_field.z = mz;
-    // ROS_INFO_STREAM(mag);
+    grp->getChannelValueConverted("MX", mag.magnetic_field.x);
+    grp->getChannelValueConverted("MY", mag.magnetic_field.y);
+    grp->getChannelValueConverted("MZ", mag.magnetic_field.z);
+    //mag.magnetic_field.x = mx;
+    //mag.magnetic_field.y = my;
+    //mag.magnetic_field.z = mz;
+    mag.header.stamp = t;
+    mag.header.frame_id = "robot_magnetometer";
     pub["MAG"]->publish(mag);
   }
   catch (std::exception& e)
@@ -125,15 +149,20 @@ void publishSensorGroupMessage5(
     SensorGroup* grp, std::unordered_map<std::string, ros::Publisher*>& pub)
 {
   sensor_msgs::BatteryState batVD, batVS;
-  unsigned short vsbat, vdbat;
+  //unsigned short vsbat, vdbat;
+  double vsbat, vdbat;
+  ros::Time t = ros::Time::now();
   try
   {
-    grp->getChannelValue("VDBAT", vdbat);
-    grp->getChannelValue("VSBAT", vsbat);
+    grp->getChannelValueConverted("VDBAT", vdbat);
+    grp->getChannelValueConverted("VSBAT", vsbat);
     batVD.voltage = vdbat;
     batVS.voltage = vsbat;
-    // ROS_INFO_STREAM(batVD);
-    // ROS_INFO_STREAM(batVS);
+    //batVD.voltage = vdbat;
+    //batVS.voltage = vsbat;
+    batVD.header.stamp = t;
+    batVS.header.stamp = t;
+
     pub["VDBAT"]->publish(batVD);
     pub["VSBAT"]->publish(batVS);
   }
@@ -142,6 +171,44 @@ void publishSensorGroupMessage5(
     ROS_WARN_STREAM("An error in Message 'Sensor grp5' occured!\n Description: "
                     << e.what());
   }
+}
+
+void motorLevelCallback(std_msgs::Int16::ConstPtr motorLevel, Communication* com){
+  bool was_set = false;
+  std::string cmd = "Drive Forward";
+  short level = motorLevel->data;
+  if (level < 0)
+  {
+    cmd = "Drive Backward";
+    level = -level;
+  }
+  Parameter::ParameterMap input;
+  Parameter::ParameterMap output;
+  input.insertParameter("speed", "int16_t", level);
+  try{
+    was_set = com->sendCommand(cmd, input, output);
+  }catch(std::exception& e){
+    ROS_WARN_STREAM("An error in Message 'set_motor_level_msg' occured!\n Description: "<<e.what());
+    was_set = false;
+  }
+  if(!was_set) ROS_WARN_STREAM("Motor level set to: "<<motorLevel->data<<" failed!");
+}
+
+void steeringLevelCallback(std_msgs::Int16::ConstPtr steeringLevel, Communication* com){
+  ros::Time t = ros::Time::now();
+  bool was_set = false;
+  std::string cmd = "Set Steering Level";
+  Parameter::ParameterMap input;
+  Parameter::ParameterMap output;
+  input.insertParameter("steering", "int16_t", steeringLevel->data);
+  try{
+    was_set = com->sendCommand(cmd, input, output);
+  }catch(std::exception& e){
+    ROS_WARN_STREAM("An error in Message 'set_steering_level_msg' occured!\n Description: "<<e.what());
+    was_set = false;
+  }
+  if(!was_set) ROS_WARN_STREAM("Steering level set to: "<<steeringLevel->data<<" failed!");
+  ROS_INFO_STREAM("Round trip t: "<<(ros::Time::now()-t).toSec());
 }
 
 namespace uc_bridge
@@ -333,8 +400,8 @@ int main(int argc, char** argv)
   ros::Publisher grp13 = nh.advertise<sensor_msgs::Range>("USR", 10);
   ros::Publisher grp2 = nh.advertise<sensor_msgs::Imu>("IMU", 10);
   ros::Publisher grp31 = nh.advertise<std_msgs::UInt8>("HALL_CNT", 10);
-  ros::Publisher grp32 = nh.advertise<std_msgs::UInt16>("HALL_DT", 10);
-  ros::Publisher grp33 = nh.advertise<std_msgs::UInt16>("HALL_DT8", 10);
+  ros::Publisher grp32 = nh.advertise<std_msgs::Float64>("HALL_DT", 10);
+  ros::Publisher grp33 = nh.advertise<std_msgs::Float64>("HALL_DT8", 10);
   ros::Publisher grp4 = nh.advertise<sensor_msgs::MagneticField>("MAG", 10);
   ros::Publisher grp51 = nh.advertise<sensor_msgs::BatteryState>("VDBAT", 10);
   ros::Publisher grp52 = nh.advertise<sensor_msgs::BatteryState>("VSBAT", 10);
@@ -545,6 +612,10 @@ int main(int argc, char** argv)
           "toggle_us",
           std::bind(ServiceFunctions::toggleUS, std::placeholders::_1,
                     std::placeholders::_2, &com));
+
+  // create control subscribers e.g. steering, motorlevel etc.
+  ros::Subscriber motorLevelSubscriber = nh.subscribe<std_msgs::Int16>("set_motor_level_msg",10, boost::bind(motorLevelCallback, _1, &com));
+  ros::Subscriber steeringLevelSubscriber = nh.subscribe<std_msgs::Int16>("set_steering_level_msg",10, boost::bind(steeringLevelCallback, _1 , &com));
 
   // register shut down signal handler
   signal(SIGINT, uc_bridge::shutdownSignalHandler);

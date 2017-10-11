@@ -60,6 +60,7 @@ bool Communication::sendCommand(const std::string& command,
                                 Parameter::ParameterMap& outputParams,
                                 unsigned int timeout)
 {
+  ros::Time t = ros::Time::now();
   SerialInterface& si = SerialInterface::instance();
   std::unique_lock<std::mutex> lck(mtx);
   std::string cmd;
@@ -68,15 +69,21 @@ bool Communication::sendCommand(const std::string& command,
   //ROS_INFO_STREAM(cmd);
   dispatcher->setCommunicationWakeUp(true);
   cmd = cmd+syntax->endOfFrame;
-  //ros::Time t = ros::Time::now();
+  ROS_INFO_STREAM("Cmd gen time t: "<<(ros::Time::now()-t).toSec());
+  t = ros::Time::now();
   si.send(cmd);
   cv.wait_for(lck, std::chrono::microseconds(timeout));
   if(dispatcher->IsResponseQueueEmpty()) return false;
    //ROS_INFO_STREAM("Round trip t: "<<(ros::Time::now()-t).toSec());
+  ROS_INFO_STREAM("Wakeup time t: "<<(ros::Time::now()-t).toSec());
+  t = ros::Time::now();
   while(!dispatcher->IsResponseQueueEmpty()){
     dispatcher->dequeueResponse(response);
     //ROS_INFO_STREAM(response);
-    if(commands[command]->verifyResponse(inputParams, response, outputParams)) return true;
+    if(commands[command]->verifyResponse(inputParams, response, outputParams)){
+      ROS_INFO_STREAM("Search time t: "<<(ros::Time::now()-t).toSec());
+      return true;
+    }
   }
 }
 //timeout in microseconds

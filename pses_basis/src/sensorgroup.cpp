@@ -25,9 +25,12 @@ SensorGroup::SensorGroup(const SensorGroupParameter& sensorParams)
   cmdInputParams.insertParameter("grp_nr", "uint8_t", grpNumber);
   // insert channel list
   std::vector<std::string> channels;
+  // init channel map
+  channelMap = std::unordered_map<std::string, Channel>();
   for (Channel ch : channelList)
   {
     channels.push_back(ch.chName);
+    channelMap.insert(std::make_pair(ch.chName, ch));
   }
   cmdInputParams.insertParameter("channels", "string_t[]", channels);
   // init options list and adding option parameters
@@ -153,4 +156,103 @@ SensorGroup::verifyResponseOnComand(Command& cmd,
 {
   Parameter::ParameterMap outputParams;
   return cmd.verifyResponse(cmdInputParams, optionsList, response, outputParams);
+}
+
+const bool SensorGroup::getChannelValueConverted(const std::string& name, double& out) const{
+  if (!channelValues.isParamInMap(name))
+    return false;
+  const std::string& type = channelValues.getParameter(name)->getType();
+  int size = channelValues.getParameter(name)->getTypeByteSize();
+  if (type.compare("int8_t") == 0)
+  {
+    if (size > 1)
+      throw std::invalid_argument("Parameter typename \"" + type +
+                                  "\" doesn't match given variable type!");
+    char value;
+    channelValues.getParameterValue(name, value);
+    out=value*channelMap.at(name).conversionFactor;
+  }
+  else if (type.compare("uint8_t") == 0)
+  {
+    if (size > 1)
+      throw std::invalid_argument("Parameter typename \"" + type +
+                                  "\" doesn't match given variable type!");
+    unsigned char value;
+    channelValues.getParameterValue(name, value);
+    out=value*channelMap.at(name).conversionFactor;
+  }
+  else if (type.compare("int16_t") == 0)
+  {
+    if (size > 2)
+      throw std::invalid_argument("Parameter typename \"" + type +
+                                  "\" doesn't match given variable type!");
+    short value;
+    channelValues.getParameterValue(name, value);
+    out=value*channelMap.at(name).conversionFactor;
+  }
+  else if (type.compare("uint16_t") == 0)
+  {
+    if (size > 2)
+      throw std::invalid_argument("Parameter typename \"" + type +
+                                  "\" doesn't match given variable type!");
+    unsigned short value;
+    channelValues.getParameterValue(name, value);
+    out=value*channelMap.at(name).conversionFactor;
+  }
+  else if (type.compare("int32_t") == 0)
+  {
+    if (size > 4)
+      throw std::invalid_argument("Parameter typename \"" + type +
+                                  "\" doesn't match given variable type!");
+    int value;
+    channelValues.getParameterValue(name, value);
+    out=value*channelMap.at(name).conversionFactor;
+  }
+  else if (type.compare("uint32_t") == 0)
+  {
+    if (size > 4)
+      throw std::invalid_argument("Parameter typename \"" + type +
+                                  "\" doesn't match given variable type!");
+    unsigned int value;
+    channelValues.getParameterValue(name, value);
+    out=value*channelMap.at(name).conversionFactor;
+  }
+  else if (type.compare("int64_t") == 0)
+  {
+    if (size > 8)
+      throw std::invalid_argument("Parameter typename \"" + type +
+                                  "\" doesn't match given variable type!");
+    long value;
+    channelValues.getParameterValue(name, value);
+    out=value*channelMap.at(name).conversionFactor;
+  }
+  else if (type.compare("uint64_t") == 0)
+  {
+    if (size > 8)
+      throw std::invalid_argument("Parameter typename \"" + type +
+                                  "\" doesn't match given variable type!");
+    unsigned long value;
+    channelValues.getParameterValue(name, value);
+    out=value*channelMap.at(name).conversionFactor;
+  }
+  else if (type.compare("float32_t") == 0)
+  {
+    if (size > 4)
+      throw std::invalid_argument("Parameter typename \"" + type +
+                                  "\" doesn't match given variable type!");
+    float value;
+    channelValues.getParameterValue(name, value);
+    out=value*channelMap.at(name).conversionFactor;
+  }
+  else if (type.compare("float64_t") == 0)
+  {
+    if (size > 8)
+      throw std::invalid_argument("Parameter typename \"" + type +
+                                  "\" doesn't match given variable type!");
+    double value;
+    channelValues.getParameterValue(name, value);
+    out=value*channelMap.at(name).conversionFactor;
+  }
+  else return false;
+
 }
