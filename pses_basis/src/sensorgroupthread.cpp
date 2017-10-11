@@ -64,7 +64,9 @@ void SensorGroupThread::workerFunction()
       msg = msg.substr(startIdx, std::string::npos);
       boost::trim(msg);
       if(msg.size()<1) continue;
-
+      // check if requested sensor group exists
+      if(sensorGroups.find(grpNum)==sensorGroups.end()) continue;
+      // call the corresponding group parser and send
       try{
         sensorGroups[grpNum]->processResponse(msg);
       }catch(std::exception& e){

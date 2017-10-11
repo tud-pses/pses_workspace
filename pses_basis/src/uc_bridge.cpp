@@ -8,6 +8,7 @@
 #include <std_msgs/builtin_uint16.h>
 #include <std_msgs/Float64.h>
 #include <std_msgs/Int16.h>
+#include <std_msgs/String.h>
 #include <sensor_msgs/Range.h>
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/MagneticField.h>
@@ -173,6 +174,15 @@ void publishSensorGroupMessage5(
   }
 }
 
+void publishDebugMessage(
+    const std::string& msg, ros::Publisher* pub)
+{
+  std_msgs::String debug;
+  debug.data = msg;
+  pub->publish(debug);
+}
+
+
 void motorLevelCallback(std_msgs::Int16::ConstPtr motorLevel, Communication* com){
   bool was_set = false;
   std::string cmd = "Drive Forward";
@@ -209,6 +219,14 @@ void steeringLevelCallback(std_msgs::Int16::ConstPtr steeringLevel, Communicatio
   }
   if(!was_set) ROS_WARN_STREAM("Steering level set to: "<<steeringLevel->data<<" failed!");
   ROS_INFO_STREAM("Round trip t: "<<(ros::Time::now()-t).toSec());
+}
+
+void ucBoardMessageCallback(std_msgs::String::ConstPtr msg, Communication* com){
+  try{
+    com->sendRawMessage(msg->data);
+  }catch(std::exception& e){
+    ROS_WARN_STREAM("An error in Message 'send_uc_board_msg' occured!\n Description: "<<e.what());
+  }
 }
 
 namespace uc_bridge
@@ -380,7 +398,7 @@ int main(int argc, char** argv)
   ros::NodeHandle nh;
   // get launch paramer
   bool regSensorGrps, motorCtrlOn, steeringCtrlOn, kinectOn, usOn,
-      daqOn;
+      daqOn, debugMsgOn, rawComOn;
   std::string configPath;
   nh.getParam("/uc_bridge/reset_on_shutdown", uc_bridge::rstOnShutdown);
   nh.getParam("/uc_bridge/register_sensor_groups", regSensorGrps);
@@ -390,6 +408,16 @@ int main(int argc, char** argv)
   nh.getParam("/uc_bridge/activate_us_sensors", usOn);
   nh.getParam("/uc_bridge/activate_daq", daqOn);
   nh.getParam("/uc_bridge/config_path", configPath);
+  nh.getParam("/uc_bridge/enable_debug_messages", debugMsgOn);
+  nh.getParam("/uc_bridge/enable_raw_communiction", rawComOn);
+  if(rawComOn){
+    regSensorGrps = false;
+    motorCtrlOn = false;
+    steeringCtrlOn = false;
+    kinectOn = false;
+    usOn = false;
+    daqOn = false;
+  }
   // load communication config files and init communication
   //std::string typesPath = ros::package::getPath("pses_basis") + "/config/";
   Communication com(configPath);
@@ -405,6 +433,8 @@ int main(int argc, char** argv)
   ros::Publisher grp4 = nh.advertise<sensor_msgs::MagneticField>("MAG", 10);
   ros::Publisher grp51 = nh.advertise<sensor_msgs::BatteryState>("VDBAT", 10);
   ros::Publisher grp52 = nh.advertise<sensor_msgs::BatteryState>("VSBAT", 10);
+  ros::Publisher debug;
+  if(debugMsgOn) debug = nh.advertise<std_msgs::String>("DEBUG", 10);
   // group publish services by putting them into a map
   std::unordered_map<std::string, ros::Publisher*> usGrp;
   std::unordered_map<std::string, ros::Publisher*> imuGrp;
@@ -423,16 +453,20 @@ int main(int argc, char** argv)
   batGrp.insert(std::make_pair("VSBAT", &grp52));
 
   // register publish callbacks with the uc-board communication framework
-  com.registerSensorGroupCallback(
-      1, boost::bind(&publishSensorGroupMessage1, _1, usGrp));
-  com.registerSensorGroupCallback(
-      2, boost::bind(&publishSensorGroupMessage2, _1, imuGrp));
-  com.registerSensorGroupCallback(
-      3, boost::bind(&publishSensorGroupMessage3, _1, hallGrp));
-  com.registerSensorGroupCallback(
-      4, boost::bind(&publishSensorGroupMessage4, _1, magGrp));
-  com.registerSensorGroupCallback(
-      5, boost::bind(&publishSensorGroupMessage5, _1, batGrp));
+  if(regSensorGrps){
+    com.registerSensorGroupCallback(
+        1, boost::bind(&publishSensorGroupMessage1, _1, usGrp));
+    com.registerSensorGroupCallback(
+        2, boost::bind(&publishSensorGroupMessage2, _1, imuGrp));
+    com.registerSensorGroupCallback(
+        3, boost::bind(&publishSensorGroupMessage3, _1, hallGrp));
+    com.registerSensorGroupCallback(
+        4, boost::bind(&publishSensorGroupMessage4, _1, magGrp));
+    com.registerSensorGroupCallback(
+        5, boost::bind(&publishSensorGroupMessage5, _1, batGrp));
+  }
+  if(debugMsgOn) com.enableDebugMessages(boost::bind(&publishDebugMessage, _1, &debug));
+  if(rawComOn) com.enableRawCommunication();
 
   // start serial communication
   try
@@ -616,6 +650,9 @@ int main(int argc, char** argv)
   // create control subscribers e.g. steering, motorlevel etc.
   ros::Subscriber motorLevelSubscriber = nh.subscribe<std_msgs::Int16>("set_motor_level_msg",10, boost::bind(motorLevelCallback, _1, &com));
   ros::Subscriber steeringLevelSubscriber = nh.subscribe<std_msgs::Int16>("set_steering_level_msg",10, boost::bind(steeringLevelCallback, _1 , &com));
+  ros::Subscriber ucBoardMsgSubscriber;
+  if(rawComOn) ucBoardMsgSubscriber = nh.subscribe<std_msgs::String>("send_uc_board_msg",10, boost::bind(ucBoardMessageCallback, _1 , &com));
+
 
   // register shut down signal handler
   signal(SIGINT, uc_bridge::shutdownSignalHandler);

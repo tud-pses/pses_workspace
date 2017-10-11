@@ -6,6 +6,8 @@ ThreadDispatcher::ThreadDispatcher(const std::shared_ptr<Syntax>& syntax)
   commandResponse = std::queue<std::string>();
   sensorGroupMessage = std::queue<std::string>();
   wakeUpCommunication = false;
+  debugMsgEnabled = false;
+  rawCommunicationEnabled = false;
 }
 
 void ThreadDispatcher::startThread()
@@ -30,6 +32,15 @@ void ThreadDispatcher::stopThread()
   //ROS_INFO_STREAM("ThreadDispatcher stopped..");
 }
 
+void ThreadDispatcher::enableDebugMessages(debugCallback debug){
+  this->debug = debug;
+  debugMsgEnabled = true;
+}
+
+void ThreadDispatcher::enableRawCommunication(){
+  rawCommunicationEnabled = true;
+}
+
 void ThreadDispatcher::workerFunction()
 {
   while (active)
@@ -44,6 +55,10 @@ void ThreadDispatcher::workerFunction()
       // in case of empty string
       if (data.size() < 1)
         continue;
+      if (debugMsgEnabled) debug(data);
+      if (rawCommunicationEnabled) {
+        continue;
+      }
       // check for known prefixes
       //ROS_INFO_STREAM("cmd queue size: "<<commandResponse.size()<<" msg queue size: "<<sensorGroupMessage.size());
       if (data.find(syntax->cmdErrorPrefix) == 0)

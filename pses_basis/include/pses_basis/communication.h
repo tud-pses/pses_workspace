@@ -19,6 +19,9 @@ public:
   void startCommunication();
   void stopCommunication();
   void disconnect();
+  void sendRawMessage(const std::string& msg);
+  void enableDebugMessages(debugCallback debug);
+  void enableRawCommunication();
   bool sendCommand(const std::string& command,
                    const Parameter::ParameterMap& inputParams,
                    Parameter::ParameterMap& outputParams,
@@ -39,6 +42,7 @@ private:
   std::unordered_map<std::string, std::shared_ptr<Command> > commands;
   std::unordered_map<unsigned char, std::shared_ptr<SensorGroup> > sensorGroups;
   ThreadDispatcher* dispatcher;
+  bool rawCommunicationEnabled;
   ReadingThread* rxPolling;
   SensorGroupThread* sensorGroupThread;
   mutable std::mutex mtx;
