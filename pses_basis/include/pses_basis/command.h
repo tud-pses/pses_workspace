@@ -44,7 +44,7 @@ class Command
 public:
   Command();
   Command(const CommandParams& cmdParams, const std::string& cmdResponsePrefix,
-          const std::unordered_map<std::string, CommandOptions>& options,
+          const std::unordered_map<std::string, std::shared_ptr<CommandOptions>>& options,
           const std::string& optionsPrefix);
   void generateCommand(const Parameter::ParameterMap& inputParams,
                        std::string& out);
@@ -65,7 +65,7 @@ private:
   bool cmdHasParams;
   bool cmdHasResponse;
   bool respHasParams;
-  std::unordered_map<std::string, CommandOptions> options;
+  std::unordered_map<std::string, std::shared_ptr<CommandOptions>> options;
   std::string optionsPrefix;
   // first: name, second: type
   std::unordered_map<std::string, std::string> parameterTypes;

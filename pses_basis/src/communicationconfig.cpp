@@ -72,7 +72,7 @@ void operator>>(const YAML::Node& node, SerialInterfaceParams& serialParams)
 
 // Channel-struct assign operator
 void operator>>(const YAML::Node& node,
-                std::unordered_map<std::string, Channel>& channels)
+                std::unordered_map<std::string, std::shared_ptr<Channel>>& channels)
 {
   Channel ch;
   ch.chName = node["ch_name"].as<std::string>();
@@ -84,12 +84,12 @@ void operator>>(const YAML::Node& node,
   {
     ch.conversionFactor = node["conversion_factor"].as<double>();
   }
-  channels.insert(std::make_pair(ch.chName, ch));
+  channels.insert(std::make_pair(ch.chName, std::make_shared<Channel>(ch)));
 }
 
 // CommandOptions-struct assign operator
 void operator>>(const YAML::Node& node,
-                std::unordered_map<std::string, CommandOptions>& options)
+                std::unordered_map<std::string, std::shared_ptr<CommandOptions>>& options)
 {
   CommandOptions cmdOpt;
   cmdOpt.optName = node["name"].as<std::string>();
@@ -117,7 +117,7 @@ void operator>>(const YAML::Node& node,
       cmdOpt.params.push_back(std::make_pair(name, type));
     }
   }
-  options.insert(std::make_pair(cmdOpt.optName, cmdOpt));
+  options.insert(std::make_pair(cmdOpt.optName, std::make_shared<CommandOptions>(cmdOpt)));
 }
 
 // CommandObject insertion/creation method

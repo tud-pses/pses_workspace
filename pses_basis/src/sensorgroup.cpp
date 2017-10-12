@@ -18,9 +18,9 @@ SensorGroup::SensorGroup(const SensorGroupParameter& sensorParams,
   valueErrorCBSet = false;
   // init channel values map
   channelValues = Parameter::ParameterMap();
-  for (Channel ch : channelList)
+  for (std::shared_ptr<Channel> ch : channelList)
   {
-    channelValues.insertParameter(ch.chName, ch.dataType);
+    channelValues.insertParameter(ch->chName, ch->dataType);
   }
   // init command params map
   cmdInputParams = Parameter::ParameterMap();
@@ -29,11 +29,11 @@ SensorGroup::SensorGroup(const SensorGroupParameter& sensorParams,
   // insert channel list
   std::vector<std::string> channels;
   // init channel map
-  channelMap = std::unordered_map<std::string, Channel>();
-  for (Channel ch : channelList)
+  channelMap = std::unordered_map<std::string, std::shared_ptr<Channel>>();
+  for (std::shared_ptr<Channel> ch : channelList)
   {
-    channels.push_back(ch.chName);
-    channelMap.insert(std::make_pair(ch.chName, ch));
+    channels.push_back(ch->chName);
+    channelMap.insert(std::make_pair(ch->chName, ch));
   }
   cmdInputParams.insertParameter("channels", "string_t[]", channels);
   // init options list and adding option parameters
@@ -45,14 +45,14 @@ SensorGroup::SensorGroup(const SensorGroupParameter& sensorParams,
   {
 
     Parameter::ParameterMap tempPm;
-    for (auto param : option.first.params)
+    for (auto param : option.first->params)
     {
       tempPm.insertParameter(param.first, param.second);
     }
     // the first part is later needed for the command string
-    optionsList.push_back(option.first.optName);
+    optionsList.push_back(option.first->optName);
     std::vector<std::string> optionSplit;
-    boost::split(optionSplit, option.first.opt, boost::is_any_of(" ="));
+    boost::split(optionSplit, option.first->opt, boost::is_any_of(" ="));
     std::vector<std::string> splitParamValues;
     if (option.second.find(',') != std::string::npos)
     {
@@ -82,10 +82,10 @@ SensorGroup::SensorGroup(const SensorGroupParameter& sensorParams,
       }
     }
     // this part is later needed for parsing
-    if (option.first.addsRespToGrps)
+    if (option.first->addsRespToGrps)
     {
       std::vector<std::string> split;
-      boost::split(split, option.first.response, boost::is_any_of(" "));
+      boost::split(split, option.first->response, boost::is_any_of(" "));
       for (std::string s : split)
       {
         if (s.at(0) == '$')
@@ -127,12 +127,12 @@ void SensorGroup::parseResponse(const std::string& response)
       {
 
         valueError("Group: " + std::to_string(grpNumber) + " ch.: " +
-                   channelList[splitIndex].chName +
+                   channelList[splitIndex]->chName +
                    " had a faulty value!\n Error Code: " + s);
       }
       else
       {
-        channelValues.setParameterValueAsString(channelList[splitIndex].chName,
+        channelValues.setParameterValueAsString(channelList[splitIndex]->chName,
                                                 s);
       }
       splitIndex++;
@@ -153,7 +153,7 @@ void SensorGroup::parseResponse(const std::string& response)
     int byteIndex = 1;
     for (int i = 0; i < channelList.size(); i++)
     {
-      std::string chName = channelList[i].chName;
+      std::string chName = channelList[i]->chName;
       if (!channelValues.isParamInMap(chName))
         return;
 
@@ -177,7 +177,7 @@ void SensorGroup::parseResponse(const std::string& response)
         }
       }
       std::string val = std::to_string(tempValue);
-      channelValues.setParameterValueAsString(channelList[i].chName, val);
+      channelValues.setParameterValueAsString(channelList[i]->chName, val);
       byteIndex += typeSize;
     }
   }
@@ -226,7 +226,7 @@ const bool SensorGroup::getChannelValueConverted(const std::string& name,
                                   "\" doesn't match given variable type!");
     char value;
     channelValues.getParameterValue(name, value);
-    out = value * channelMap.at(name).conversionFactor;
+    out = value * channelMap.at(name)->conversionFactor;
   }
   else if (type.compare("uint8_t") == 0)
   {
@@ -235,7 +235,7 @@ const bool SensorGroup::getChannelValueConverted(const std::string& name,
                                   "\" doesn't match given variable type!");
     unsigned char value;
     channelValues.getParameterValue(name, value);
-    out = value * channelMap.at(name).conversionFactor;
+    out = value * channelMap.at(name)->conversionFactor;
   }
   else if (type.compare("int16_t") == 0)
   {
@@ -244,7 +244,7 @@ const bool SensorGroup::getChannelValueConverted(const std::string& name,
                                   "\" doesn't match given variable type!");
     short value;
     channelValues.getParameterValue(name, value);
-    out = value * channelMap.at(name).conversionFactor;
+    out = value * channelMap.at(name)->conversionFactor;
   }
   else if (type.compare("uint16_t") == 0)
   {
@@ -253,7 +253,7 @@ const bool SensorGroup::getChannelValueConverted(const std::string& name,
                                   "\" doesn't match given variable type!");
     unsigned short value;
     channelValues.getParameterValue(name, value);
-    out = value * channelMap.at(name).conversionFactor;
+    out = value * channelMap.at(name)->conversionFactor;
   }
   else if (type.compare("int32_t") == 0)
   {
@@ -262,7 +262,7 @@ const bool SensorGroup::getChannelValueConverted(const std::string& name,
                                   "\" doesn't match given variable type!");
     int value;
     channelValues.getParameterValue(name, value);
-    out = value * channelMap.at(name).conversionFactor;
+    out = value * channelMap.at(name)->conversionFactor;
   }
   else if (type.compare("uint32_t") == 0)
   {
@@ -271,7 +271,7 @@ const bool SensorGroup::getChannelValueConverted(const std::string& name,
                                   "\" doesn't match given variable type!");
     unsigned int value;
     channelValues.getParameterValue(name, value);
-    out = value * channelMap.at(name).conversionFactor;
+    out = value * channelMap.at(name)->conversionFactor;
   }
   else if (type.compare("int64_t") == 0)
   {
@@ -280,7 +280,7 @@ const bool SensorGroup::getChannelValueConverted(const std::string& name,
                                   "\" doesn't match given variable type!");
     long value;
     channelValues.getParameterValue(name, value);
-    out = value * channelMap.at(name).conversionFactor;
+    out = value * channelMap.at(name)->conversionFactor;
   }
   else if (type.compare("uint64_t") == 0)
   {
@@ -289,7 +289,7 @@ const bool SensorGroup::getChannelValueConverted(const std::string& name,
                                   "\" doesn't match given variable type!");
     unsigned long value;
     channelValues.getParameterValue(name, value);
-    out = value * channelMap.at(name).conversionFactor;
+    out = value * channelMap.at(name)->conversionFactor;
   }
   else if (type.compare("float32_t") == 0)
   {
@@ -298,7 +298,7 @@ const bool SensorGroup::getChannelValueConverted(const std::string& name,
                                   "\" doesn't match given variable type!");
     float value;
     channelValues.getParameterValue(name, value);
-    out = value * channelMap.at(name).conversionFactor;
+    out = value * channelMap.at(name)->conversionFactor;
   }
   else if (type.compare("float64_t") == 0)
   {
@@ -307,7 +307,7 @@ const bool SensorGroup::getChannelValueConverted(const std::string& name,
                                   "\" doesn't match given variable type!");
     double value;
     channelValues.getParameterValue(name, value);
-    out = value * channelMap.at(name).conversionFactor;
+    out = value * channelMap.at(name)->conversionFactor;
   }
   else
     return false;

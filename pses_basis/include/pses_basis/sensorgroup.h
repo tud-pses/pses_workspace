@@ -21,9 +21,9 @@ struct SensorGroupParameter
 {
   std::string grpName;
   unsigned char grpNumber;
-  std::vector<Channel> channels;
+  std::vector<std::shared_ptr<Channel>> channels;
   // first: option name, second: option parameter values
-  std::vector<std::pair<CommandOptions, std::string>> options;
+  std::vector<std::pair<std::shared_ptr<CommandOptions>, std::string>> options;
   std::string encoding;
 };
 
@@ -63,8 +63,8 @@ private:
   unsigned char grpNumber;
   std::string grpName;
   std::string responseEncoding;
-  std::vector<Channel> channelList;
-  std::unordered_map<std::string, Channel> channelMap;
+  std::vector<std::shared_ptr<Channel>> channelList;
+  std::unordered_map<std::string, std::shared_ptr<Channel>> channelMap;
   Parameter::ParameterMap channelValues;
   std::vector<std::string> optionVariableList;
   Parameter::ParameterMap optionValues;

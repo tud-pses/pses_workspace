@@ -4,7 +4,7 @@ Command::Command() {}
 
 Command::Command(const CommandParams& cmdParams,
                  const std::string& cmdResponsePrefix,
-                 const std::unordered_map<std::string, CommandOptions>& options,
+                 const std::unordered_map<std::string, std::shared_ptr<CommandOptions>>& options,
                  const std::string& optionsPrefix)
 {
   name = cmdParams.name;
@@ -106,7 +106,7 @@ void Command::generateCommand(const Parameter::ParameterMap& inputParams,
   ss << cmd;
   for (std::string s : optionsList)
   {
-    const CommandOptions& cmdopt = options[s];
+    const CommandOptions& cmdopt = *options[s];
     if(cmdopt.opt.size()<1) break;
     std::vector<std::string> split;
     boost::split(split, cmdopt.opt, boost::is_any_of(" ="));
@@ -219,13 +219,13 @@ const bool Command::verifyResponse(const Parameter::ParameterMap& inputParams,
   if (!cmdHasResponse)
     return true;
   // second case -> there may be a response of some kind
-  std::vector<CommandOptions*> optWithResponse = std::vector<CommandOptions*>();
+  std::vector<std::shared_ptr<CommandOptions>> optWithResponse = std::vector<std::shared_ptr<CommandOptions>>();
   for (std::string opt : options)
   {
-    if (this->options[opt].optReturnsParams)
+    if (this->options[opt]->optReturnsParams)
     {
       // gather all options that provoke an additional parameter in the response
-      optWithResponse.push_back(&(this->options[opt]));
+      optWithResponse.push_back(this->options[opt]);
     }
   }
   std::vector<std::string> split;
@@ -282,7 +282,7 @@ const bool Command::verifyResponse(const Parameter::ParameterMap& inputParams,
     }
   }
   // at last, check every key word and parameter of the modified response
-  for (CommandOptions* opt : optWithResponse)
+  for (std::shared_ptr<CommandOptions> opt : optWithResponse)
   {
     // if there are more tokens in the response than expected -> exit
     if (splitIndex >= split.size())

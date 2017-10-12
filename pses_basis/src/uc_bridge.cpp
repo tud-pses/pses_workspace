@@ -1,385 +1,4 @@
-#include <ros/ros.h>
-#include <signal.h>
-#include <pses_basis/servicefunctions.h>
-#include <pses_basis/communication.h>
-#include <pses_basis/communicationconfig.h>
-#include <ros/package.h>
-#include <std_msgs/builtin_uint8.h>
-#include <std_msgs/builtin_uint16.h>
-#include <std_msgs/Float64.h>
-#include <std_msgs/Int16.h>
-#include <std_msgs/String.h>
-#include <sensor_msgs/Range.h>
-#include <sensor_msgs/Imu.h>
-#include <sensor_msgs/MagneticField.h>
-#include <sensor_msgs/BatteryState.h>
-
-void publishSensorGroupMessage1(
-    SensorGroup* grp, std::unordered_map<std::string, ros::Publisher*>& pub)
-{
-  sensor_msgs::Range usl, usr, usf;
-  double l, r, f;
-  ros::Time t = ros::Time::now();
-  try
-  {
-    grp->getChannelValueConverted("USL", l);
-    grp->getChannelValueConverted("USF", f);
-    grp->getChannelValueConverted("USR", r);
-    usl.range = l;
-    usf.range = f;
-    usr.range = r;
-
-    usl.max_range = 3;
-    usl.min_range = 0.06;
-    usl.field_of_view = 0.76;
-    usl.radiation_type = 0;
-    usl.header.frame_id = "robot_left_us";
-    usl.header.stamp = t;
-
-    usf.max_range = 3;
-    usf.min_range = 0.06;
-    usf.field_of_view = 0.76;
-    usf.radiation_type = 0;
-    usf.header.frame_id = "robot_front_us";
-    usf.header.stamp = t;
-
-    usr.max_range = 3;
-    usr.min_range = 0.06;
-    usr.field_of_view = 0.76;
-    usr.radiation_type = 0;
-    usr.header.frame_id = "robot_right_us";
-    usr.header.stamp = t;
-
-    pub["USL"]->publish(usl);
-    pub["USF"]->publish(usf);
-    pub["USR"]->publish(usr);
-  }
-  catch (std::exception& e)
-  {
-    ROS_WARN_STREAM("An error in Message 'Sensor grp1' occured!\n Description: "
-                    << e.what());
-  }
-}
-
-void publishSensorGroupMessage2(
-    SensorGroup* grp, std::unordered_map<std::string, ros::Publisher*>& pub)
-{
-  sensor_msgs::Imu imu;
-  ros::Time t = ros::Time::now();
-  try
-  {
-    grp->getChannelValueConverted("GX", imu.angular_velocity.x);
-    grp->getChannelValueConverted("GY", imu.angular_velocity.y);
-    grp->getChannelValueConverted("GZ", imu.angular_velocity.z);
-    grp->getChannelValueConverted("AX", imu.linear_acceleration.x);
-    grp->getChannelValueConverted("AY", imu.linear_acceleration.y);
-    grp->getChannelValueConverted("AZ", imu.linear_acceleration.z);
-    imu.header.stamp = t;
-    imu.header.frame_id = "robot_imu";
-
-    pub["IMU"]->publish(imu);
-  }
-  catch (std::exception& e)
-  {
-    ROS_WARN_STREAM("An error in Message 'Sensor grp2' occured!\n Description: "
-                    << e.what());
-  }
-}
-
-void publishSensorGroupMessage3(
-    SensorGroup* grp, std::unordered_map<std::string, ros::Publisher*>& pub)
-{
-  std_msgs::UInt8 hallcnt;
-  std_msgs::Float64 halldt, halldt8;
-  try
-  {
-    grp->getChannelValue("HALL_CNT", hallcnt.data);
-    grp->getChannelValueConverted("HALL_DT", halldt.data);
-    grp->getChannelValueConverted("HALL_DT8", halldt8.data);
-    pub["HALL_CNT"]->publish(hallcnt);
-    pub["HALL_DT"]->publish(halldt);
-    pub["HALL_DT8"]->publish(halldt8);
-  }
-  catch (std::exception& e)
-  {
-    ROS_WARN_STREAM("An error in Message 'Sensor grp3' occured!\n Description: "
-                    << e.what());
-  }
-}
-
-void publishSensorGroupMessage4(
-    SensorGroup* grp, std::unordered_map<std::string, ros::Publisher*>& pub)
-{
-  sensor_msgs::MagneticField mag;
-  //short mx, my, mz;
-  ros::Time t = ros::Time::now();
-  try
-  {
-    grp->getChannelValueConverted("MX", mag.magnetic_field.x);
-    grp->getChannelValueConverted("MY", mag.magnetic_field.y);
-    grp->getChannelValueConverted("MZ", mag.magnetic_field.z);
-    mag.header.stamp = t;
-    mag.header.frame_id = "robot_magnetometer";
-    pub["MAG"]->publish(mag);
-  }
-  catch (std::exception& e)
-  {
-    ROS_WARN_STREAM("An error in Message 'Sensor grp4' occured!\n Description: "
-                    << e.what());
-  }
-}
-
-void publishSensorGroupMessage5(
-    SensorGroup* grp, std::unordered_map<std::string, ros::Publisher*>& pub)
-{
-  sensor_msgs::BatteryState batVD, batVS;
-  double vsbat, vdbat;
-  ros::Time t = ros::Time::now();
-  try
-  {
-    grp->getChannelValueConverted("VDBAT", vdbat);
-    grp->getChannelValueConverted("VSBAT", vsbat);
-    batVD.voltage = vdbat;
-    batVS.voltage = vsbat;
-    batVD.header.stamp = t;
-    batVS.header.stamp = t;
-
-    pub["VDBAT"]->publish(batVD);
-    pub["VSBAT"]->publish(batVS);
-  }
-  catch (std::exception& e)
-  {
-    ROS_WARN_STREAM("An error in Message 'Sensor grp5' occured!\n Description: "
-                    << e.what());
-  }
-}
-
-void errorCallback(
-    const std::string& msg)
-{
-  ROS_WARN_STREAM("A communication Error occured!\n"<<msg);
-}
-
-void textCallback(
-    const std::string& msg)
-{
-  ROS_INFO_STREAM("UC board sent the following info:\n"<<msg);
-}
-
-void publishDebugMessage(
-    const std::string& msg, ros::Publisher* pub)
-{
-  std_msgs::String debug;
-  debug.data = msg;
-  pub->publish(debug);
-}
-
-
-void motorLevelCallback(std_msgs::Int16::ConstPtr motorLevel, Communication* com){
-  bool was_set = false;
-  std::string cmd = "Drive Forward";
-  short level = motorLevel->data;
-  if (level < 0)
-  {
-    cmd = "Drive Backward";
-    level = -level;
-  }
-  Parameter::ParameterMap input;
-  Parameter::ParameterMap output;
-  input.insertParameter("speed", "int16_t", level);
-  try{
-    was_set = com->sendCommand(cmd, input, output);
-  }catch(std::exception& e){
-    ROS_WARN_STREAM("An error in Message 'set_motor_level_msg' occured!\n Description: "<<e.what());
-    was_set = false;
-  }
-  if(!was_set) ROS_WARN_STREAM("Motor level set to: "<<motorLevel->data<<" failed!");
-}
-
-void steeringLevelCallback(std_msgs::Int16::ConstPtr steeringLevel, Communication* com){
-  bool was_set = false;
-  std::string cmd = "Set Steering Level";
-  Parameter::ParameterMap input;
-  Parameter::ParameterMap output;
-  input.insertParameter("steering", "int16_t", steeringLevel->data);
-  try{
-    was_set = com->sendCommand(cmd, input, output);
-  }catch(std::exception& e){
-    ROS_WARN_STREAM("An error in Message 'set_steering_level_msg' occured!\n Description: "<<e.what());
-    was_set = false;
-  }
-  if(!was_set) ROS_WARN_STREAM("Steering level set to: "<<steeringLevel->data<<" failed!");
-}
-
-void ucBoardMessageCallback(std_msgs::String::ConstPtr msg, Communication* com){
-  try{
-    com->sendRawMessage(msg->data);
-  }catch(std::exception& e){
-    ROS_WARN_STREAM("An error in Message 'send_uc_board_msg' occured!\n Description: "<<e.what());
-  }
-}
-
-namespace uc_bridge
-{
-Communication* com_ptr;
-bool rstOnShutdown;
-
-void resetController(Communication* com)
-{
-  std::string cmd = "Reset Controller";
-  Parameter::ParameterMap input;
-  Parameter::ParameterMap output;
-  try
-  {
-    com->sendCommand(cmd, input, output);
-  }
-  catch (std::exception& e)
-  {
-    ROS_WARN_STREAM(
-        "An error occured during initial Reset!\n Description: " << e.what());
-  }
-}
-
-void shutdownSignalHandler(int sig)
-{
-  if(rstOnShutdown){
-    resetController(com_ptr);
-    ros::Duration(0.1).sleep();
-  }
-  try
-  {
-    com_ptr->stopCommunication();
-    com_ptr->disconnect();
-  }
-  catch (std::exception& e)
-  {
-    ROS_WARN_STREAM("An error occured while trying to shut down the "
-                    "connection.\n Description: "
-                    << e.what());
-  }
-  ros::shutdown();
-}
-
-void registerSensorGroups(Communication* com)
-{
-  // register sensor groups
-  try
-  {
-    if (!com->registerSensorGroups("Set Group"))
-      ROS_WARN_STREAM("Registering all sensor groups failed!");
-  }
-  catch (std::exception& e)
-  {
-    ROS_WARN_STREAM("An error occured while trying to register sensor "
-                    "groups!\n Description: "
-                    << e.what());
-  }
-}
-
-void activateMotorController(Communication* com)
-{
-  bool was_set = false;
-  Parameter::ParameterMap input;
-  Parameter::ParameterMap output;
-  std::string cmd = "Drive Forward";
-  short level = 0;
-  input.insertParameter("speed", "int16_t", level);
-  try
-  {
-    was_set = com->sendCommand(cmd, input, output);
-    if (!was_set)
-      ROS_WARN_STREAM("Activating motor controller failed!");
-  }
-  catch (std::exception& e)
-  {
-    ROS_WARN_STREAM("An error occured while trying to activate the motor "
-                    "controller!\n Description: "
-                    << e.what());
-  }
-}
-
-void activateSteeringController(Communication* com)
-{
-  bool was_set = false;
-  Parameter::ParameterMap input;
-  Parameter::ParameterMap output;
-  std::string cmd = "Set Steering Level";
-  short level = 0;
-  input.insertParameter("steering", "int16_t", level);
-  try
-  {
-    was_set = com->sendCommand(cmd, input, output);
-    if (!was_set)
-      ROS_WARN_STREAM("Activating steering controller failed!");
-  }
-  catch (std::exception& e)
-  {
-    ROS_WARN_STREAM("An error occured while trying to activate the steering "
-                    "controller!\n Description: "
-                    << e.what());
-  }
-}
-
-void activateKinect(Communication* com)
-{
-  bool was_set = false;
-  Parameter::ParameterMap input;
-  Parameter::ParameterMap output;
-  std::string cmd = "Toggle Kinect On";
-  try
-  {
-    was_set = com->sendCommand(cmd, input, output);
-    if (!was_set)
-      ROS_WARN_STREAM("Activating kinect failed!");
-  }
-  catch (std::exception& e)
-  {
-    ROS_WARN_STREAM(
-        "An error occured while trying to activate kinect!\n Description: "
-        << e.what());
-  }
-}
-
-void activateUS(Communication* com)
-{
-  bool was_set = false;
-  Parameter::ParameterMap input;
-  Parameter::ParameterMap output;
-  std::string cmd = "Toggle US On";
-  try
-  {
-    was_set = com->sendCommand(cmd, input, output);
-    if (!was_set)
-      ROS_WARN_STREAM("Activating us-sensors failed!");
-  }
-  catch (std::exception& e)
-  {
-    ROS_WARN_STREAM(
-        "An error occured while trying to activate us-sensors!\n Description: "
-        << e.what());
-  }
-}
-
-void activateDAQ(Communication* com)
-{
-  bool was_set = false;
-  Parameter::ParameterMap input;
-  Parameter::ParameterMap output;
-  std::string cmd = "Start DAQ";
-  try
-  {
-    was_set = com->sendCommand(cmd, input, output);
-    if (!was_set)
-      ROS_WARN_STREAM("Activating daq failed!");
-  }
-  catch (std::exception& e)
-  {
-    ROS_WARN_STREAM(
-        "An error occured while trying to activate daq!\n Description: "
-        << e.what());
-  }
-}
-}
+#include <pses_basis/uc_bridge.h>
 
 int main(int argc, char** argv)
 {
@@ -387,8 +6,8 @@ int main(int argc, char** argv)
   ros::init(argc, argv, "uc_bridge", ros::init_options::NoSigintHandler);
   ros::NodeHandle nh;
   // get launch paramer
-  bool regSensorGrps, motorCtrlOn, steeringCtrlOn, kinectOn, usOn,
-      daqOn, debugMsgOn, rawComOn;
+  bool regSensorGrps, motorCtrlOn, steeringCtrlOn, kinectOn, usOn, daqOn,
+      debugMsgOn, rawComOn;
   std::string configPath;
   nh.getParam("/uc_bridge/reset_on_shutdown", uc_bridge::rstOnShutdown);
   nh.getParam("/uc_bridge/register_sensor_groups", regSensorGrps);
@@ -400,7 +19,8 @@ int main(int argc, char** argv)
   nh.getParam("/uc_bridge/config_path", configPath);
   nh.getParam("/uc_bridge/enable_debug_messages", debugMsgOn);
   nh.getParam("/uc_bridge/enable_raw_communiction", rawComOn);
-  if(rawComOn){
+  if (rawComOn)
+  {
     regSensorGrps = false;
     motorCtrlOn = false;
     steeringCtrlOn = false;
@@ -409,7 +29,7 @@ int main(int argc, char** argv)
     daqOn = false;
   }
   // load communication config files and init communication
-  //std::string typesPath = ros::package::getPath("pses_basis") + "/config/";
+  // std::string typesPath = ros::package::getPath("pses_basis") + "/config/";
   Communication com(configPath);
   uc_bridge::com_ptr = &com;
   // create sensor group publish services
@@ -424,7 +44,8 @@ int main(int argc, char** argv)
   ros::Publisher grp51 = nh.advertise<sensor_msgs::BatteryState>("VDBAT", 10);
   ros::Publisher grp52 = nh.advertise<sensor_msgs::BatteryState>("VSBAT", 10);
   ros::Publisher debug;
-  if(debugMsgOn) debug = nh.advertise<std_msgs::String>("DEBUG", 10);
+  if (debugMsgOn)
+    debug = nh.advertise<std_msgs::String>("DEBUG", 10);
   // group publish services by putting them into a map
   std::unordered_map<std::string, ros::Publisher*> usGrp;
   std::unordered_map<std::string, ros::Publisher*> imuGrp;
@@ -443,32 +64,35 @@ int main(int argc, char** argv)
   batGrp.insert(std::make_pair("VSBAT", &grp52));
 
   // register publish callbacks with the uc-board communication framework
-  if(regSensorGrps){
+  if (regSensorGrps)
+  {
     com.registerSensorGroupCallback(
-        1, boost::bind(&publishSensorGroupMessage1, _1, usGrp));
+        1, boost::bind(&uc_bridge::publishSensorGroupMessage1, _1, usGrp));
     com.registerSensorGroupCallback(
-        2, boost::bind(&publishSensorGroupMessage2, _1, imuGrp));
+        2, boost::bind(&uc_bridge::publishSensorGroupMessage2, _1, imuGrp));
     com.registerSensorGroupCallback(
-        3, boost::bind(&publishSensorGroupMessage3, _1, hallGrp));
+        3, boost::bind(&uc_bridge::publishSensorGroupMessage3, _1, hallGrp));
     com.registerSensorGroupCallback(
-        4, boost::bind(&publishSensorGroupMessage4, _1, magGrp));
+        4, boost::bind(&uc_bridge::publishSensorGroupMessage4, _1, magGrp));
     com.registerSensorGroupCallback(
-        5, boost::bind(&publishSensorGroupMessage5, _1, batGrp));
+        5, boost::bind(&uc_bridge::publishSensorGroupMessage5, _1, batGrp));
   }
   // debug special modes
-  if(debugMsgOn) com.enableDebugMessages(boost::bind(&publishDebugMessage, _1, &debug));
-  if(rawComOn) com.enableRawCommunication();
+  if (debugMsgOn)
+    com.enableDebugMessages(
+        boost::bind(&uc_bridge::publishDebugMessage, _1, &debug));
+  if (rawComOn)
+    com.enableRawCommunication();
 
-  //register error/txt-message callbacks
-  com.registerErrorCallback(&errorCallback);
-  com.registerTextCallback(&textCallback);
+  // register error/txt-message callbacks
+  com.registerErrorCallback(&uc_bridge::errorCallback);
+  com.registerTextCallback(&uc_bridge::textCallback);
 
   // start serial communication
   try
   {
     com.connect();
     com.startCommunication();
-    //ros::Duration(1.0).sleep();
   }
   catch (std::exception& e)
   {
@@ -478,27 +102,34 @@ int main(int argc, char** argv)
     uc_bridge::shutdownSignalHandler(0);
   }
 
-  if(regSensorGrps){
+  // configure communication according to start up parameters
+  if (regSensorGrps)
+  {
     uc_bridge::registerSensorGroups(&com);
   }
 
-  if(motorCtrlOn){
+  if (motorCtrlOn)
+  {
     uc_bridge::activateMotorController(&com);
   }
 
-  if(steeringCtrlOn){
+  if (steeringCtrlOn)
+  {
     uc_bridge::activateSteeringController(&com);
   }
 
-  if(kinectOn){
+  if (kinectOn)
+  {
     uc_bridge::activateKinect(&com);
   }
 
-  if(usOn){
+  if (usOn)
+  {
     uc_bridge::activateUS(&com);
   }
 
-  if(daqOn){
+  if (daqOn)
+  {
     uc_bridge::activateDAQ(&com);
   }
 
@@ -618,16 +249,14 @@ int main(int argc, char** argv)
   ros::ServiceServer setIMUService =
       nh.advertiseService<pses_basis::SetIMU::Request,
                           pses_basis::SetIMU::Response>(
-          "set_imu",
-          std::bind(ServiceFunctions::setIMU, std::placeholders::_1,
-                    std::placeholders::_2, &com));
+          "set_imu", std::bind(ServiceFunctions::setIMU, std::placeholders::_1,
+                               std::placeholders::_2, &com));
 
   ros::ServiceServer setMagService =
       nh.advertiseService<pses_basis::SetMag::Request,
                           pses_basis::SetMag::Response>(
-          "set_mag",
-          std::bind(ServiceFunctions::setMag, std::placeholders::_1,
-                    std::placeholders::_2, &com));
+          "set_mag", std::bind(ServiceFunctions::setMag, std::placeholders::_1,
+                               std::placeholders::_2, &com));
 
   ros::ServiceServer setMotorLevelService =
       nh.advertiseService<pses_basis::SetMotorLevel::Request,
@@ -653,9 +282,8 @@ int main(int argc, char** argv)
   ros::ServiceServer setUSService =
       nh.advertiseService<pses_basis::SetUS::Request,
                           pses_basis::SetUS::Response>(
-          "set_us",
-          std::bind(ServiceFunctions::setUS, std::placeholders::_1,
-                    std::placeholders::_2, &com));
+          "set_us", std::bind(ServiceFunctions::setUS, std::placeholders::_1,
+                              std::placeholders::_2, &com));
 
   ros::ServiceServer toggleBrakesService =
       nh.advertiseService<pses_basis::ToggleBrakes::Request,
@@ -706,12 +334,18 @@ int main(int argc, char** argv)
                     std::placeholders::_2, &com));
 
   // create control subscribers e.g. steering, motorlevel etc.
-  ros::Subscriber motorLevelSubscriber = nh.subscribe<std_msgs::Int16>("set_motor_level_msg",10, boost::bind(motorLevelCallback, _1, &com));
-  ros::Subscriber steeringLevelSubscriber = nh.subscribe<std_msgs::Int16>("set_steering_level_msg",10, boost::bind(steeringLevelCallback, _1 , &com));
+  ros::Subscriber motorLevelSubscriber = nh.subscribe<std_msgs::Int16>(
+      "set_motor_level_msg", 10,
+      boost::bind(uc_bridge::motorLevelCallback, _1, &com));
+  ros::Subscriber steeringLevelSubscriber = nh.subscribe<std_msgs::Int16>(
+      "set_steering_level_msg", 10,
+      boost::bind(uc_bridge::steeringLevelCallback, _1, &com));
   // raw mode subscriber
   ros::Subscriber ucBoardMsgSubscriber;
-  if(rawComOn) ucBoardMsgSubscriber = nh.subscribe<std_msgs::String>("send_uc_board_msg",10, boost::bind(ucBoardMessageCallback, _1 , &com));
-
+  if (rawComOn)
+    ucBoardMsgSubscriber = nh.subscribe<std_msgs::String>(
+        "send_uc_board_msg", 10,
+        boost::bind(uc_bridge::ucBoardMessageCallback, _1, &com));
 
   // register shut down signal handler
   signal(SIGINT, uc_bridge::shutdownSignalHandler);
