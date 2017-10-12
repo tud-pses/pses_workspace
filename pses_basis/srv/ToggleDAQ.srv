@@ -1,3 +1,5 @@
-int16 level
+bool DAQ_on
 ---
 bool was_set
+
+

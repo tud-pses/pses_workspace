@@ -1,0 +1,33 @@
+# Group numbers have to be unique (unsigned char type), names are optional (mostly for debugging purposes)
+# If an option has more than one parameter, simply add additional parameters by separating them with a comma.
+# Possible encoding types: ASCII, HEX (hexadecimal), B64 (base 64 encoding)
+
+- grp_nr: 1
+  name: "Ultra Sound Sensors"
+  channels: ['USL', 'USF', 'USR']
+  options: ['Wait_For_All_Maxwait', 'Encoding:ASCII']
+  encoding: "ASCII"
+
+- grp_nr: 2
+  name: "IMU"
+  channels: ['AX', 'AY', 'AZ', 'GX', 'GY', 'GZ']
+  options: ['Channel_Polling_Interval:10', 'Average_Default', 'Encoding:ASCII']
+  encoding: "ASCII"
+
+- grp_nr: 3
+  name: "Hall Sensor"
+  channels: ['HALL_CNT', 'HALL_DT', 'HALL_DT8']
+  options: ['Wait_For_All:10', 'Encoding:ASCII']
+  encoding: "ASCII"
+
+- grp_nr: 4
+  name: "Magnetometer"
+  channels: ['MX', 'MY', 'MZ']
+  options: ['Encoding:ASCII']
+  encoding: "ASCII"
+
+- grp_nr: 5
+  name: "Battery"
+  channels: ['VDBAT', 'VSBAT']
+  options: ['Wait_For_All:500', 'Encoding:ASCII']
+  encoding: "ASCII"

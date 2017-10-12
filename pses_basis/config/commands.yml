@@ -1,0 +1,287 @@
+# command definitions:
+
+- cmd_name: "Drive Forward"
+  cmd_has_params: True
+  params: ['int16_t:speed']
+  command: "!DRV F $speed"
+  cmd_has_response: True
+  response_contains_params: True
+  response: "F $speed"
+
+- cmd_name: "Drive Backward"
+  cmd_has_params: True
+  params: ['int16_t:speed']
+  command: "!DRV B $speed"
+  cmd_has_response: True
+  response_contains_params: True
+  response: "B $speed"
+
+- cmd_name: "Set Drv"
+  cmd_has_params: False
+  params:
+  command: "!DRV"
+  cmd_has_response: True
+  response_contains_params: False
+  response: ""
+
+- cmd_name: "Reset DMS"
+  cmd_has_params: False
+  params:
+  command: "!DRV"
+  cmd_has_response: True
+  response_contains_params: False
+  response: "ok"
+
+
+- cmd_name: "Full Stop"
+  cmd_has_params: False
+  params:
+  command: "!DRV F -500"
+  cmd_has_response: True
+  response_contains_params: False
+  response: "F -500"
+
+- cmd_name: "Motor Off"
+  cmd_has_params: False
+  params:
+  command: "!DRV OFF"
+  cmd_has_response: True
+  response_contains_params: False
+  response: "OFF"
+
+- cmd_name: "Set Steering Level"
+  cmd_has_params: True
+  params: ['int16_t:steering']
+  command: "!STEER $steering"
+  cmd_has_response: True
+  response_contains_params: True
+  response: "$steering"
+
+- cmd_name: "Set Session ID"
+  cmd_has_params: True
+  params: ['int32_t:ID']
+  command: "!SID $ID"
+  cmd_has_response: True
+  response_contains_params: True
+  response: "$ID"
+
+- cmd_name: "Reset Controller"
+  cmd_has_params: False
+  params:
+  command: "!RESET NOW"
+  cmd_has_response: False
+  response_contains_params: False
+  response:
+
+- cmd_name: "Toggle Kinect On"
+  cmd_has_params: False
+  params:
+  command: "!VOUT ON"
+  cmd_has_response: True
+  response_contains_params: False
+  response: 'ON'
+
+- cmd_name: "Toggle Kinect Off"
+  cmd_has_params: False
+  params:
+  command: "!VOUT OFF"
+  cmd_has_response: True
+  response_contains_params: False
+  response: 'OFF'
+
+- cmd_name: "Toggle US On"
+  cmd_has_params: False
+  params:
+  command: "!US ON"
+  cmd_has_response: True
+  response_contains_params: False
+  response: 'ON'
+
+- cmd_name: "Toggle US Off"
+  cmd_has_params: False
+  params:
+  command: "!US OFF"
+  cmd_has_response: True
+  response_contains_params: False
+  response: 'OFF'
+
+- cmd_name: "Get Motor Level"
+  cmd_has_params: False
+  params: ['string_t:direction', 'int16_t:level']
+  command: "?DRV"
+  cmd_has_response: True
+  response_contains_params: True
+  response: "$direction $level"
+
+- cmd_name: "Get Steering Level"
+  cmd_has_params: False
+  params: ['int16_t:level']
+  command: "?STEER"
+  cmd_has_response: True
+  response_contains_params: True
+  response: "$level"
+
+- cmd_name: "Get Controller ID"
+  cmd_has_params: False
+  params: ['int16_t:ID']
+  command: "?ID"
+  cmd_has_response: True
+  response_contains_params: True
+  response: "$ID"
+
+- cmd_name: "Get Session ID"
+  cmd_has_params: False
+  params: ['int32_t:ID']
+  command: "?SID"
+  cmd_has_response: True
+  response_contains_params: True
+  response: "$ID"
+
+- cmd_name: "Get Firmware Version"
+  cmd_has_params: False
+  params: ['string_t:version']
+  command: "?VER"
+  cmd_has_response: True
+  response_contains_params: True
+  response: "$version"
+
+- cmd_name: "Get Kinect Status"
+  cmd_has_params: False
+  params: ['string_t:kinect_stat']
+  command: "?VOUT"
+  cmd_has_response: True
+  response_contains_params: True
+  response: "$kinect_stat"
+
+- cmd_name: "Set IMU"
+  cmd_has_params: False
+  params:
+  command: "!IMU OPT"
+  cmd_has_response: True
+  response_contains_params: False
+  response: ""
+
+- cmd_name: "Get IMU Info"
+  cmd_has_params: False
+  params: ['string_t:info']
+  command: "?IMU OPT"
+  cmd_has_response: True
+  response_contains_params: True
+  response: "$info"
+
+- cmd_name: "Set MAG"
+  cmd_has_params: False
+  params:
+  command: "!MAG OPT"
+  cmd_has_response: True
+  response_contains_params: False
+  response: ""
+
+- cmd_name: "Get MAG Info"
+  cmd_has_params: False
+  params: ['string_t:info']
+  command: "?MAG OPT"
+  cmd_has_response: True
+  response_contains_params: True
+  response: "$info"
+
+- cmd_name: "Get MAG ASA"
+  cmd_has_params: False
+  params: ['int16_t:asa_mx', 'int16_t:asa_my', 'int16_t:asa_mz']
+  command: "?MAG ASA"
+  cmd_has_response: True
+  response_contains_params: True
+  response: "$asa_mx $asa_my $asa_mz"
+
+- cmd_name: "Set US"
+  cmd_has_params: False
+  params:
+  command: "!US OPT"
+  cmd_has_response: True
+  response_contains_params: False
+  response: ""
+
+- cmd_name: "Get US Info"
+  cmd_has_params: False
+  params: ['string_t:info']
+  command: "?US OPT"
+  cmd_has_response: True
+  response_contains_params: True
+  response: "$info"
+
+# basic grouping functions:
+
+#IMPORTANT: This command is mandatory and musn't be changed!
+# The command and response syntax however may be changed, but the variables have to be kept.
+- cmd_name: "Set Group"
+  cmd_has_params: True
+  params: ['uint8_t:grp_nr', 'string_t[]:channels']
+  command: "!DAQ GRP $grp_nr $channels"
+  cmd_has_response: True
+  response_contains_params: False
+  response: "ok"
+
+- cmd_name: "Start DAQ"
+  cmd_has_params: False
+  params:
+  command: "!DAQ START"
+  cmd_has_response: True
+  response_contains_params: False
+  response: "started"
+
+- cmd_name: "Stop DAQ"
+  cmd_has_params: False
+  params:
+  command: "!DAQ STOP"
+  cmd_has_response: True
+  response_contains_params: False
+  response: "stopped"
+
+- cmd_name: "All Groups Info"
+  cmd_has_params: False
+  params: ['string_t:info']
+  command: "?DAQ GRPS"
+  cmd_has_response: True
+  response_contains_params: True
+  response: "$info"
+
+- cmd_name: "Is DAQ Started"
+  cmd_has_params: False
+  params: ['string_t:info']
+  command: "?DAQ"
+  cmd_has_response: True
+  response_contains_params: True
+  response: "$info"
+
+- cmd_name: "Group Info"
+  cmd_has_params: True
+  params: ['uint8_t:grp_nr', 'string_t:info']
+  command: "?DAQ GRP $grp_nr"
+  cmd_has_response: True
+  response_contains_params: True
+  response: "$info"
+
+- cmd_name: "Delete Group"
+  cmd_has_params: True
+  params: ['uint8_t:grp_nr']
+  command: "!DAQ GRP $grp_nr ~DELETE"
+  cmd_has_response: True
+  response_contains_params: False
+  response: "ok"
+
+- cmd_name: "Deactivate Group"
+  cmd_has_params: True
+  params: ['uint8_t:grp_nr']
+  command: "!DAQ GRP $grp_nr ~DEACTIVATE"
+  cmd_has_response: True
+  response_contains_params: False
+  response: "ok"
+
+- cmd_name: "Activate Group"
+  cmd_has_params: True
+  params: ['uint8_t:grp_nr']
+  command: "!DAQ GRP $grp_nr ~ACTIVATE"
+  cmd_has_response: True
+  response_contains_params: False
+  response: "ok"
+

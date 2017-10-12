@@ -1,0 +1,22 @@
+# basic communication tokens
+end_of_message: "\x03"
+end_of_frame: "\n"
+
+# basic prefixes
+text_msg_prefix: "'"
+answer_on_command_prefix: ":"
+
+# advanced prefixes
+channel_group_msg_prefix: "#"
+cmd_error_prefix: ":ERR"
+gen_error_prefix: "'ERR"
+options_prefix: "~"
+
+# group value errors
+grp_errors_ascii: ['[---]', '[mfault]', '[fault]', '[range]', '[over]', '[under]']
+grp_errors_binary: [['uint32_t', 0xFFFFFFFF, 0xFFFFFFFE, 0xFFFFFFFD, 0xFFFFFFFC, 0xFFFFFFFB],
+                    ['int32_t', 0x7FFFFFFF, 0x7FFFFFFE, 0x7FFFFFFD, 0x7FFFFFFC, 0x7FFFFFFB],
+                    ['uint16_t', 0xFFFF, 0xFFFE, 0xFFFD, 0xFFFC, 0xFFFB],
+                    ['int16_t', 0x7FFF, 0x7FFE, 0x7FFD, 0x7FFC, 0x7FFB],
+                    ['uint8_t', 0xFF, 0xFE, 0xFD, 0xFC, 0xFB],
+                    ['uint32_t', 0x7F, 0x7E, 0x7D, 0x7C, 0x7B]]

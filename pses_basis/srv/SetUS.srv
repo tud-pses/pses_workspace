@@ -1,0 +1,5 @@
+int16 range
+int16 gain
+---
+bool was_set
+string in_si_units

@@ -1,0 +1,134 @@
+- ch_name: 'AX'
+  datatype: 'int16_t'
+  conversion_needed: True
+  conversion_factor: 0.00119750976
+
+- ch_name: 'AY'
+  datatype: 'int16_t'
+  conversion_needed: True
+  conversion_factor: 0.00119750976
+
+- ch_name: 'AZ'
+  datatype: 'int16_t'
+  conversion_needed: True
+  conversion_factor: 0.00119750976
+
+- ch_name: 'GX'
+  datatype: 'int16_t'
+  conversion_needed: True
+  conversion_factor: 0.06097560975
+
+- ch_name: 'GY'
+  datatype: 'int16_t'
+  conversion_needed: True
+  conversion_factor: 0.06097560975
+
+- ch_name: 'GZ'
+  datatype: 'int16_t'
+  conversion_needed: True
+  conversion_factor: 0.06097560975
+
+- ch_name: 'HALL_CNT'
+  datatype: 'uint8_t'
+  conversion_needed: False
+  conversion_factor:
+
+- ch_name: 'HALL_DT'
+  datatype: 'uint16_t'
+  conversion_needed: True
+  conversion_factor: 0.0001
+
+- ch_name: 'HALL_DT8'
+  datatype: 'uint16_t'
+  conversion_needed: True
+  conversion_factor: 0.001
+
+- ch_name: 'MX'
+  datatype: 'int16_t'
+  conversion_needed: True
+  conversion_factor: 0.00000015
+
+- ch_name: 'MY'
+  datatype: 'int16_t'
+  conversion_needed: True
+  conversion_factor: 0.00000015
+
+- ch_name: 'MZ'
+  datatype: 'int16_t'
+  conversion_needed: True
+  conversion_factor: 0.00000015
+
+- ch_name: 'USF'
+  datatype: 'uint16_t'
+  conversion_needed: True
+  conversion_factor: 0.0001
+
+- ch_name: 'USR'
+  datatype: 'uint16_t'
+  conversion_needed: True
+  conversion_factor: 0.0001
+
+- ch_name: 'USL'
+  datatype: 'uint16_t'
+  conversion_needed: True
+  conversion_factor: 0.0001
+
+- ch_name: 'VDBAT'
+  datatype: 'uint16_t'
+  conversion_needed: True
+  conversion_factor: 0.001
+
+- ch_name: 'VSBAT'
+  datatype: 'uint16_t'
+  conversion_needed: True
+  conversion_factor: 0.001
+
+- ch_name: '_CNT'
+  datatype: 'uint32_t'
+  conversion_needed: False
+  conversion_factor: 0.001
+
+- ch_name: '_CNT16'
+  datatype: 'uint16_t'
+  conversion_needed: False
+  conversion_factor: 0.001
+
+- ch_name: '_CNT8'
+  datatype: 'uint8_t'
+  conversion_needed: False
+  conversion_factor: 0.001
+
+- ch_name: '_TICS'
+  datatype: 'uint32_t'
+  conversion_needed: True
+  conversion_factor: 0.001
+
+- ch_name: '_TICS16'
+  datatype: 'uint16_t'
+  conversion_needed: True
+  conversion_factor: 0.001
+
+- ch_name: '_TICS8'
+  datatype: 'uint8_t'
+  conversion_needed: True
+  conversion_factor: 0.001
+
+- ch_name: '_DTICS'
+  datatype: 'uint32_t'
+  conversion_needed: True
+  conversion_factor: 0.001
+
+- ch_name: '_DTICS16'
+  datatype: 'uint16_t'
+  conversion_needed: True
+  conversion_factor: 0.001
+
+- ch_name: '_DTICS8'
+  datatype: 'uint8_t'
+  conversion_needed: True
+  conversion_factor: 0.001
+
+- ch_name: '_DLY'
+  datatype: 'uint8_t'
+  conversion_needed: True
+  conversion_factor: 0.001

@@ -1,0 +1,186 @@
+# options that modify a response to a command
+
+- name: "Age(Cmd)"
+  opt_has_params: False
+  params: ['uint32_t:age']
+  opt: "AGE"
+  opt_returns_params: True
+  response: "$age"
+  adds_response_to_groups: False
+
+- name: "Tics(Cmd)"
+  opt_has_params: False
+  params: ['uint32_t:tics']
+  opt: "TICS"
+  opt_returns_params: True
+  response: "$tics"
+  adds_response_to_groups: False
+
+- name: "DMS_Interval"
+  opt_has_params: True
+  params: ['uint32_t:dms_time']
+  opt: "DMS=$dms_time"
+  opt_returns_params: True
+  response: "~DMS=$dms_time"
+  adds_response_to_groups: False
+
+- name: "IMU_AccelRange"
+  opt_has_params: True
+  params: ['int16_t:arange']
+  opt: "ARANGE=$arange"
+  opt_returns_params: True
+  response: "~ARANGE=$arange"
+  adds_response_to_groups: False
+
+- name: "IMU_AccelFilter"
+  opt_has_params: True
+  params: ['int16_t:afilt']
+  opt: "AFILT=$afilt"
+  opt_returns_params: True
+  response: "~AFILT=$afilt"
+  adds_response_to_groups: False
+
+- name: "IMU_GyroRange"
+  opt_has_params: True
+  params: ['int16_t:grange']
+  opt: "GRANGE=$grange"
+  opt_returns_params: True
+  response: "~GRANGE=$grange"
+  adds_response_to_groups: False
+
+- name: "IMU_GyroFilter"
+  opt_has_params: True
+  params: ['int16_t:gfilt']
+  opt: "GFILT=$gfilt"
+  opt_returns_params: True
+  response: "~GFILT=$gfilt"
+  adds_response_to_groups: False
+
+- name: "IMU_si_info"
+  opt_has_params: True
+  params: ['string_t:info']
+  opt: ""
+  opt_returns_params: True
+  response: "$info"
+  adds_response_to_groups: False
+
+- name: "MAG_USEASA"
+  opt_has_params: True
+  params: ['uint8_t:use_asa']
+  opt: "USEASA=$use_asa"
+  opt_returns_params: True
+  response: "~USEASA=$use_asa"
+  adds_response_to_groups: False
+
+- name: "US_Range"
+  opt_has_params: True
+  params: ['int16_t:usrange']
+  opt: "RANGE=$usrange"
+  opt_returns_params: True
+  response: "~RANGE=$usrange"
+  adds_response_to_groups: False
+
+- name: "US_Gain"
+  opt_has_params: True
+  params: ['int16_t:usgain']
+  opt: "GAIN=$usgain"
+  opt_returns_params: True
+  response: "~GAIN=$usgain"
+  adds_response_to_groups: False
+
+- name: "US_si_info"
+  opt_has_params: True
+  params: ['string_t:info']
+  opt: ""
+  opt_returns_params: True
+  response: "$info"
+  adds_response_to_groups: False
+
+# options that modify a sensor group message
+- name: "CRC_16"
+  opt_has_params: False
+  params:
+  opt: 'CRC'
+  opt_returns_params: False
+  response:
+  adds_response_to_groups: False
+
+- name: "Encoding"
+  opt_has_params: True
+  params: ['string_t:encoding']
+  opt: 'ENC=$encoding'
+  opt_returns_params: False
+  response:
+  adds_response_to_groups: False
+
+- name: "Wait_For_All"
+  opt_has_params: True
+  params: ['uint16_t:wait']
+  opt: 'ALL=$wait'
+  opt_returns_params: False
+  response:
+  adds_response_to_groups: False
+
+- name: "Wait_For_All_Maxwait"
+  opt_has_params: False
+  params:
+  opt: 'ALL'
+  opt_returns_params: False
+  response:
+  adds_response_to_groups: False
+
+- name: "Wait_For_Any"
+  opt_has_params: False
+  params:
+  opt: "ANY"
+  opt_returns_params: False
+  response:
+  adds_response_to_groups: False
+
+- name: "Channel_Polling_Interval"
+  opt_has_params: True
+  params: ['uint16_t:interval']
+  opt: "TS=$interval"
+  opt_returns_params: False
+  response:
+  adds_response_to_groups: False
+
+- name: "Average_Over_Interval"
+  opt_has_params: True
+  params: ['uint16_t:average']
+  opt: "AVG=$average"
+  opt_returns_params: False
+  response:
+  adds_response_to_groups: False
+
+- name: "Average_Default"
+  opt_has_params: False
+  params:
+  opt: "AVG"
+  opt_returns_params: False
+  response:
+  adds_response_to_groups: False
+
+- name: "Skip_Polling_Intervalls"
+  opt_has_params: True
+  params: ['uint16_t:skips']
+  opt: "SKIP=$skips"
+  opt_returns_params: False
+  response:
+  adds_response_to_groups: False
+
+- name: "Age(Group)"
+  opt_has_params: False
+  params: ['uint32_t:age']
+  opt: "AGE"
+  opt_returns_params: False
+  response: "$age"
+  adds_response_to_groups: True
+
+- name: "Tics(Group)"
+  opt_has_params: False
+  params: ['uint32_t:tics']
+  opt: "TICS"
+  opt_returns_params: False
+  response: "$tics"
+  adds_response_to_groups: True
