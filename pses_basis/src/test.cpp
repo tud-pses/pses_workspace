@@ -20,11 +20,18 @@
 #include <pses_basis/ToggleMotor.h>
 #include <pses_basis/ToggleUS.h>
 #include <std_msgs/String.h>
+#include <pses_basis/base64Decoder.h>
 
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "test");
   ros::NodeHandle nh;
+  std::string test = "BNz/EQHI/w";
+  long mx = base64_decode(test, 1, 2, 2, true);
+  long my = base64_decode(test, 3, 4, 2, true);
+  long mz = base64_decode(test, 5, 6, 2, true);
+  ROS_INFO_STREAM("mx: "<<mx<<" my: "<<my<<" mz: "<<mz);
+
   /*
   ros::Publisher pub = nh.advertise<std_msgs::String>("send_uc_board_msg", 10);
   std_msgs::String st;
@@ -43,6 +50,7 @@ int main(int argc, char **argv)
   ros::spin();
   */
 
+  /*
   ros::Duration(1.0).sleep();
   //test set_steering_level
   pses_basis::SetSteering::Request req13;

@@ -7,7 +7,8 @@ const std::string SensorGroup::ENCODING_HEX = "HEX";
 SensorGroup::SensorGroup() {}
 
 SensorGroup::SensorGroup(const SensorGroupParameter& sensorParams,
-                         std::shared_ptr<Syntax> syntax) : syntax(syntax)
+                         std::shared_ptr<Syntax> syntax)
+    : syntax(syntax)
 {
   grpNumber = sensorParams.grpNumber;
   grpName = sensorParams.grpName;
@@ -47,14 +48,12 @@ SensorGroup::SensorGroup(const SensorGroupParameter& sensorParams,
     for (auto param : option.first.params)
     {
       tempPm.insertParameter(param.first, param.second);
-      // ROS_INFO_STREAM("oh boy.. "<<param.first<<" "<<param.second);
     }
     // the first part is later needed for the command string
     optionsList.push_back(option.first.optName);
     std::vector<std::string> optionSplit;
     boost::split(optionSplit, option.first.opt, boost::is_any_of(" ="));
     std::vector<std::string> splitParamValues;
-    // ROS_INFO_STREAM(option.second);
     if (option.second.find(',') != std::string::npos)
     {
       boost::split(splitParamValues, option.second, boost::is_any_of(","));
@@ -70,9 +69,6 @@ SensorGroup::SensorGroup(const SensorGroupParameter& sensorParams,
       if (optString.at(0) == '$')
       {
         std::string paramName = optString.substr(1, std::string::npos);
-        // ROS_INFO_STREAM("oh boy.. wtf .."<<paramName<<"
-        // "<<tempPm.getParameter(paramName)->getType()<<"
-        // "<<splitParamValues[valueCounter]);
         cmdInputParams.insertParameter(
             paramName, tempPm.getParameter(paramName)->getType());
 
@@ -125,15 +121,14 @@ void SensorGroup::parseResponse(const std::string& response)
         continue;
       if (splitIndex >= channelList.size())
         break;
-      // ROS_INFO_STREAM("Parsing: "<<s<<" from response: "<<response);
 
-      if (syntax->grpErrorsAscii.find(s) != syntax->grpErrorsAscii.end() && valueErrorCBSet)
+      if (syntax->grpErrorsAscii.find(s) != syntax->grpErrorsAscii.end() &&
+          valueErrorCBSet)
       {
 
         valueError("Group: " + std::to_string(grpNumber) + " ch.: " +
-                       channelList[splitIndex].chName +
-                       " had a faulty value!\n Error Code: "
-                   + s);
+                   channelList[splitIndex].chName +
+                   " had a faulty value!\n Error Code: " + s);
       }
       else
       {
@@ -142,16 +137,48 @@ void SensorGroup::parseResponse(const std::string& response)
       }
       splitIndex++;
     }
-    // ROS_INFO_STREAM("looking for options: "<<optionVariableList.size());
     // check for options
     if (optionVariableList.size() <= 0)
       return;
-    // ROS_INFO_STREAM("Nani?????");
     // parse options with returns
     for (; splitIndex < optionVariableList.size(); splitIndex++)
     {
       optionValues.setParameterValueAsString(optionVariableList[splitIndex],
                                              split[splitIndex]);
+    }
+  }
+  else if (responseEncoding.compare(ENCODING_B64) == 0)
+  {
+
+    int byteIndex = 1;
+    for (int i = 0; i < channelList.size(); i++)
+    {
+      std::string chName = channelList[i].chName;
+      if (!channelValues.isParamInMap(chName))
+        return;
+
+      int typeSize = channelValues.getParameter(chName)->getTypeByteSize();
+      bool isSigned = channelValues.getParameter(chName)->isTypeSigned();
+      std::string type = channelValues.getParameter(chName)->getType();
+      long tempValue = tempValue = base64_decode(
+          response, byteIndex, byteIndex + typeSize - 1, typeSize, isSigned);
+      // check for value errors;
+      if (syntax->grpErrorsBinary.find(type) != syntax->grpErrorsBinary.end())
+      {
+        // unsigned int errorCode = tempValue;
+
+        if (syntax->grpErrorsBinary[type].find(tempValue) !=
+            syntax->grpErrorsBinary[type].end())
+        {
+
+          valueError("Group: " + std::to_string(grpNumber) + " ch.: " + chName +
+                     " had a faulty value!\n Error Code: " +
+                     std::to_string(tempValue));
+        }
+      }
+      std::string val = std::to_string(tempValue);
+      channelValues.setParameterValueAsString(channelList[i].chName, val);
+      byteIndex += typeSize;
     }
   }
 }

@@ -105,26 +105,10 @@
   response:
   adds_response_to_groups: False
 
-- name: "Encoding_ASCII"
-  opt_has_params: False
-  params:
-  opt: 'ASCII'
-  opt_returns_params: False
-  response:
-  adds_response_to_groups: False
-
-- name: "Encoding_B64"
-  opt_has_params: False
-  params:
-  opt: 'ENC=B64'
-  opt_returns_params: False
-  response:
-  adds_response_to_groups: False
-
-- name: "Encoding_HEX"
-  opt_has_params: False
-  params:
-  opt: 'ENC=HEX'
+- name: "Encoding"
+  opt_has_params: True
+  params: ['string_t:encoding']
+  opt: 'ENC=$encoding'
   opt_returns_params: False
   response:
   adds_response_to_groups: False

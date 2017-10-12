@@ -5,7 +5,6 @@
 #include <unordered_map>
 #include <yaml-cpp/yaml.h>
 #include <utility>
-#include <ros/ros.h>
 #include <boost/algorithm/string.hpp>
 
 namespace Parameter
@@ -22,6 +21,8 @@ public:
   const std::string& getName() const { return name; }
   const std::string& getType() const { return type; }
   virtual const int getTypeByteSize() const = 0;
+  virtual const bool isTypeSigned() const = 0;
+  virtual const bool isTypeArithmetic() const = 0;
 
 private:
   std::string name;
@@ -36,6 +37,8 @@ public:
   {
   }
   const int getTypeByteSize() const { return sizeof(m_data); }
+  const bool isTypeSigned() const { return std::is_signed<T>(); }
+  const bool isTypeArithmetic() const { return std::is_arithmetic<T>(); }
   void setData(const T& m_data) { this->m_data = m_data; }
   const T& getData() const { return m_data; }
 
@@ -73,7 +76,6 @@ public:
   void insertParameter(const std::string& name, const std::string& type,
                        const T& value)
   {
-    // ROS_INFO_STREAM(name<<" "<<type<<" ");
     std::shared_ptr<Parameter> param =
         std::shared_ptr<Parameter>(new GenericParameter<T>(name, type));
     std::dynamic_pointer_cast<GenericParameter<T>>(param)->setData(value);
@@ -88,7 +90,6 @@ public:
       throw std::invalid_argument("Key: \"" + name + "\" with Type: \"" +
                                   parameters.at(name)->getType() +
                                   "\" doesn't match given variable type.");
-    // ROS_INFO_STREAM(name<<" "<<parameters.at(name)->getType()<<" ");
     value = std::dynamic_pointer_cast<GenericParameter<T>>(parameters.at(name))
                 ->getData();
   }
@@ -113,9 +114,11 @@ public:
       throw std::out_of_range("Key: \"" + name + "\" not in Map!");
     const std::string& type = parameters.at(name)->getType();
     int size = getParameter(name)->getTypeByteSize();
+    bool isSigned = getParameter(name)->isTypeSigned();
+    bool isArithmetic = getParameter(name)->isTypeArithmetic();
     if (type.compare("int8_t") == 0)
     {
-      if (size > 1)
+      if (size > 1 || !isSigned || !isArithmetic)
         throw std::invalid_argument("Parameter typename \"" + type +
                                     "\" doesn't match given variable type!");
       char value;
@@ -124,7 +127,7 @@ public:
     }
     else if (type.compare("uint8_t") == 0)
     {
-      if (size > 1)
+      if (size > 1 || isSigned || !isArithmetic)
         throw std::invalid_argument("Parameter typename \"" + type +
                                     "\" doesn't match given variable type!");
       unsigned char value;
@@ -133,7 +136,7 @@ public:
     }
     else if (type.compare("int16_t") == 0)
     {
-      if (size > 2)
+      if (size > 2 || !isSigned || !isArithmetic)
         throw std::invalid_argument("Parameter typename \"" + type +
                                     "\" doesn't match given variable type!");
       short value;
@@ -142,7 +145,7 @@ public:
     }
     else if (type.compare("uint16_t") == 0)
     {
-      if (size > 2)
+      if (size > 2 || isSigned || !isArithmetic)
         throw std::invalid_argument("Parameter typename \"" + type +
                                     "\" doesn't match given variable type!");
       unsigned short value;
@@ -151,7 +154,7 @@ public:
     }
     else if (type.compare("int32_t") == 0)
     {
-      if (size > 4)
+      if (size > 4 || !isSigned || !isArithmetic)
         throw std::invalid_argument("Parameter typename \"" + type +
                                     "\" doesn't match given variable type!");
       int value;
@@ -160,7 +163,7 @@ public:
     }
     else if (type.compare("uint32_t") == 0)
     {
-      if (size > 4)
+      if (size > 4 || isSigned || !isArithmetic)
         throw std::invalid_argument("Parameter typename \"" + type +
                                     "\" doesn't match given variable type!");
       unsigned int value;
@@ -169,7 +172,7 @@ public:
     }
     else if (type.compare("int64_t") == 0)
     {
-      if (size > 8)
+      if (size > 8 || !isSigned || !isArithmetic)
         throw std::invalid_argument("Parameter typename \"" + type +
                                     "\" doesn't match given variable type!");
       long value;
@@ -178,7 +181,7 @@ public:
     }
     else if (type.compare("uint64_t") == 0)
     {
-      if (size > 8)
+      if (size > 8 || isSigned || !isArithmetic)
         throw std::invalid_argument("Parameter typename \"" + type +
                                     "\" doesn't match given variable type!");
       unsigned long value;
@@ -187,7 +190,7 @@ public:
     }
     else if (type.compare("float32_t") == 0)
     {
-      if (size > 4)
+      if (size > 4 || !isArithmetic)
         throw std::invalid_argument("Parameter typename \"" + type +
                                     "\" doesn't match given variable type!");
       float value;
@@ -196,7 +199,7 @@ public:
     }
     else if (type.compare("float64_t") == 0)
     {
-      if (size > 8)
+      if (size > 8 || !isArithmetic)
         throw std::invalid_argument("Parameter typename \"" + type +
                                     "\" doesn't match given variable type!");
       double value;
@@ -206,10 +209,14 @@ public:
     else if (type.compare("string_t") == 0)
     {
       // wie string type mismatch bestimmen ?
+      if(isArithmetic) throw std::invalid_argument("Parameter typename \"" + type +
+                                                  "\" doesn't match given variable type!");
       getParameterValue(name, out);
     }
     else if (type.compare("string_t[]") == 0)
     {
+      if(isArithmetic) throw std::invalid_argument("Parameter typename \"" + type +
+                                                  "\" doesn't match given variable type!");
       // wie string type mismatch bestimmen ?
       std::vector<std::string> sArray;
       getParameterValue(name, sArray);
@@ -234,9 +241,11 @@ public:
       throw std::out_of_range("Key: \"" + name + "\" not in Map!");
     const std::string& type = parameters.at(name)->getType();
     int size = getParameter(name)->getTypeByteSize();
+    bool isSigned = getParameter(name)->isTypeSigned();
+    bool isArithmetic = getParameter(name)->isTypeArithmetic();
     if (type.compare("int8_t") == 0)
     {
-      if (size > 1)
+      if (size > 1 || !isSigned || !isArithmetic)
         throw std::invalid_argument("Parameter typename \"" + type +
                                     "\" doesn't match stored variable type!");
       int value = std::stoi(input);
@@ -245,7 +254,7 @@ public:
     }
     else if (type.compare("uint8_t") == 0)
     {
-      if (size > 1)
+      if (size > 1 || isSigned || !isArithmetic)
         throw std::invalid_argument("Parameter typename \"" + type +
                                     "\" doesn't match stored variable type!");
       unsigned long value = std::stoul(input);
@@ -254,7 +263,7 @@ public:
     }
     else if (type.compare("int16_t") == 0)
     {
-      if (size > 2)
+      if (size > 2 || !isSigned || !isArithmetic)
         throw std::invalid_argument("Parameter typename \"" + type +
                                     "\" doesn't match stored variable type!");
       int value = std::stoi(input);
@@ -263,7 +272,7 @@ public:
     }
     else if (type.compare("uint16_t") == 0)
     {
-      if (size > 2)
+      if (size > 2 || isSigned || !isArithmetic)
         throw std::invalid_argument("Parameter typename \"" + type +
                                     "\" doesn't match stored variable type!");
       unsigned long value = std::stoul(input);
@@ -272,7 +281,7 @@ public:
     }
     else if (type.compare("int32_t") == 0)
     {
-      if (size > 4)
+      if (size > 4 || !isSigned || !isArithmetic)
         throw std::invalid_argument("Parameter typename \"" + type +
                                     "\" doesn't match stored variable type!");
       int value = std::stoi(input);
@@ -281,7 +290,7 @@ public:
     }
     else if (type.compare("uint32_t") == 0)
     {
-      if (size > 4)
+      if (size > 4 || isSigned || !isArithmetic)
         throw std::invalid_argument("Parameter typename \"" + type +
                                     "\" doesn't match stored variable type!");
       unsigned long value = std::stoul(input);
@@ -290,7 +299,7 @@ public:
     }
     else if (type.compare("int64_t") == 0)
     {
-      if (size > 8)
+      if (size > 8 || !isSigned || !isArithmetic)
         throw std::invalid_argument("Parameter typename \"" + type +
                                     "\" doesn't match stored variable type!");
       long value = std::stol(input);
@@ -299,7 +308,7 @@ public:
     }
     else if (type.compare("uint64_t") == 0)
     {
-      if (size > 8)
+      if (size > 8 || isSigned || !isArithmetic)
         throw std::invalid_argument("Parameter typename \"" + type +
                                     "\" doesn't match stored variable type!");
       unsigned long value = std::stoul(input);
@@ -308,7 +317,7 @@ public:
     }
     else if (type.compare("float32_t") == 0)
     {
-      if (size > 4)
+      if (size > 4 || !isArithmetic)
         throw std::invalid_argument("Parameter typename \"" + type +
                                     "\" doesn't match stored variable type!");
       float value = std::stof(input);
@@ -317,7 +326,7 @@ public:
     }
     else if (type.compare("float64_t") == 0)
     {
-      if (size > 8)
+      if (size > 8 || !isArithmetic)
         throw std::invalid_argument("Parameter typename \"" + type +
                                     "\" doesn't match stored variable type!");
       double value = std::stod(input);
@@ -326,11 +335,17 @@ public:
     }
     else if (type.compare("string_t") == 0)
     {
+      if (isArithmetic)
+        throw std::invalid_argument("Parameter typename \"" + type +
+                                    "\" doesn't match stored variable type!");
       std::dynamic_pointer_cast<GenericParameter<std::string>>(parameters[name])
           ->setData(input);
     }
     else if (type.compare("string_t[]") == 0)
     {
+      if (isArithmetic)
+        throw std::invalid_argument("Parameter typename \"" + type +
+                                    "\" doesn't match stored variable type!");
       std::vector<std::string> split;
       boost::split(split, input, boost::is_any_of(" "));
 

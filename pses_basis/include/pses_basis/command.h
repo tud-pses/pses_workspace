@@ -10,7 +10,6 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/range/algorithm/remove_if.hpp>
 #include <boost/algorithm/string/trim.hpp>
-#include <ros/ros.h>
 
 struct CommandParams
 {

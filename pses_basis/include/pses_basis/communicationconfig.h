@@ -6,7 +6,6 @@
 #include <string>
 #include <unordered_map>
 #include <yaml-cpp/yaml.h>
-#include <ros/ros.h>
 #include <utility>
 #include <vector>
 #include <boost/algorithm/string.hpp>

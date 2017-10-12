@@ -33,7 +33,6 @@ void operator>>(const YAML::Node& node, Syntax& syntax)
   const YAML::Node& errorAsciiNode = node["grp_errors_ascii"];
   if (errorAsciiNode.IsSequence() && errorAsciiNode.size() > 0){
     for(auto item : errorAsciiNode){
-      //ROS_INFO_STREAM(item.as<std::string>());
       syntax.grpErrorsAscii.insert(item.as<std::string>());
     }
   }
@@ -47,11 +46,9 @@ void operator>>(const YAML::Node& node, Syntax& syntax)
         for(auto item2 : item){
           if(c != 0){
             errorSet.insert(item2.as<unsigned int>());
-            //ROS_INFO_STREAM(item2.as<unsigned int>());
             c++;
           }else{
             type = item2.as<std::string>();
-            //ROS_INFO_STREAM(item2.as<std::string>());
             c++;
           }
         }
@@ -189,7 +186,6 @@ void CommunicationConfig::insertSensorGroup(const YAML::Node& node)
       std::string option = item.as<std::string>();
       std::string name = "";
       std::string params = "";
-      // ROS_INFO_STREAM(option);
       if (option.find(':') != std::string::npos)
       {
         std::vector<std::string> split;

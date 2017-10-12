@@ -5,29 +5,29 @@
 - grp_nr: 1
   name: "Ultra Sound Sensors"
   channels: ['USL', 'USF', 'USR']
-  options: ['Wait_For_All_Maxwait']
+  options: ['Wait_For_All_Maxwait', 'Encoding:ASCII']
   encoding: "ASCII"
 
 - grp_nr: 2
   name: "IMU"
   channels: ['AX', 'AY', 'AZ', 'GX', 'GY', 'GZ']
-  options: ['Channel_Polling_Interval:10', 'Average_Default']
+  options: ['Channel_Polling_Interval:10', 'Average_Default', 'Encoding:ASCII']
   encoding: "ASCII"
 
 - grp_nr: 3
   name: "Hall Sensor"
   channels: ['HALL_CNT', 'HALL_DT', 'HALL_DT8']
-  options: ['Wait_For_All:10']
+  options: ['Wait_For_All:10', 'Encoding:ASCII']
   encoding: "ASCII"
 
 - grp_nr: 4
   name: "Magnetometer"
   channels: ['MX', 'MY', 'MZ']
-  options: []
+  options: ['Encoding:ASCII']
   encoding: "ASCII"
 
 - grp_nr: 5
   name: "Battery"
   channels: ['VDBAT', 'VSBAT']
-  options: ['Wait_For_All:500']
+  options: ['Wait_For_All:500', 'Encoding:ASCII']
   encoding: "ASCII"

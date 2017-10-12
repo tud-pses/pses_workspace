@@ -14,24 +14,20 @@ ThreadDispatcher::ThreadDispatcher(const std::shared_ptr<Syntax>& syntax)
 
 void ThreadDispatcher::startThread()
 {
-  // ROS_INFO_STREAM("ThreadDispatcher starting..");
   active = true;
   worker = std::thread(&ThreadDispatcher::workerFunction, this);
   sensorGroupThread->startThread();
   readingThread->startThread();
 
-  // ROS_INFO_STREAM("ThreadDispatcher started..");
 }
 
 void ThreadDispatcher::stopThread()
 {
-  // ROS_INFO_STREAM("ThreadDispatcher stopping..");
   readingThread->stopThread();
   sensorGroupThread->stopThread();
   active = false;
   wakeUp();
   worker.join();
-  // ROS_INFO_STREAM("ThreadDispatcher stopped..");
 }
 
 void ThreadDispatcher::enableDebugMessages(debugCallbackPtr debug)
@@ -49,13 +45,10 @@ void ThreadDispatcher::workerFunction()
 {
   while (active)
   {
-    // ROS_INFO_STREAM("ThreadDispatcher sleeping..");
     sleep();
-    // ROS_INFO_STREAM("ThreadDispatcher woke up..");
     while (!readingThread->isQueueEmpty() && active)
     {
       std::string data = readingThread->getData();
-      // ROS_INFO_STREAM("Msg in dispatch:\n"<<data);
       // in case of empty string
       if (data.size() < 1)
         continue;
@@ -66,8 +59,6 @@ void ThreadDispatcher::workerFunction()
         continue;
       }
       // check for known prefixes
-      // ROS_INFO_STREAM("cmd queue size: "<<commandResponse.size()<<" msg queue
-      // size: "<<sensorGroupMessage.size());
       if (data.find(syntax->cmdErrorPrefix) == 0)
       {
         if (errorCBregistered)
@@ -85,12 +76,8 @@ void ThreadDispatcher::workerFunction()
       }
       else if (data.find(syntax->channelGrpMsgPrefix) == 0)
       {
-        // ROS_INFO_STREAM("Msg in dispatch pre push: "<<data<<"
-        // "<<sensorGroupMessage.size());
         sensorGroupMessage.push(data);
         sensorGroupThread->wakeUp();
-        // ROS_INFO_STREAM("Msg in dispatch post push:
-        // "<<sensorGroupMessage.front()<<" "<<sensorGroupMessage.size());
       }
       else if (data.find(syntax->answerOnCmdPrefix) == 0)
       {
@@ -131,6 +118,8 @@ void ThreadDispatcher::registerErrorCallback(debugCallbackPtr error)
   this->error = error;
   errorCBregistered = true;
   sensorGroupThread->registerErrorCallback(error);
+  readingThread->registerErrorCallback(error);
+
 }
 void ThreadDispatcher::registerTextCallback(debugCallbackPtr text)
 {

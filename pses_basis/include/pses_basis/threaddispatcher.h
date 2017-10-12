@@ -8,7 +8,6 @@
 #include <pses_basis/readingthread.h>
 #include <pses_basis/communicationconfig.h>
 #include <pses_basis/sensorgroupthread.h>
-#include <ros/ros.h>
 
 class ReadingThread;
 class SensorGroupThread;

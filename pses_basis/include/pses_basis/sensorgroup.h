@@ -7,7 +7,7 @@
 #include <pses_basis/command.h>
 #include <pses_basis/syntax.h>
 #include <boost/range/algorithm/remove_if.hpp>
-#include <ros/ros.h>
+#include <pses_basis/base64Decoder.h>
 
 struct Channel
 {

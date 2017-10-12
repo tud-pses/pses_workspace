@@ -48,50 +48,39 @@ inline std::vector<unsigned char> base64_to_binary(const std::string& in)
   return std::vector<unsigned char>(out.begin(), out.end());
 }
 
-inline int getValueAt(std::vector<unsigned char>& bytes,
+inline unsigned getValueAt(std::vector<unsigned char>& bytes,
                       const unsigned int startByteIndex,
                       const unsigned int endByteIndex)
 {
+  unsigned long out = 0;
 
-  int offset = endByteIndex - startByteIndex;
-  int out = 0;
-
-  for (int i = endByteIndex; i >= startByteIndex; i--)
+  for (int i = startByteIndex; i <= endByteIndex; i++)
   {
-    out = out | (0x00000000 | bytes[i] << 8 * offset);
-    offset -= 1;
+    if(i>=bytes.size()) throw std::out_of_range("Out of bounds error while decoding b64.");
+    out = out | ( (0x0000000000000000 | bytes[i]) << 8 * (i-startByteIndex) );
   }
   return out;
 }
 
-inline int convertValue(const int value, const unsigned int size, bool isSigned)
+inline long convertValue(const unsigned long value, const unsigned int size, bool isSigned)
 {
-  int val = value;
-  int mask = 1 << size - 1;
-  int sign = val & mask;
-  sign = sign >> size - 1;
-  if (sign == 1 && isSigned)
-  {
-    int offset = 32 - size;
-    int sign_extension = 1;
-
-    for (int i = 1; i < offset; i++)
-    {
-      sign_extension = (sign_extension << 1) | 1;
-    }
-
-    sign_extension = sign_extension << size;
-    val |= sign_extension;
+  if(!isSigned) return static_cast<unsigned int>(value);
+  unsigned long mask = 0x0000000000000080;
+  mask = mask << (8*(size-1));
+  mask = mask & value;
+  for(int i = 0; i<64-(size*8); i++){
+    mask = mask | (mask << 1);
   }
-  return val;
+  return value | mask;
 }
 
 /** Function decodes a Base64 string and returns the decoded string (or only
- *parts of it) as an int32.
+ * parts of it) up to a maximum of 8 byte signed/unsigned data types
+ * wrapped in an int64 return value.
  * This Fuction decodes a Base64 string and returns a specific byte or multiple
- *bytes at the given indices,
+ * bytes at the given indices,
  * where this information is converted as a desired datatype and returned as
- *int32.
+ * int64.
  *
  * Example for decoding a Base64 string, getting the second byte, reading this
  *value as an int16:
@@ -105,14 +94,14 @@ inline int convertValue(const int value, const unsigned int size, bool isSigned)
  *string.
  * @param isSigned whether the value from the decoded string is to be read as
  *signed or unsigned.
- * @return Decoded information as an int32.
+ * @return Decoded information as an int64.
 */
-inline int base64_decode(const std::string& in,
+inline long base64_decode(const std::string& in,
                          const unsigned int startByteIndex,
                          const unsigned int endByteIndex,
                          const unsigned int size, bool isSigned)
 {
   std::vector<unsigned char> bytes = base64_to_binary(in);
-  int value = getValueAt(bytes);
+  unsigned long value = getValueAt(bytes, startByteIndex, endByteIndex);
   return convertValue(value, size, isSigned);
 }

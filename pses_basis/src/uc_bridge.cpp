@@ -17,10 +17,7 @@
 void publishSensorGroupMessage1(
     SensorGroup* grp, std::unordered_map<std::string, ros::Publisher*>& pub)
 {
-  // do stuff
-  // ROS_INFO_STREAM("doing stuff");
   sensor_msgs::Range usl, usr, usf;
-  //unsigned short l, r, f;
   double l, r, f;
   ros::Time t = ros::Time::now();
   try
@@ -31,7 +28,7 @@ void publishSensorGroupMessage1(
     usl.range = l;
     usf.range = f;
     usr.range = r;
-    //usl.range = l;
+
     usl.max_range = 3;
     usl.min_range = 0.06;
     usl.field_of_view = 0.76;
@@ -39,7 +36,6 @@ void publishSensorGroupMessage1(
     usl.header.frame_id = "robot_left_us";
     usl.header.stamp = t;
 
-    //usf.range = f;
     usf.max_range = 3;
     usf.min_range = 0.06;
     usf.field_of_view = 0.76;
@@ -47,7 +43,6 @@ void publishSensorGroupMessage1(
     usf.header.frame_id = "robot_front_us";
     usf.header.stamp = t;
 
-    //usr.range = r;
     usr.max_range = 3;
     usr.min_range = 0.06;
     usr.field_of_view = 0.76;
@@ -69,10 +64,7 @@ void publishSensorGroupMessage1(
 void publishSensorGroupMessage2(
     SensorGroup* grp, std::unordered_map<std::string, ros::Publisher*>& pub)
 {
-  // do stuff
-  // ROS_INFO_STREAM("doing stuff");
   sensor_msgs::Imu imu;
-  //short gx, gy, gz, ax, ay, az;
   ros::Time t = ros::Time::now();
   try
   {
@@ -82,12 +74,6 @@ void publishSensorGroupMessage2(
     grp->getChannelValueConverted("AX", imu.linear_acceleration.x);
     grp->getChannelValueConverted("AY", imu.linear_acceleration.y);
     grp->getChannelValueConverted("AZ", imu.linear_acceleration.z);
-    //imu.angular_velocity.x = gx;
-    //imu.angular_velocity.y = gy;
-    //imu.angular_velocity.z = gz;
-    //imu.linear_acceleration.x = ax;
-    //imu.linear_acceleration.y = ay;
-    //imu.linear_acceleration.z = az;
     imu.header.stamp = t;
     imu.header.frame_id = "robot_imu";
 
@@ -132,9 +118,6 @@ void publishSensorGroupMessage4(
     grp->getChannelValueConverted("MX", mag.magnetic_field.x);
     grp->getChannelValueConverted("MY", mag.magnetic_field.y);
     grp->getChannelValueConverted("MZ", mag.magnetic_field.z);
-    //mag.magnetic_field.x = mx;
-    //mag.magnetic_field.y = my;
-    //mag.magnetic_field.z = mz;
     mag.header.stamp = t;
     mag.header.frame_id = "robot_magnetometer";
     pub["MAG"]->publish(mag);
@@ -150,7 +133,6 @@ void publishSensorGroupMessage5(
     SensorGroup* grp, std::unordered_map<std::string, ros::Publisher*>& pub)
 {
   sensor_msgs::BatteryState batVD, batVS;
-  //unsigned short vsbat, vdbat;
   double vsbat, vdbat;
   ros::Time t = ros::Time::now();
   try
@@ -159,8 +141,6 @@ void publishSensorGroupMessage5(
     grp->getChannelValueConverted("VSBAT", vsbat);
     batVD.voltage = vdbat;
     batVS.voltage = vsbat;
-    //batVD.voltage = vdbat;
-    //batVS.voltage = vsbat;
     batVD.header.stamp = t;
     batVS.header.stamp = t;
 
@@ -217,7 +197,6 @@ void motorLevelCallback(std_msgs::Int16::ConstPtr motorLevel, Communication* com
 }
 
 void steeringLevelCallback(std_msgs::Int16::ConstPtr steeringLevel, Communication* com){
-  ros::Time t = ros::Time::now();
   bool was_set = false;
   std::string cmd = "Set Steering Level";
   Parameter::ParameterMap input;
@@ -230,7 +209,6 @@ void steeringLevelCallback(std_msgs::Int16::ConstPtr steeringLevel, Communicatio
     was_set = false;
   }
   if(!was_set) ROS_WARN_STREAM("Steering level set to: "<<steeringLevel->data<<" failed!");
-  ROS_INFO_STREAM("Round trip t: "<<(ros::Time::now()-t).toSec());
 }
 
 void ucBoardMessageCallback(std_msgs::String::ConstPtr msg, Communication* com){

@@ -8,6 +8,7 @@
 #include <pses_basis/sensorgroup.h>
 #include <boost/range/algorithm/remove_if.hpp>
 #include <boost/algorithm/string/trim.hpp>
+#include <algorithm>
 
 class ThreadDispatcher;
 

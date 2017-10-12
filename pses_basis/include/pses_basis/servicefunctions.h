@@ -366,9 +366,7 @@ bool setIMU(pses_basis::SetIMU::Request& req,
   options.push_back("IMU_GyroFilter");
   options.push_back("IMU_si_info");
   try{
-    ROS_INFO_STREAM("calling service");
     res.was_set = com->sendCommand(cmd, options, input, output);
-    ROS_INFO_STREAM("returned from service");
     output.getParameterValue("info", res.in_si_units);
   }catch(std::exception& e){
     ROS_WARN_STREAM("An error in Service 'Set IMU' occured!\n Description: "<<e.what());
@@ -390,9 +388,7 @@ bool setMag(pses_basis::SetMag::Request& req,
   std::vector<std::string>options;
   options.push_back("MAG_USEASA");
   try{
-    ROS_INFO_STREAM("calling service");
     res.was_set = com->sendCommand(cmd, options, input, output);
-    ROS_INFO_STREAM("returned from service");
   }catch(std::exception& e){
     ROS_WARN_STREAM("An error in Service 'Set IMU' occured!\n Description: "<<e.what());
     res.was_set = false;
@@ -476,9 +472,7 @@ bool setUS(pses_basis::SetUS::Request& req,
   options.push_back("US_Gain");
   options.push_back("US_si_info");
   try{
-    ROS_INFO_STREAM("calling service");
     res.was_set = com->sendCommand(cmd, options, input, output);
-    ROS_INFO_STREAM("returned from service");
     output.getParameterValue("info", res.in_si_units);
   }catch(std::exception& e){
     ROS_WARN_STREAM("An error in Service 'Set US' occured!\n Description: "<<e.what());
