@@ -553,6 +553,13 @@ int main(int argc, char** argv)
           std::bind(ServiceFunctions::getFirmwareVersion, std::placeholders::_1,
                     std::placeholders::_2, &com));
 
+  ros::ServiceServer getIMUInfoService =
+      nh.advertiseService<pses_basis::GetIMUInfo::Request,
+                          pses_basis::GetIMUInfo::Response>(
+          "get_imu_info",
+          std::bind(ServiceFunctions::getIMUInfo, std::placeholders::_1,
+                    std::placeholders::_2, &com));
+
   ros::ServiceServer getInfoAllGroupsService =
       nh.advertiseService<pses_basis::GetInfoAllGroups::Request,
                           pses_basis::GetInfoAllGroups::Response>(
@@ -572,6 +579,20 @@ int main(int argc, char** argv)
                           pses_basis::GetKinectStatus::Response>(
           "get_kinect_status",
           std::bind(ServiceFunctions::getKinectStatus, std::placeholders::_1,
+                    std::placeholders::_2, &com));
+
+  ros::ServiceServer getMagASAService =
+      nh.advertiseService<pses_basis::GetMagASA::Request,
+                          pses_basis::GetMagASA::Response>(
+          "get_mag_asa",
+          std::bind(ServiceFunctions::getMagASA, std::placeholders::_1,
+                    std::placeholders::_2, &com));
+
+  ros::ServiceServer getMagInfoService =
+      nh.advertiseService<pses_basis::GetMagInfo::Request,
+                          pses_basis::GetMagInfo::Response>(
+          "get_mag_info",
+          std::bind(ServiceFunctions::getMagInfo, std::placeholders::_1,
                     std::placeholders::_2, &com));
 
   ros::ServiceServer getMotorLevelService =
@@ -595,11 +616,39 @@ int main(int argc, char** argv)
           std::bind(ServiceFunctions::getSteeringLevel, std::placeholders::_1,
                     std::placeholders::_2, &com));
 
+  ros::ServiceServer getUSInfoService =
+      nh.advertiseService<pses_basis::GetUSInfo::Request,
+                          pses_basis::GetUSInfo::Response>(
+          "get_us_info",
+          std::bind(ServiceFunctions::getUSInfo, std::placeholders::_1,
+                    std::placeholders::_2, &com));
+
   ros::ServiceServer resetControllerService =
       nh.advertiseService<pses_basis::ResetController::Request,
                           pses_basis::ResetController::Response>(
           "reset_controller",
           std::bind(ServiceFunctions::resetController, std::placeholders::_1,
+                    std::placeholders::_2, &com));
+
+  ros::ServiceServer resetDMSService =
+      nh.advertiseService<pses_basis::ResetDMS::Request,
+                          pses_basis::ResetDMS::Response>(
+          "reset_dms",
+          std::bind(ServiceFunctions::resetDMS, std::placeholders::_1,
+                    std::placeholders::_2, &com));
+
+  ros::ServiceServer setIMUService =
+      nh.advertiseService<pses_basis::SetIMU::Request,
+                          pses_basis::SetIMU::Response>(
+          "set_imu",
+          std::bind(ServiceFunctions::setIMU, std::placeholders::_1,
+                    std::placeholders::_2, &com));
+
+  ros::ServiceServer setMagService =
+      nh.advertiseService<pses_basis::SetMag::Request,
+                          pses_basis::SetMag::Response>(
+          "set_mag",
+          std::bind(ServiceFunctions::setMag, std::placeholders::_1,
                     std::placeholders::_2, &com));
 
   ros::ServiceServer setMotorLevelService =
@@ -623,6 +672,13 @@ int main(int argc, char** argv)
           std::bind(ServiceFunctions::setSteeringLevel, std::placeholders::_1,
                     std::placeholders::_2, &com));
 
+  ros::ServiceServer setUSService =
+      nh.advertiseService<pses_basis::SetUS::Request,
+                          pses_basis::SetUS::Response>(
+          "set_us",
+          std::bind(ServiceFunctions::setUS, std::placeholders::_1,
+                    std::placeholders::_2, &com));
+
   ros::ServiceServer toggleBrakesService =
       nh.advertiseService<pses_basis::ToggleBrakes::Request,
                           pses_basis::ToggleBrakes::Response>(
@@ -635,6 +691,13 @@ int main(int argc, char** argv)
                           pses_basis::ToggleDAQ::Response>(
           "toggle_daq",
           std::bind(ServiceFunctions::toggleDAQ, std::placeholders::_1,
+                    std::placeholders::_2, &com));
+
+  ros::ServiceServer toggleDMSService =
+      nh.advertiseService<pses_basis::ToggleDMS::Request,
+                          pses_basis::ToggleDMS::Response>(
+          "toggle_dms",
+          std::bind(ServiceFunctions::toggleDMS, std::placeholders::_1,
                     std::placeholders::_2, &com));
 
   ros::ServiceServer toggleGroupService =

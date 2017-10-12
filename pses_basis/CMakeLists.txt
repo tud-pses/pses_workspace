@@ -61,25 +61,35 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate services in the 'srv' folder
  add_service_files(
    FILES
-   SetMotorLevel.srv
-   SetSteering.srv
+
    DeleteGroup.srv
    GetControllerID.srv
    GetDAQStatus.srv
    GetFirmwareVersion.srv
+   GetIMUInfo.srv
    GetInfoGroup.srv
    GetInfoAllGroups.srv
    GetKinectStatus.srv
+   GetMagASA.srv
+   GetMagInfo.srv
    GetMotorLevel.srv
    GetSessionID.srv
    GetSteeringLevel.srv
+   GetUSInfo.srv
    ResetController.srv
-   ToggleBrakes.srv
-   ToggleMotor.srv
+   ResetDMS.srv
+   SetIMU.srv
+   SetMag.srv
+   SetMotorLevel.srv
    SetSessionID.srv
+   SetSteering.srv
+   SetUS.srv
+   ToggleBrakes.srv
    ToggleDAQ.srv
+   ToggleDMS.srv
    ToggleGroup.srv
    ToggleKinect.srv
+   ToggleMotor.srv
    ToggleUS.srv
  )
 

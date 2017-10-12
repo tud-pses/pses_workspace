@@ -1,0 +1,7 @@
+int16 accel_range
+int16 accel_filter
+int16 gyro_range
+int16 gyro_filter
+---
+bool was_set
+string in_si_units

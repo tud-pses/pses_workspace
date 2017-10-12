@@ -1,0 +1,4 @@
+uint32 dms_interval
+bool dms_on
+---
+bool was_set

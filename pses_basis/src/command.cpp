@@ -21,7 +21,8 @@ Command::Command(const CommandParams& cmdParams,
     for (std::pair<std::string, std::string> param : cmdParams.params)
     {
       parameterTypes.insert(param);
-      //ROS_INFO_STREAM("Command: "<<name<<", Param: "<<param.first<<" "<<param.second);
+      // ROS_INFO_STREAM("Command: "<<name<<", Param: "<<param.first<<"
+      // "<<param.second);
     }
   }
 
@@ -36,7 +37,7 @@ Command::Command(const CommandParams& cmdParams,
   int paramCounter = 0;
   for (std::string s : split)
   {
-    if (s.at(0) == '$')
+    if (s.find('$') != std::string::npos)
     {
       commandTemplate.push_back(
           std::make_pair(paramCounter, &Command::insertCmdParameter));
@@ -69,7 +70,7 @@ Command::Command(const CommandParams& cmdParams,
       paramCounter = 0;
       for (std::string s : split2)
       {
-        if (s.at(0) == '$')
+        if (s.find('$') != std::string::npos)
         {
           std::string param = s.substr(1, std::string::npos);
           responseTemplate.push_back(std::make_pair(param, true));
@@ -107,23 +108,23 @@ void Command::generateCommand(const Parameter::ParameterMap& inputParams,
   ss << cmd;
   for (std::string s : optionsList)
   {
-    bool bla = options.find(s)!=options.end();
-
+    ROS_INFO_STREAM("Trying to find: "<<s<<" option...");
     const CommandOptions& cmdopt = options[s];
+    if(cmdopt.opt.size()<1) break;
     std::vector<std::string> split;
     boost::split(split, cmdopt.opt, boost::is_any_of(" ="));
-    //ROS_INFO_STREAM("cmd: "<<name<<" opt: "<<cmdopt.opt);
+    ROS_INFO_STREAM("cmd: "<<name<<" opt: "<<cmdopt.opt);
     for (std::string s1 : split)
     {
-      //ROS_INFO_STREAM(s1);
+       ROS_INFO_STREAM(s1);
       if (s1.at(0) == '$')
       {
         std::string value = "";
-        //ROS_INFO_STREAM("fetching param");
-        //ROS_INFO_STREAM(inputParams.toString());
+         ROS_INFO_STREAM("fetching param");
+         ROS_INFO_STREAM(inputParams.toString());
         inputParams.getParameterValueAsString(s1.substr(1, std::string::npos),
                                               value);
-        //ROS_INFO_STREAM(value);
+         ROS_INFO_STREAM(value);
         ss << "=" << value;
       }
       else
@@ -141,39 +142,34 @@ const bool Command::verifyResponse(const Parameter::ParameterMap& inputParams,
 {
   // preprocessing
   std::string response = responseOrig;
-  response.erase(boost::remove_if(response, boost::is_any_of(cmdResponsePrefix+"\x03"+"\n")), response.end());
+  response.erase(boost::remove_if(response, boost::is_any_of(cmdResponsePrefix +
+                                                             "\x03" + "\n")),
+                 response.end());
   boost::trim(response);
   // start
   outputParams = Parameter::ParameterMap();
-  //ROS_INFO_STREAM("Response: " << response);
   // first case -> no response
   if (!cmdHasResponse)
     return true;
-  //ROS_INFO_STREAM("passed first case");
   // second case -> static response
   if (!respHasParams)
   {
-    //ROS_INFO_STREAM(response << "  expected: "<<simpleResponse);
     return response.compare(simpleResponse) == 0;
   }
-  //ROS_INFO_STREAM("passed second case");
   // third case -> response contains any amount of parameter
   std::vector<std::string> split;
-  boost::split(split, response, boost::is_any_of(" "));
+  boost::split(split, response, boost::is_any_of(" ="));
   // response contains not enough tokens/params
-  if(split.size()<responseTemplate.size()) return false;
+  if (split.size() < responseTemplate.size())
+    return false;
   // continue
-  for (int i= 0; i < split.size(); i++)
+  for (int i = 0; i < split.size(); i++)
   {
     // exit if the response contains more elements than expected
-    //ROS_INFO_STREAM("component index: " << i << " num. of components: "
-                                        //<< responseTemplate.size());
     if (i >= responseTemplate.size())
       return false;
-    //ROS_INFO_STREAM("did it died?");
     // check if this component is a variable
     const std::string& param = responseTemplate[i].first;
-    //ROS_INFO_STREAM("expected component: " << param << " got: " << split[i]);
     if (responseTemplate[i].second)
     {
       // if the param appears in cmd. and resp. -> indicates reply on cmd
@@ -188,15 +184,19 @@ const bool Command::verifyResponse(const Parameter::ParameterMap& inputParams,
       // if param doesn't appear in cmd. -> indicates request for data
       else
       {
-        //int bla = parameterTypes.find(param)!=parameterTypes.end();
-        //ROS_INFO_STREAM("Getting param: "<<bla);
-        //outputParams.insertParameter("bla", "int32_t", 3);
+        // special treatment for string types
+        if(parameterTypes[param].compare("string_t")==0){
+          std::stringstream ss = std::stringstream();
+          for(int n = i; n<split.size(); n++){
+            ss<<" "<<split[n];
+          }
+          std::string out = ss.str().substr(1,std::string::npos);
+          outputParams.insertParameter(param, parameterTypes[param], out);
+          return true;
+        }
+        //standard case
         outputParams.insertParameter(param, parameterTypes[param]);
         outputParams.setParameterValueAsString(param, split[i]);
-        //outputParams.setParameterValueAsString(param, split[i]);
-        //short bla;
-        //outputParams.getParameterValue(param, bla);
-        //ROS_INFO_STREAM("After insertion"<<bla);
       }
     }
     // check if keyWord equals the expected response keyWord
@@ -217,15 +217,17 @@ const bool Command::verifyResponse(const Parameter::ParameterMap& inputParams,
 {
   // preprocessing
   std::string response = responseOrig;
-  response.erase(boost::remove_if(response, boost::is_any_of(cmdResponsePrefix)), response.end());
+  response.erase(
+      boost::remove_if(response, boost::is_any_of(cmdResponsePrefix)),
+      response.end());
   boost::trim(response);
   // start
   outputParams = Parameter::ParameterMap();
-  //ROS_INFO_STREAM("Response: " << response);
+  ROS_INFO_STREAM("Response: " << response);
   // first case -> no response
   if (!cmdHasResponse)
     return true;
-  //ROS_INFO_STREAM("passed first case");
+  ROS_INFO_STREAM("passed first case");
   // second case -> there may be a response of some kind
   std::vector<CommandOptions*> optWithResponse = std::vector<CommandOptions*>();
   for (std::string opt : options)
@@ -241,6 +243,7 @@ const bool Command::verifyResponse(const Parameter::ParameterMap& inputParams,
   // second case a) -> static response with opt. parameters
   if (!respHasParams)
   {
+    ROS_INFO_STREAM("We don't have params?");
     // exit if the static response w.o. options doesn't match
     if (simpleResponse.compare(response.substr(0, simpleResponse.size())) != 0)
       return false;
@@ -257,7 +260,8 @@ const bool Command::verifyResponse(const Parameter::ParameterMap& inputParams,
     for (int i = 0; i < split.size(); i++)
     {
       // break if the response contains more elements than expected
-      if (i >= responseTemplate.size()){
+      if (i >= responseTemplate.size())
+      {
         splitIndex = i;
         break;
       }
@@ -288,12 +292,14 @@ const bool Command::verifyResponse(const Parameter::ParameterMap& inputParams,
       }
     }
   }
+  ROS_INFO_STREAM("We should continue here..");
   // at last, check every key word and parameter of the modified response
   for (CommandOptions* opt : optWithResponse)
   {
     // if there are more tokens in the response than expected -> exit
     if (splitIndex >= split.size())
       return false;
+    ROS_INFO_STREAM("We should continue here.. -> past primitive case");
     // separate expected option response into tokens at white spaces
     std::vector<std::string> optionSplit;
     boost::split(optionSplit, opt->response, boost::is_any_of(" "));
@@ -302,15 +308,40 @@ const bool Command::verifyResponse(const Parameter::ParameterMap& inputParams,
       // if there are more tokens in the response than expected -> exit
       if (splitIndex >= split.size())
         return false;
+      ROS_INFO_STREAM("We should continue here.. -> past second primitive case");
       // case: token expected as a parameter
-      if (s.at(0) == '$')
+      int dollarIdx = s.find('$');
+      int assignIdx = s.find('=');
+      if (dollarIdx != std::string::npos && dollarIdx == 0)
       {
+        ROS_INFO_STREAM("We should continue here.. -> found response param");
         // if the parameter is expected in out and input -> check for equality
         std::string param = s.substr(1, std::string::npos);
+        // check if param is string type -> special treatment required
+        std::string paramType = "";
+        for(auto params : opt->params){
+          if(params.first.compare(param)==0){
+            paramType = params.second;
+            break;
+          }
+        }
+        ROS_INFO_STREAM("We should continue here.. -> param: "<<param<<" type: "<<paramType);
+        if(paramType.size()<1) return false;
+        if(paramType.compare("string_t")==0){
+          std::stringstream ss = std::stringstream();
+          for(int n = splitIndex; n<split.size(); n++){
+            ss<<" "<<split[n];
+          }
+          std::string out = ss.str().substr(1,std::string::npos);
+          outputParams.insertParameter(param, paramType, out);
+          return true;
+        }
+        // continue with standard case
         if (outputParams.isParamInMap(param) && inputParams.isParamInMap(param))
         {
           std::string paramValue = "";
           inputParams.getParameterValueAsString(param, paramValue);
+          //ROS_INFO_STREAM("We should continue here.. -> this should be the case we're looking for.");
           if (split[splitIndex].compare(paramValue) != 0)
             return false;
         }
@@ -320,9 +351,50 @@ const bool Command::verifyResponse(const Parameter::ParameterMap& inputParams,
           outputParams.setParameterValueAsString(param, split[splitIndex]);
         }
       }
+      else if(dollarIdx!=std::string::npos && assignIdx!=std::string::npos){
+        ROS_INFO_STREAM("We should continue here..");
+        ROS_INFO_STREAM("s: "<<s<<" vs. split["<<splitIndex<<"]: "<<split[splitIndex]);
+        std::vector<std::string> asignSplit;
+        boost::split(asignSplit, s, boost::is_any_of("="));
+        if(split[splitIndex].find('=')==std::string::npos) return false;
+        ROS_INFO_STREAM("We should continue here.. -> equals = found");
+        std::vector<std::string> responseSplit;
+        boost::split(responseSplit, split[splitIndex], boost::is_any_of("="));
+
+        if(asignSplit.size()!=2) return false;
+        ROS_INFO_STREAM("We should continue here.. -> size 2 correct");
+        if(responseSplit.size()!=2) return false;
+        ROS_INFO_STREAM("We should continue here.. -> size 2 correct2");
+        std::string optParam = asignSplit[1].substr(1, std::string::npos);
+        std::string optKey =  asignSplit[0].substr(0, std::string::npos);
+        std::string respParam = responseSplit[1].substr(0, std::string::npos);
+        std::string respKey =  responseSplit[0].substr(0, std::string::npos);
+        if(optKey.compare(respKey)!=0) return false;
+        ROS_INFO_STREAM("We should continue here.. -> key correct");
+        std::string optParamValue;
+        if(!inputParams.isParamInMap(optParam)) return false;
+        ROS_INFO_STREAM("We should continue here.. -> param in map");
+        inputParams.getParameterValueAsString(optParam, optParamValue);
+        ROS_INFO_STREAM(optParamValue<<" vs. "<<respParam);
+        if(respParam.compare(optParamValue)!=0) return false;
+        ROS_INFO_STREAM("and end up here.. "<<optParamValue<<" "<<optKey<<" "<<respParam<<" "<<respKey);
+
+        /*
+        if (outputParams.isParamInMap(param) && inputParams.isParamInMap(param))
+        {
+          std::string paramValue = "";
+          inputParams.getParameterValueAsString(param, paramValue);
+          ROS_INFO_STREAM("We should continue here.. -> this should be the case we're looking for.");
+          if (split[splitIndex].compare(paramValue) != 0)
+            return false;
+        }
+        */
+
+      }
       // case: token expected as key word
       else
       {
+        ROS_INFO_STREAM("aehh.. what? "<<s<<" "<<split[splitIndex]);
         if (s.compare(split[splitIndex]) != 0)
           return false;
       }
@@ -339,6 +411,10 @@ void Command::insertCmdKeyword(const int& index,
                                const Parameter::ParameterMap& input,
                                std::string& out)
 {
+  if (index >= cmdKeyWords.size())
+    throw std::out_of_range("Command keyword index out of bounds! Size: " +
+                            std::to_string(cmdKeyWords.size()) + " Index: " +
+                            std::to_string(index));
   out = cmdKeyWords[index];
 }
 
@@ -346,7 +422,12 @@ void Command::insertCmdParameter(const int& index,
                                  const Parameter::ParameterMap& input,
                                  std::string& out)
 {
+  if (index >= cmdParameter.size())
+    throw std::out_of_range("Command parameter index out of bounds! Size: " +
+                            std::to_string(cmdParameter.size()) + " Index: " +
+                            std::to_string(index));
   const std::string& param = cmdParameter[index];
-  const std::string& type = parameterTypes[param];
+  if (!input.isParamInMap(param))
+    throw std::out_of_range("Command parameter" + param + "not in map.");
   input.getParameterValueAsString(param, out);
 }

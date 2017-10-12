@@ -77,13 +77,14 @@ bool Communication::sendCommand(const std::string& command,
                                 Parameter::ParameterMap& outputParams,
                                 unsigned int timeout)
 {
+  if(commands.find(command)==commands.end()) throw std::out_of_range("Command: "+command+" does not exist!");
   ros::Time t = ros::Time::now();
   SerialInterface& si = SerialInterface::instance();
   std::unique_lock<std::mutex> lck(mtx);
   std::string cmd;
   std::string response;
   commands[command]->generateCommand(inputParams, cmd);
-  // ROS_INFO_STREAM(cmd);
+  ROS_INFO_STREAM(cmd);
   dispatcher->setCommunicationWakeUp(true);
   cmd = cmd + syntax->endOfFrame;
   ROS_INFO_STREAM("Cmd gen time t: " << (ros::Time::now() - t).toSec());
@@ -98,13 +99,14 @@ bool Communication::sendCommand(const std::string& command,
   while (!dispatcher->IsResponseQueueEmpty())
   {
     dispatcher->dequeueResponse(response);
-    // ROS_INFO_STREAM(response);
+     ROS_INFO_STREAM(response);
     if (commands[command]->verifyResponse(inputParams, response, outputParams))
     {
       ROS_INFO_STREAM("Search time t: " << (ros::Time::now() - t).toSec());
       return true;
     }
   }
+  return false;
 }
 // timeout in microseconds
 bool Communication::sendCommand(const std::string& command,
@@ -113,26 +115,42 @@ bool Communication::sendCommand(const std::string& command,
                                 Parameter::ParameterMap& outputParams,
                                 unsigned int timeout)
 {
+  if(commands.find(command)==commands.end()) throw std::out_of_range("Command: "+command+" does not exist!");
+  ros::Time t = ros::Time::now();
   SerialInterface& si = SerialInterface::instance();
   std::unique_lock<std::mutex> lck(mtx);
   std::string cmd;
-  std::string response = "F 6";
-  commands[command]->generateCommand(inputParams, options, cmd);
-  // ROS_INFO_STREAM(cmd);
+  std::string response;
+  commands[command]->generateCommand(inputParams,options, cmd);
+  ROS_INFO_STREAM(cmd);
   dispatcher->setCommunicationWakeUp(true);
   cmd = cmd + syntax->endOfFrame;
-  // si.send(cmd);
+  ROS_INFO_STREAM("Cmd gen time t: " << (ros::Time::now() - t).toSec());
+  t = ros::Time::now();
+  si.send(cmd);
   cv.wait_for(lck, std::chrono::microseconds(timeout));
-  // if(dispatcher->IsResponseQueueEmpty()) return false;
-  // dispatcher->dequeueResponse(response);
-  // return commands[command]->verifyResponse(inputParams, options,response,
-  // outputParams);
-  return true;
+  if (dispatcher->IsResponseQueueEmpty())
+    return false;
+  // ROS_INFO_STREAM("Round trip t: "<<(ros::Time::now()-t).toSec());
+  ROS_INFO_STREAM("Wakeup time t: " << (ros::Time::now() - t).toSec());
+  t = ros::Time::now();
+  while (!dispatcher->IsResponseQueueEmpty())
+  {
+    dispatcher->dequeueResponse(response);
+     ROS_INFO_STREAM(response);
+    if (commands[command]->verifyResponse(inputParams, options, response, outputParams))
+    {
+      ROS_INFO_STREAM("Search time t: " << (ros::Time::now() - t).toSec());
+      return true;
+    }
+  }
+  return false;
 }
 
 bool Communication::registerSensorGroups(const std::string& cmdName,
                                          unsigned int timeout)
 {
+  if(commands.find(cmdName)==commands.end()) throw std::out_of_range("Command: "+cmdName+" does not exist!");
   bool success = true;
   SerialInterface& si = SerialInterface::instance();
   for (auto grp : sensorGroups)

@@ -33,7 +33,7 @@ void ReadingThread::workerFunction()
     std::string message;
     try
     {
-      si.read(message, syntax->endOfFrame);
+      si.read(message, syntax->endOfMessage);
       message.erase(
           boost::remove_if(message, boost::is_any_of(syntax->endOfFrame +
                                                      syntax->endOfMessage)),
