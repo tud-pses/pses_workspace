@@ -37,12 +37,18 @@ int main(int argc, char** argv)
   ros::Publisher grp12 = nh.advertise<sensor_msgs::Range>("/uc_bridge/usf", 10);
   ros::Publisher grp13 = nh.advertise<sensor_msgs::Range>("/uc_bridge/usr", 10);
   ros::Publisher grp2 = nh.advertise<sensor_msgs::Imu>("/uc_bridge/imu", 10);
-  ros::Publisher grp31 = nh.advertise<std_msgs::UInt8>("/uc_bridge/hall_cnt", 10);
-  ros::Publisher grp32 = nh.advertise<std_msgs::Float64>("/uc_bridge/hall_dt", 10);
-  ros::Publisher grp33 = nh.advertise<std_msgs::Float64>("/uc_bridge/hall_dt8", 10);
-  ros::Publisher grp4 = nh.advertise<sensor_msgs::MagneticField>("/uc_bridge/mag", 10);
-  ros::Publisher grp51 = nh.advertise<sensor_msgs::BatteryState>("/uc_bridge/vdbat", 10);
-  ros::Publisher grp52 = nh.advertise<sensor_msgs::BatteryState>("/uc_bridge/vsbat", 10);
+  ros::Publisher grp31 =
+      nh.advertise<std_msgs::UInt8>("/uc_bridge/hall_cnt", 10);
+  ros::Publisher grp32 =
+      nh.advertise<std_msgs::Float64>("/uc_bridge/hall_dt", 10);
+  ros::Publisher grp33 =
+      nh.advertise<std_msgs::Float64>("/uc_bridge/hall_dt8", 10);
+  ros::Publisher grp4 =
+      nh.advertise<sensor_msgs::MagneticField>("/uc_bridge/mag", 10);
+  ros::Publisher grp51 =
+      nh.advertise<sensor_msgs::BatteryState>("/uc_bridge/vdbat", 10);
+  ros::Publisher grp52 =
+      nh.advertise<sensor_msgs::BatteryState>("/uc_bridge/vsbat", 10);
   ros::Publisher debug;
   if (debugMsgOn)
     debug = nh.advertise<std_msgs::String>("DEBUG", 10);
@@ -249,14 +255,16 @@ int main(int argc, char** argv)
   ros::ServiceServer setIMUService =
       nh.advertiseService<pses_basis::SetIMU::Request,
                           pses_basis::SetIMU::Response>(
-          "/uc_bridge/set_imu", std::bind(ServiceFunctions::setIMU, std::placeholders::_1,
-                               std::placeholders::_2, &com));
+          "/uc_bridge/set_imu",
+          std::bind(ServiceFunctions::setIMU, std::placeholders::_1,
+                    std::placeholders::_2, &com));
 
   ros::ServiceServer setMagService =
       nh.advertiseService<pses_basis::SetMag::Request,
                           pses_basis::SetMag::Response>(
-          "/uc_bridge/set_mag", std::bind(ServiceFunctions::setMag, std::placeholders::_1,
-                               std::placeholders::_2, &com));
+          "/uc_bridge/set_mag",
+          std::bind(ServiceFunctions::setMag, std::placeholders::_1,
+                    std::placeholders::_2, &com));
 
   ros::ServiceServer setMotorLevelService =
       nh.advertiseService<pses_basis::SetMotorLevel::Request,
@@ -282,8 +290,9 @@ int main(int argc, char** argv)
   ros::ServiceServer setUSService =
       nh.advertiseService<pses_basis::SetUS::Request,
                           pses_basis::SetUS::Response>(
-          "/uc_bridge/set_us", std::bind(ServiceFunctions::setUS, std::placeholders::_1,
-                              std::placeholders::_2, &com));
+          "/uc_bridge/set_us",
+          std::bind(ServiceFunctions::setUS, std::placeholders::_1,
+                    std::placeholders::_2, &com));
 
   ros::ServiceServer toggleBrakesService =
       nh.advertiseService<pses_basis::ToggleBrakes::Request,

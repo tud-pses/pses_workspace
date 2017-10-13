@@ -7,9 +7,8 @@
 #include <pses_basis/communication.h>
 #include <pses_basis/communicationconfig.h>
 #include <ros/package.h>
-#include <std_msgs/builtin_uint8.h>
-#include <std_msgs/builtin_uint16.h>
 #include <std_msgs/Float64.h>
+#include <std_msgs/UInt8.h>
 #include <std_msgs/Int16.h>
 #include <std_msgs/String.h>
 #include <sensor_msgs/Range.h>
