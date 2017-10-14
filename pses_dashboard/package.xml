@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>pses_dashboard</name>
-  <version>0.3.0</version>
+  <version>0.3.1</version>
   <description>The pses_dashboard package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
@@ -41,13 +41,13 @@
   <!--   <test_depend>gtest</test_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>cv_bridge</build_depend>
-  <build_depend>pses_basis</build_depend>
+  <build_depend>pses_ucbridge</build_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>sensor_msgs</build_depend>
   <build_depend>std_msgs</build_depend>
   <build_depend>tf</build_depend>
   <run_depend>cv_bridge</run_depend>
-  <run_depend>pses_basis</run_depend>
+  <run_depend>pses_ucbridge</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>sensor_msgs</run_depend>
   <run_depend>std_msgs</run_depend>

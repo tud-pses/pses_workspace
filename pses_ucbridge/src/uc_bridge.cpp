@@ -1,4 +1,4 @@
-#include <pses_basis/uc_bridge.h>
+#include <pses_ucbridge/uc_bridge.h>
 
 int main(int argc, char** argv)
 {
@@ -29,7 +29,7 @@ int main(int argc, char** argv)
     daqOn = false;
   }
   // load communication config files and init communication
-  // std::string typesPath = ros::package::getPath("pses_basis") + "/config/";
+  // std::string typesPath = ros::package::getPath("pses_ucbridge") + "/config/";
   Communication com(configPath);
   uc_bridge::com_ptr = &com;
   // create sensor group publish services
@@ -141,203 +141,203 @@ int main(int argc, char** argv)
 
   // register uc-board communication services with ros
   ros::ServiceServer deleteGroupService =
-      nh.advertiseService<pses_basis::DeleteGroup::Request,
-                          pses_basis::DeleteGroup::Response>(
+      nh.advertiseService<pses_ucbridge::DeleteGroup::Request,
+                          pses_ucbridge::DeleteGroup::Response>(
           "/uc_bridge/delete_group",
           std::bind(ServiceFunctions::deleteGroup, std::placeholders::_1,
                     std::placeholders::_2, &com));
 
   ros::ServiceServer getControllerIDService =
-      nh.advertiseService<pses_basis::GetControllerID::Request,
-                          pses_basis::GetControllerID::Response>(
+      nh.advertiseService<pses_ucbridge::GetControllerID::Request,
+                          pses_ucbridge::GetControllerID::Response>(
           "/uc_bridge/get_controller_id",
           std::bind(ServiceFunctions::getControllerID, std::placeholders::_1,
                     std::placeholders::_2, &com));
 
   ros::ServiceServer getDAQStatusService =
-      nh.advertiseService<pses_basis::GetDAQStatus::Request,
-                          pses_basis::GetDAQStatus::Response>(
+      nh.advertiseService<pses_ucbridge::GetDAQStatus::Request,
+                          pses_ucbridge::GetDAQStatus::Response>(
           "/uc_bridge/get_daq_status",
           std::bind(ServiceFunctions::getDAQStatus, std::placeholders::_1,
                     std::placeholders::_2, &com));
 
   ros::ServiceServer getFirmwareVersionService =
-      nh.advertiseService<pses_basis::GetFirmwareVersion::Request,
-                          pses_basis::GetFirmwareVersion::Response>(
+      nh.advertiseService<pses_ucbridge::GetFirmwareVersion::Request,
+                          pses_ucbridge::GetFirmwareVersion::Response>(
           "/uc_bridge/get_firmware_version",
           std::bind(ServiceFunctions::getFirmwareVersion, std::placeholders::_1,
                     std::placeholders::_2, &com));
 
   ros::ServiceServer getIMUInfoService =
-      nh.advertiseService<pses_basis::GetIMUInfo::Request,
-                          pses_basis::GetIMUInfo::Response>(
+      nh.advertiseService<pses_ucbridge::GetIMUInfo::Request,
+                          pses_ucbridge::GetIMUInfo::Response>(
           "/uc_bridge/get_imu_info",
           std::bind(ServiceFunctions::getIMUInfo, std::placeholders::_1,
                     std::placeholders::_2, &com));
 
   ros::ServiceServer getInfoAllGroupsService =
-      nh.advertiseService<pses_basis::GetInfoAllGroups::Request,
-                          pses_basis::GetInfoAllGroups::Response>(
+      nh.advertiseService<pses_ucbridge::GetInfoAllGroups::Request,
+                          pses_ucbridge::GetInfoAllGroups::Response>(
           "/uc_bridge/get_info_all_groups",
           std::bind(ServiceFunctions::getInfoAllGroups, std::placeholders::_1,
                     std::placeholders::_2, &com));
 
   ros::ServiceServer getInfoGroupService =
-      nh.advertiseService<pses_basis::GetInfoGroup::Request,
-                          pses_basis::GetInfoGroup::Response>(
+      nh.advertiseService<pses_ucbridge::GetInfoGroup::Request,
+                          pses_ucbridge::GetInfoGroup::Response>(
           "/uc_bridge/get_info_group",
           std::bind(ServiceFunctions::getInfoGroup, std::placeholders::_1,
                     std::placeholders::_2, &com));
 
   ros::ServiceServer getKinectStatusService =
-      nh.advertiseService<pses_basis::GetKinectStatus::Request,
-                          pses_basis::GetKinectStatus::Response>(
+      nh.advertiseService<pses_ucbridge::GetKinectStatus::Request,
+                          pses_ucbridge::GetKinectStatus::Response>(
           "/uc_bridge/get_kinect_status",
           std::bind(ServiceFunctions::getKinectStatus, std::placeholders::_1,
                     std::placeholders::_2, &com));
 
   ros::ServiceServer getMagASAService =
-      nh.advertiseService<pses_basis::GetMagASA::Request,
-                          pses_basis::GetMagASA::Response>(
+      nh.advertiseService<pses_ucbridge::GetMagASA::Request,
+                          pses_ucbridge::GetMagASA::Response>(
           "/uc_bridge/get_mag_asa",
           std::bind(ServiceFunctions::getMagASA, std::placeholders::_1,
                     std::placeholders::_2, &com));
 
   ros::ServiceServer getMagInfoService =
-      nh.advertiseService<pses_basis::GetMagInfo::Request,
-                          pses_basis::GetMagInfo::Response>(
+      nh.advertiseService<pses_ucbridge::GetMagInfo::Request,
+                          pses_ucbridge::GetMagInfo::Response>(
           "/uc_bridge/get_mag_info",
           std::bind(ServiceFunctions::getMagInfo, std::placeholders::_1,
                     std::placeholders::_2, &com));
 
   ros::ServiceServer getMotorLevelService =
-      nh.advertiseService<pses_basis::GetMotorLevel::Request,
-                          pses_basis::GetMotorLevel::Response>(
+      nh.advertiseService<pses_ucbridge::GetMotorLevel::Request,
+                          pses_ucbridge::GetMotorLevel::Response>(
           "/uc_bridge/get_motor_level",
           std::bind(ServiceFunctions::getMotorLevel, std::placeholders::_1,
                     std::placeholders::_2, &com));
 
   ros::ServiceServer getSessionIDService =
-      nh.advertiseService<pses_basis::GetSessionID::Request,
-                          pses_basis::GetSessionID::Response>(
+      nh.advertiseService<pses_ucbridge::GetSessionID::Request,
+                          pses_ucbridge::GetSessionID::Response>(
           "/uc_bridge/get_session_id",
           std::bind(ServiceFunctions::getSessionID, std::placeholders::_1,
                     std::placeholders::_2, &com));
 
   ros::ServiceServer getSteeringLevelService =
-      nh.advertiseService<pses_basis::GetSteeringLevel::Request,
-                          pses_basis::GetSteeringLevel::Response>(
+      nh.advertiseService<pses_ucbridge::GetSteeringLevel::Request,
+                          pses_ucbridge::GetSteeringLevel::Response>(
           "/uc_bridge/get_steering_level",
           std::bind(ServiceFunctions::getSteeringLevel, std::placeholders::_1,
                     std::placeholders::_2, &com));
 
   ros::ServiceServer getUSInfoService =
-      nh.advertiseService<pses_basis::GetUSInfo::Request,
-                          pses_basis::GetUSInfo::Response>(
+      nh.advertiseService<pses_ucbridge::GetUSInfo::Request,
+                          pses_ucbridge::GetUSInfo::Response>(
           "/uc_bridge/get_us_info",
           std::bind(ServiceFunctions::getUSInfo, std::placeholders::_1,
                     std::placeholders::_2, &com));
 
   ros::ServiceServer resetControllerService =
-      nh.advertiseService<pses_basis::ResetController::Request,
-                          pses_basis::ResetController::Response>(
+      nh.advertiseService<pses_ucbridge::ResetController::Request,
+                          pses_ucbridge::ResetController::Response>(
           "/uc_bridge/reset_controller",
           std::bind(ServiceFunctions::resetController, std::placeholders::_1,
                     std::placeholders::_2, &com));
 
   ros::ServiceServer resetDMSService =
-      nh.advertiseService<pses_basis::ResetDMS::Request,
-                          pses_basis::ResetDMS::Response>(
+      nh.advertiseService<pses_ucbridge::ResetDMS::Request,
+                          pses_ucbridge::ResetDMS::Response>(
           "/uc_bridge/reset_dms",
           std::bind(ServiceFunctions::resetDMS, std::placeholders::_1,
                     std::placeholders::_2, &com));
 
   ros::ServiceServer setIMUService =
-      nh.advertiseService<pses_basis::SetIMU::Request,
-                          pses_basis::SetIMU::Response>(
+      nh.advertiseService<pses_ucbridge::SetIMU::Request,
+                          pses_ucbridge::SetIMU::Response>(
           "/uc_bridge/set_imu",
           std::bind(ServiceFunctions::setIMU, std::placeholders::_1,
                     std::placeholders::_2, &com));
 
   ros::ServiceServer setMagService =
-      nh.advertiseService<pses_basis::SetMag::Request,
-                          pses_basis::SetMag::Response>(
+      nh.advertiseService<pses_ucbridge::SetMag::Request,
+                          pses_ucbridge::SetMag::Response>(
           "/uc_bridge/set_mag",
           std::bind(ServiceFunctions::setMag, std::placeholders::_1,
                     std::placeholders::_2, &com));
 
   ros::ServiceServer setMotorLevelService =
-      nh.advertiseService<pses_basis::SetMotorLevel::Request,
-                          pses_basis::SetMotorLevel::Response>(
+      nh.advertiseService<pses_ucbridge::SetMotorLevel::Request,
+                          pses_ucbridge::SetMotorLevel::Response>(
           "/uc_bridge/set_motor_level",
           std::bind(ServiceFunctions::setMotorLevel, std::placeholders::_1,
                     std::placeholders::_2, &com));
 
   ros::ServiceServer setSessionIDService =
-      nh.advertiseService<pses_basis::SetSessionID::Request,
-                          pses_basis::SetSessionID::Response>(
+      nh.advertiseService<pses_ucbridge::SetSessionID::Request,
+                          pses_ucbridge::SetSessionID::Response>(
           "/uc_bridge/set_session_id",
           std::bind(ServiceFunctions::setSessionID, std::placeholders::_1,
                     std::placeholders::_2, &com));
 
   ros::ServiceServer setSteeringLevelService =
-      nh.advertiseService<pses_basis::SetSteering::Request,
-                          pses_basis::SetSteering::Response>(
+      nh.advertiseService<pses_ucbridge::SetSteering::Request,
+                          pses_ucbridge::SetSteering::Response>(
           "/uc_bridge/set_steering_level",
           std::bind(ServiceFunctions::setSteeringLevel, std::placeholders::_1,
                     std::placeholders::_2, &com));
 
   ros::ServiceServer setUSService =
-      nh.advertiseService<pses_basis::SetUS::Request,
-                          pses_basis::SetUS::Response>(
+      nh.advertiseService<pses_ucbridge::SetUS::Request,
+                          pses_ucbridge::SetUS::Response>(
           "/uc_bridge/set_us",
           std::bind(ServiceFunctions::setUS, std::placeholders::_1,
                     std::placeholders::_2, &com));
 
   ros::ServiceServer toggleBrakesService =
-      nh.advertiseService<pses_basis::ToggleBrakes::Request,
-                          pses_basis::ToggleBrakes::Response>(
+      nh.advertiseService<pses_ucbridge::ToggleBrakes::Request,
+                          pses_ucbridge::ToggleBrakes::Response>(
           "/uc_bridge/toggle_brakes",
           std::bind(ServiceFunctions::toggleBrakes, std::placeholders::_1,
                     std::placeholders::_2, &com));
 
   ros::ServiceServer toggleDAQService =
-      nh.advertiseService<pses_basis::ToggleDAQ::Request,
-                          pses_basis::ToggleDAQ::Response>(
+      nh.advertiseService<pses_ucbridge::ToggleDAQ::Request,
+                          pses_ucbridge::ToggleDAQ::Response>(
           "/uc_bridge/toggle_daq",
           std::bind(ServiceFunctions::toggleDAQ, std::placeholders::_1,
                     std::placeholders::_2, &com));
 
   ros::ServiceServer toggleDMSService =
-      nh.advertiseService<pses_basis::ToggleDMS::Request,
-                          pses_basis::ToggleDMS::Response>(
+      nh.advertiseService<pses_ucbridge::ToggleDMS::Request,
+                          pses_ucbridge::ToggleDMS::Response>(
           "/uc_bridge/toggle_dms",
           std::bind(ServiceFunctions::toggleDMS, std::placeholders::_1,
                     std::placeholders::_2, &com));
 
   ros::ServiceServer toggleGroupService =
-      nh.advertiseService<pses_basis::ToggleGroup::Request,
-                          pses_basis::ToggleGroup::Response>(
+      nh.advertiseService<pses_ucbridge::ToggleGroup::Request,
+                          pses_ucbridge::ToggleGroup::Response>(
           "/uc_bridge/toggle_group",
           std::bind(ServiceFunctions::toggleGroup, std::placeholders::_1,
                     std::placeholders::_2, &com));
 
   ros::ServiceServer toggleKinectService =
-      nh.advertiseService<pses_basis::ToggleKinect::Request,
-                          pses_basis::ToggleKinect::Response>(
+      nh.advertiseService<pses_ucbridge::ToggleKinect::Request,
+                          pses_ucbridge::ToggleKinect::Response>(
           "/uc_bridge/toggle_kinect",
           std::bind(ServiceFunctions::toggleKinect, std::placeholders::_1,
                     std::placeholders::_2, &com));
 
   ros::ServiceServer toggleMotorService =
-      nh.advertiseService<pses_basis::ToggleMotor::Request,
-                          pses_basis::ToggleMotor::Response>(
+      nh.advertiseService<pses_ucbridge::ToggleMotor::Request,
+                          pses_ucbridge::ToggleMotor::Response>(
           "/uc_bridge/toggle_motor",
           std::bind(ServiceFunctions::toggleMotor, std::placeholders::_1,
                     std::placeholders::_2, &com));
   ros::ServiceServer toggleUSService =
-      nh.advertiseService<pses_basis::ToggleUS::Request,
-                          pses_basis::ToggleUS::Response>(
+      nh.advertiseService<pses_ucbridge::ToggleUS::Request,
+                          pses_ucbridge::ToggleUS::Response>(
           "/uc_bridge/toggle_us",
           std::bind(ServiceFunctions::toggleUS, std::placeholders::_1,
                     std::placeholders::_2, &com));

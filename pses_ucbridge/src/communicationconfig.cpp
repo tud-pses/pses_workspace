@@ -1,4 +1,4 @@
-#include <pses_basis/communicationconfig.h>
+#include <pses_ucbridge/communicationconfig.h>
 
 CommunicationConfig::CommunicationConfig() {}
 

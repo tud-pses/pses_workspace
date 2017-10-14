@@ -2,13 +2,13 @@
 #define COMMUNICATION_H
 
 #include <string>
-#include <pses_basis/threaddispatcher.h>
-#include <pses_basis/serialinterface.h>
-#include <pses_basis/communicationconfig.h>
-#include <pses_basis/readingthread.h>
+#include <pses_ucbridge/threaddispatcher.h>
+#include <pses_ucbridge/serialinterface.h>
+#include <pses_ucbridge/communicationconfig.h>
+#include <pses_ucbridge/readingthread.h>
 #include <ros/ros.h>
-#include <pses_basis/parameter.h>
-#include <pses_basis/command.h>
+#include <pses_ucbridge/parameter.h>
+#include <pses_ucbridge/command.h>
 
 class Communication
 {

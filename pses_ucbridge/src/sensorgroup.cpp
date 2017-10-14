@@ -1,4 +1,4 @@
-#include <pses_basis/sensorgroup.h>
+#include <pses_ucbridge/sensorgroup.h>
 
 const std::string SensorGroup::ENCODING_ASCII = "ASCII";
 const std::string SensorGroup::ENCODING_B64 = "B64";

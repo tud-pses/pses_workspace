@@ -9,7 +9,7 @@ project(pses_dashboard)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   cv_bridge
-  pses_basis
+  pses_ucbridge
   roscpp
   sensor_msgs
   std_msgs
@@ -122,7 +122,7 @@ set(QT_LIBRARIES Qt5::Widgets Qt5::Gui Qt5::Core)
 catkin_package(
    #INCLUDE_DIRS include
    #LIBRARIES pses_dashboard
-   CATKIN_DEPENDS pses_basis
+   CATKIN_DEPENDS pses_ucbridge
 )
 
 ###########
@@ -172,7 +172,7 @@ add_executable(dashboard src/dashboard_node.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-#add_dependencies(pses_dashboard pses_basis _gencpp ${catkin_EXPORTED_TARGETS})
+#add_dependencies(pses_dashboard pses_ucbridge _gencpp ${catkin_EXPORTED_TARGETS})
 add_dependencies(dashboard_project ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against

@@ -312,8 +312,8 @@ void Dashboard::callGetFirmwareServide()
 {
   if (!ros::service::waitForService(getFirmwareService, 5000))
     ROS_WARN_STREAM("Get car id service not availible!");
-  pses_basis::GetFirmwareVersion::Request firmwareRequest;
-  pses_basis::GetFirmwareVersion::Response firmwareResponse;
+  pses_ucbridge::GetFirmwareVersion::Request firmwareRequest;
+  pses_ucbridge::GetFirmwareVersion::Response firmwareResponse;
   ros::service::call(getFirmwareService, firmwareRequest, firmwareResponse);
   if (firmwareResponse.answer_received)
   {
@@ -329,8 +329,8 @@ void Dashboard::callGetCarIdServide()
 {
   if (!ros::service::waitForService(getCarIdService, 5000))
     ROS_WARN_STREAM("Get car id service not availible!");
-  pses_basis::GetControllerID::Request idRequest;
-  pses_basis::GetControllerID::Response idResponse;
+  pses_ucbridge::GetControllerID::Request idRequest;
+  pses_ucbridge::GetControllerID::Response idResponse;
   ros::service::call(getCarIdService, idRequest, idResponse);
   if (idResponse.answer_received)
   {
@@ -346,8 +346,8 @@ void Dashboard::callGetSidServide()
 {
   if (!ros::service::waitForService(getSidService, 5000))
     ROS_WARN_STREAM("Get car sid service not availible!");
-  pses_basis::GetSessionID::Request sidRequest;
-  pses_basis::GetSessionID::Response sidResponse;
+  pses_ucbridge::GetSessionID::Request sidRequest;
+  pses_ucbridge::GetSessionID::Response sidResponse;
   ros::service::call(getSidService, sidRequest, sidResponse);
   if (sidResponse.answer_received)
   {
@@ -584,9 +584,9 @@ void Dashboard::pollNodeHandle()
 
 void Dashboard::toggleKinect()
 {
-  pses_basis::ToggleKinect::Request kinectRequest;
+  pses_ucbridge::ToggleKinect::Request kinectRequest;
   kinectRequest.kinect_on = ui->kinectToggle->isChecked();
-  pses_basis::ToggleKinect::Response kinectResponse;
+  pses_ucbridge::ToggleKinect::Response kinectResponse;
   if (!ros::service::waitForService(toggleKinectService, 1000))
     ROS_WARN_STREAM("Toggle kinect service not availible!");
   ros::service::call(toggleKinectService, kinectRequest, kinectResponse);
@@ -596,9 +596,9 @@ void Dashboard::toggleKinect()
 
 void Dashboard::toggleUS()
 {
-  pses_basis::ToggleUS::Request usRequest;
+  pses_ucbridge::ToggleUS::Request usRequest;
   usRequest.us_on = ui->usToggle->isChecked();
-  pses_basis::ToggleUS::Response usResponse;
+  pses_ucbridge::ToggleUS::Response usResponse;
   if (!ros::service::waitForService(toggleUSService, 1000))
     ROS_WARN_STREAM("Toggle us service not availible!");
   ros::service::call(toggleUSService, usRequest, usResponse);
@@ -608,9 +608,9 @@ void Dashboard::toggleUS()
 
 void Dashboard::toggleMotor()
 {
-  pses_basis::ToggleMotor::Request motorRequest;
+  pses_ucbridge::ToggleMotor::Request motorRequest;
   motorRequest.motor_on = ui->motorToggle->isChecked();
-  pses_basis::ToggleMotor::Response motorResponse;
+  pses_ucbridge::ToggleMotor::Response motorResponse;
   if (!ros::service::waitForService(toggleMotorService, 1000))
     ROS_WARN_STREAM("Toggle motor service not availible!");
   ros::service::call(toggleMotorService, motorRequest, motorResponse);
@@ -620,9 +620,9 @@ void Dashboard::toggleMotor()
 
 void Dashboard::toggleDAQ()
 {
-  pses_basis::ToggleDAQ::Request daqRequest;
+  pses_ucbridge::ToggleDAQ::Request daqRequest;
   daqRequest.DAQ_on = ui->daqToggle->isChecked();
-  pses_basis::ToggleDAQ::Response daqResponse;
+  pses_ucbridge::ToggleDAQ::Response daqResponse;
   if (!ros::service::waitForService(toggleDAQService, 1000))
     ROS_WARN_STREAM("Toggle daq service not availible!");
   ros::service::call(toggleDAQService, daqRequest, daqResponse);

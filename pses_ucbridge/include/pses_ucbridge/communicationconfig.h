@@ -1,8 +1,8 @@
 #ifndef COMMUNICATIONCONFIG_H
 #define COMMUNICATIONCONFIG_H
 
-#include <pses_basis/command.h>
-#include <pses_basis/sensorgroup.h>
+#include <pses_ucbridge/command.h>
+#include <pses_ucbridge/sensorgroup.h>
 #include <string>
 #include <unordered_map>
 #include <yaml-cpp/yaml.h>
@@ -10,7 +10,7 @@
 #include <vector>
 #include <boost/algorithm/string.hpp>
 #include <unordered_set>
-#include <pses_basis/syntax.h>
+#include <pses_ucbridge/syntax.h>
 
 struct SerialInterfaceParams
 {

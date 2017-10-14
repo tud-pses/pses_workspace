@@ -1,4 +1,4 @@
-#include <pses_basis/sensorgroupthread.h>
+#include <pses_ucbridge/sensorgroupthread.h>
 
 SensorGroupThread::SensorGroupThread(
     std::shared_ptr<Syntax> syntax, ThreadDispatcher* dispatcher,

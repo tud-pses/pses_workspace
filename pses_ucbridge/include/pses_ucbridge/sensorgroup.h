@@ -3,11 +3,11 @@
 
 #include <vector>
 #include <string>
-#include <pses_basis/parameter.h>
-#include <pses_basis/command.h>
-#include <pses_basis/syntax.h>
+#include <pses_ucbridge/parameter.h>
+#include <pses_ucbridge/command.h>
+#include <pses_ucbridge/syntax.h>
 #include <boost/range/algorithm/remove_if.hpp>
-#include <pses_basis/base64Decoder.h>
+#include <pses_ucbridge/base64Decoder.h>
 
 struct Channel
 {

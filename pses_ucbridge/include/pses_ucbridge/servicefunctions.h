@@ -2,44 +2,44 @@
 #define SERVICEFUNCTIONS_H
 
 #include <ros/ros.h>
-#include <pses_basis/communication.h>
+#include <pses_ucbridge/communication.h>
 // service includes begin
-#include <pses_basis/DeleteGroup.h>
-#include <pses_basis/GetControllerID.h>
-#include <pses_basis/GetDAQStatus.h>
-#include <pses_basis/GetFirmwareVersion.h>
-#include <pses_basis/GetIMUInfo.h>
-#include <pses_basis/GetInfoAllGroups.h>
-#include <pses_basis/GetInfoGroup.h>
-#include <pses_basis/GetKinectStatus.h>
-#include <pses_basis/GetMagASA.h>
-#include <pses_basis/GetMagInfo.h>
-#include <pses_basis/GetMotorLevel.h>
-#include <pses_basis/GetSessionID.h>
-#include <pses_basis/GetSteeringLevel.h>
-#include <pses_basis/GetUSInfo.h>
-#include <pses_basis/ResetController.h>
-#include <pses_basis/ResetDMS.h>
-#include <pses_basis/SetIMU.h>
-#include <pses_basis/SetMag.h>
-#include <pses_basis/SetMotorLevel.h>
-#include <pses_basis/SetSteering.h>
-#include <pses_basis/SetSessionID.h>
-#include <pses_basis/SetUS.h>
-#include <pses_basis/ToggleBrakes.h>
-#include <pses_basis/ToggleDAQ.h>
-#include <pses_basis/ToggleDMS.h>
-#include <pses_basis/ToggleGroup.h>
-#include <pses_basis/ToggleKinect.h>
-#include <pses_basis/ToggleMotor.h>
-#include <pses_basis/ToggleUS.h>
+#include <pses_ucbridge/DeleteGroup.h>
+#include <pses_ucbridge/GetControllerID.h>
+#include <pses_ucbridge/GetDAQStatus.h>
+#include <pses_ucbridge/GetFirmwareVersion.h>
+#include <pses_ucbridge/GetIMUInfo.h>
+#include <pses_ucbridge/GetInfoAllGroups.h>
+#include <pses_ucbridge/GetInfoGroup.h>
+#include <pses_ucbridge/GetKinectStatus.h>
+#include <pses_ucbridge/GetMagASA.h>
+#include <pses_ucbridge/GetMagInfo.h>
+#include <pses_ucbridge/GetMotorLevel.h>
+#include <pses_ucbridge/GetSessionID.h>
+#include <pses_ucbridge/GetSteeringLevel.h>
+#include <pses_ucbridge/GetUSInfo.h>
+#include <pses_ucbridge/ResetController.h>
+#include <pses_ucbridge/ResetDMS.h>
+#include <pses_ucbridge/SetIMU.h>
+#include <pses_ucbridge/SetMag.h>
+#include <pses_ucbridge/SetMotorLevel.h>
+#include <pses_ucbridge/SetSteering.h>
+#include <pses_ucbridge/SetSessionID.h>
+#include <pses_ucbridge/SetUS.h>
+#include <pses_ucbridge/ToggleBrakes.h>
+#include <pses_ucbridge/ToggleDAQ.h>
+#include <pses_ucbridge/ToggleDMS.h>
+#include <pses_ucbridge/ToggleGroup.h>
+#include <pses_ucbridge/ToggleKinect.h>
+#include <pses_ucbridge/ToggleMotor.h>
+#include <pses_ucbridge/ToggleUS.h>
 
 // service includes end
 
 namespace ServiceFunctions{
 
-bool deleteGroup(pses_basis::DeleteGroup::Request& req,
-                   pses_basis::DeleteGroup::Response& res, Communication* com)
+bool deleteGroup(pses_ucbridge::DeleteGroup::Request& req,
+                   pses_ucbridge::DeleteGroup::Response& res, Communication* com)
 {
   res.was_set = false;
   std::string cmd = "Delete Group";
@@ -56,8 +56,8 @@ bool deleteGroup(pses_basis::DeleteGroup::Request& req,
   return true;
 }
 
-bool getControllerID(pses_basis::GetControllerID::Request& req,
-                   pses_basis::GetControllerID::Response& res, Communication* com)
+bool getControllerID(pses_ucbridge::GetControllerID::Request& req,
+                   pses_ucbridge::GetControllerID::Response& res, Communication* com)
 {
   res.answer_received = false;
   std::string cmd = "Get Controller ID";
@@ -75,8 +75,8 @@ bool getControllerID(pses_basis::GetControllerID::Request& req,
   return true;
 }
 
-bool getDAQStatus(pses_basis::GetDAQStatus::Request& req,
-                   pses_basis::GetDAQStatus::Response& res, Communication* com)
+bool getDAQStatus(pses_ucbridge::GetDAQStatus::Request& req,
+                   pses_ucbridge::GetDAQStatus::Response& res, Communication* com)
 {
   res.answer_received = false;
   std::string cmd = "Is DAQ Started";
@@ -94,8 +94,8 @@ bool getDAQStatus(pses_basis::GetDAQStatus::Request& req,
   return true;
 }
 
-bool getFirmwareVersion(pses_basis::GetFirmwareVersion::Request& req,
-                   pses_basis::GetFirmwareVersion::Response& res, Communication* com)
+bool getFirmwareVersion(pses_ucbridge::GetFirmwareVersion::Request& req,
+                   pses_ucbridge::GetFirmwareVersion::Response& res, Communication* com)
 {
   res.answer_received = false;
   std::string cmd = "Get Firmware Version";
@@ -113,8 +113,8 @@ bool getFirmwareVersion(pses_basis::GetFirmwareVersion::Request& req,
   return true;
 }
 
-bool getIMUInfo(pses_basis::GetIMUInfo::Request& req,
-                   pses_basis::GetIMUInfo::Response& res, Communication* com)
+bool getIMUInfo(pses_ucbridge::GetIMUInfo::Request& req,
+                   pses_ucbridge::GetIMUInfo::Response& res, Communication* com)
 {
   res.answer_received = false;
   std::string cmd = "Get IMU Info";
@@ -132,8 +132,8 @@ bool getIMUInfo(pses_basis::GetIMUInfo::Request& req,
   return true;
 }
 
-bool getInfoAllGroups(pses_basis::GetInfoAllGroups::Request& req,
-                   pses_basis::GetInfoAllGroups::Response& res, Communication* com)
+bool getInfoAllGroups(pses_ucbridge::GetInfoAllGroups::Request& req,
+                   pses_ucbridge::GetInfoAllGroups::Response& res, Communication* com)
 {
   res.answer_received = false;
   std::string cmd = "All Groups Info";
@@ -151,8 +151,8 @@ bool getInfoAllGroups(pses_basis::GetInfoAllGroups::Request& req,
   return true;
 }
 
-bool getInfoGroup(pses_basis::GetInfoGroup::Request& req,
-                   pses_basis::GetInfoGroup::Response& res, Communication* com)
+bool getInfoGroup(pses_ucbridge::GetInfoGroup::Request& req,
+                   pses_ucbridge::GetInfoGroup::Response& res, Communication* com)
 {
   res.answer_received = false;
   std::string cmd = "Group Info";
@@ -171,8 +171,8 @@ bool getInfoGroup(pses_basis::GetInfoGroup::Request& req,
   return true;
 }
 
-bool getKinectStatus(pses_basis::GetKinectStatus::Request& req,
-                   pses_basis::GetKinectStatus::Response& res, Communication* com)
+bool getKinectStatus(pses_ucbridge::GetKinectStatus::Request& req,
+                   pses_ucbridge::GetKinectStatus::Response& res, Communication* com)
 {
   res.answer_received = false;
   std::string cmd = "Get Kinect Status";
@@ -190,8 +190,8 @@ bool getKinectStatus(pses_basis::GetKinectStatus::Request& req,
   return true;
 }
 
-bool getMagASA(pses_basis::GetMagASA::Request& req,
-                   pses_basis::GetMagASA::Response& res, Communication* com)
+bool getMagASA(pses_ucbridge::GetMagASA::Request& req,
+                   pses_ucbridge::GetMagASA::Response& res, Communication* com)
 {
   res.answer_received = false;
   std::string cmd = "Get MAG ASA";
@@ -211,8 +211,8 @@ bool getMagASA(pses_basis::GetMagASA::Request& req,
   return true;
 }
 
-bool getMagInfo(pses_basis::GetMagInfo::Request& req,
-                   pses_basis::GetMagInfo::Response& res, Communication* com)
+bool getMagInfo(pses_ucbridge::GetMagInfo::Request& req,
+                   pses_ucbridge::GetMagInfo::Response& res, Communication* com)
 {
   res.answer_received = false;
   std::string cmd = "Get MAG Info";
@@ -230,8 +230,8 @@ bool getMagInfo(pses_basis::GetMagInfo::Request& req,
   return true;
 }
 
-bool getMotorLevel(pses_basis::GetMotorLevel::Request& req,
-                   pses_basis::GetMotorLevel::Response& res, Communication* com)
+bool getMotorLevel(pses_ucbridge::GetMotorLevel::Request& req,
+                   pses_ucbridge::GetMotorLevel::Response& res, Communication* com)
 {
   res.answer_received = false;
   std::string cmd = "Get Motor Level";
@@ -256,8 +256,8 @@ bool getMotorLevel(pses_basis::GetMotorLevel::Request& req,
   return true;
 }
 
-bool getSessionID(pses_basis::GetSessionID::Request& req,
-                   pses_basis::GetSessionID::Response& res, Communication* com)
+bool getSessionID(pses_ucbridge::GetSessionID::Request& req,
+                   pses_ucbridge::GetSessionID::Response& res, Communication* com)
 {
   res.answer_received = false;
   std::string cmd = "Get Session ID";
@@ -275,8 +275,8 @@ bool getSessionID(pses_basis::GetSessionID::Request& req,
   return true;
 }
 
-bool getSteeringLevel(pses_basis::GetSteeringLevel::Request& req,
-                   pses_basis::GetSteeringLevel::Response& res, Communication* com)
+bool getSteeringLevel(pses_ucbridge::GetSteeringLevel::Request& req,
+                   pses_ucbridge::GetSteeringLevel::Response& res, Communication* com)
 {
   res.answer_received = false;
   std::string cmd = "Get Steering Level";
@@ -294,8 +294,8 @@ bool getSteeringLevel(pses_basis::GetSteeringLevel::Request& req,
   return true;
 }
 
-bool getUSInfo(pses_basis::GetUSInfo::Request& req,
-                   pses_basis::GetUSInfo::Response& res, Communication* com)
+bool getUSInfo(pses_ucbridge::GetUSInfo::Request& req,
+                   pses_ucbridge::GetUSInfo::Response& res, Communication* com)
 {
   res.answer_received = false;
   std::string cmd = "Get US Info";
@@ -313,8 +313,8 @@ bool getUSInfo(pses_basis::GetUSInfo::Request& req,
   return true;
 }
 
-bool resetController(pses_basis::ResetController::Request& req,
-                   pses_basis::ResetController::Response& res, Communication* com)
+bool resetController(pses_ucbridge::ResetController::Request& req,
+                   pses_ucbridge::ResetController::Response& res, Communication* com)
 {
   res.was_set = false;
   std::string cmd = "Reset Controller";
@@ -331,8 +331,8 @@ bool resetController(pses_basis::ResetController::Request& req,
   return true;
 }
 
-bool resetDMS(pses_basis::ResetDMS::Request& req,
-                   pses_basis::ResetDMS::Response& res, Communication* com)
+bool resetDMS(pses_ucbridge::ResetDMS::Request& req,
+                   pses_ucbridge::ResetDMS::Response& res, Communication* com)
 {
   res.was_set = false;
   std::string cmd = "Reset DMS";
@@ -348,8 +348,8 @@ bool resetDMS(pses_basis::ResetDMS::Request& req,
   return true;
 }
 
-bool setIMU(pses_basis::SetIMU::Request& req,
-                   pses_basis::SetIMU::Response& res, Communication* com)
+bool setIMU(pses_ucbridge::SetIMU::Request& req,
+                   pses_ucbridge::SetIMU::Response& res, Communication* com)
 {
   res.was_set = false;
   std::string cmd = "Set IMU";
@@ -376,8 +376,8 @@ bool setIMU(pses_basis::SetIMU::Request& req,
   return true;
 }
 
-bool setMag(pses_basis::SetMag::Request& req,
-                   pses_basis::SetMag::Response& res, Communication* com)
+bool setMag(pses_ucbridge::SetMag::Request& req,
+                   pses_ucbridge::SetMag::Response& res, Communication* com)
 {
   res.was_set = false;
   std::string cmd = "Set MAG";
@@ -397,8 +397,8 @@ bool setMag(pses_basis::SetMag::Request& req,
   return true;
 }
 
-bool setMotorLevel(pses_basis::SetMotorLevel::Request& req,
-                   pses_basis::SetMotorLevel::Response& res, Communication* com)
+bool setMotorLevel(pses_ucbridge::SetMotorLevel::Request& req,
+                   pses_ucbridge::SetMotorLevel::Response& res, Communication* com)
 {
   res.was_set = false;
   std::string cmd = "Drive Forward";
@@ -422,8 +422,8 @@ bool setMotorLevel(pses_basis::SetMotorLevel::Request& req,
   return true;
 }
 
-bool setSessionID(pses_basis::SetSessionID::Request& req,
-                   pses_basis::SetSessionID::Response& res, Communication* com)
+bool setSessionID(pses_ucbridge::SetSessionID::Request& req,
+                   pses_ucbridge::SetSessionID::Response& res, Communication* com)
 {
   res.was_set = false;
   std::string cmd = "Set Session ID";
@@ -440,8 +440,8 @@ bool setSessionID(pses_basis::SetSessionID::Request& req,
   return true;
 }
 
-bool setSteeringLevel(pses_basis::SetSteering::Request& req,
-                   pses_basis::SetSteering::Response& res, Communication* com)
+bool setSteeringLevel(pses_ucbridge::SetSteering::Request& req,
+                   pses_ucbridge::SetSteering::Response& res, Communication* com)
 {
   res.was_set = false;
   std::string cmd = "Set Steering Level";
@@ -458,8 +458,8 @@ bool setSteeringLevel(pses_basis::SetSteering::Request& req,
   return true;
 }
 
-bool setUS(pses_basis::SetUS::Request& req,
-                   pses_basis::SetUS::Response& res, Communication* com)
+bool setUS(pses_ucbridge::SetUS::Request& req,
+                   pses_ucbridge::SetUS::Response& res, Communication* com)
 {
   res.was_set = false;
   std::string cmd = "Set US";
@@ -482,8 +482,8 @@ bool setUS(pses_basis::SetUS::Request& req,
   return true;
 }
 
-bool toggleBrakes(pses_basis::ToggleBrakes::Request& req,
-                   pses_basis::ToggleBrakes::Response& res, Communication* com)
+bool toggleBrakes(pses_ucbridge::ToggleBrakes::Request& req,
+                   pses_ucbridge::ToggleBrakes::Response& res, Communication* com)
 {
   res.was_set = false;
   Parameter::ParameterMap input;
@@ -506,8 +506,8 @@ bool toggleBrakes(pses_basis::ToggleBrakes::Request& req,
   return true;
 }
 
-bool toggleDAQ(pses_basis::ToggleDAQ::Request& req,
-                   pses_basis::ToggleDAQ::Response& res, Communication* com)
+bool toggleDAQ(pses_ucbridge::ToggleDAQ::Request& req,
+                   pses_ucbridge::ToggleDAQ::Response& res, Communication* com)
 {
   res.was_set = false;
   Parameter::ParameterMap input;
@@ -529,8 +529,8 @@ bool toggleDAQ(pses_basis::ToggleDAQ::Request& req,
 }
 
 
-bool toggleDMS(pses_basis::ToggleDMS::Request& req,
-                   pses_basis::ToggleDMS::Response& res, Communication* com)
+bool toggleDMS(pses_ucbridge::ToggleDMS::Request& req,
+                   pses_ucbridge::ToggleDMS::Response& res, Communication* com)
 {
   res.was_set = false;
   std::string cmd = "Set Drv";
@@ -555,8 +555,8 @@ bool toggleDMS(pses_basis::ToggleDMS::Request& req,
   return true;
 }
 
-bool toggleGroup(pses_basis::ToggleGroup::Request& req,
-                   pses_basis::ToggleGroup::Response& res, Communication* com)
+bool toggleGroup(pses_ucbridge::ToggleGroup::Request& req,
+                   pses_ucbridge::ToggleGroup::Response& res, Communication* com)
 {
   res.was_set = false;
   Parameter::ParameterMap input;
@@ -578,8 +578,8 @@ bool toggleGroup(pses_basis::ToggleGroup::Request& req,
   return true;
 }
 
-bool toggleKinect(pses_basis::ToggleKinect::Request& req,
-                   pses_basis::ToggleKinect::Response& res, Communication* com)
+bool toggleKinect(pses_ucbridge::ToggleKinect::Request& req,
+                   pses_ucbridge::ToggleKinect::Response& res, Communication* com)
 {
   res.was_set = false;
   Parameter::ParameterMap input;
@@ -601,8 +601,8 @@ bool toggleKinect(pses_basis::ToggleKinect::Request& req,
   return true;
 }
 
-bool toggleMotor(pses_basis::ToggleMotor::Request& req,
-                   pses_basis::ToggleMotor::Response& res, Communication* com)
+bool toggleMotor(pses_ucbridge::ToggleMotor::Request& req,
+                   pses_ucbridge::ToggleMotor::Response& res, Communication* com)
 {
   res.was_set = false;
   Parameter::ParameterMap input;
@@ -625,8 +625,8 @@ bool toggleMotor(pses_basis::ToggleMotor::Request& req,
   return true;
 }
 
-bool toggleUS(pses_basis::ToggleUS::Request& req,
-                   pses_basis::ToggleUS::Response& res, Communication* com)
+bool toggleUS(pses_ucbridge::ToggleUS::Request& req,
+                   pses_ucbridge::ToggleUS::Response& res, Communication* com)
 {
   res.was_set = false;
   Parameter::ParameterMap input;

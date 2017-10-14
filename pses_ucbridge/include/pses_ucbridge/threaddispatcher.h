@@ -3,11 +3,11 @@
 
 #include <string>
 #include <queue>
-#include <pses_basis/serialinterface.h>
-#include <pses_basis/communicationthread.h>
-#include <pses_basis/readingthread.h>
-#include <pses_basis/communicationconfig.h>
-#include <pses_basis/sensorgroupthread.h>
+#include <pses_ucbridge/serialinterface.h>
+#include <pses_ucbridge/communicationthread.h>
+#include <pses_ucbridge/readingthread.h>
+#include <pses_ucbridge/communicationconfig.h>
+#include <pses_ucbridge/sensorgroupthread.h>
 
 class ReadingThread;
 class SensorGroupThread;

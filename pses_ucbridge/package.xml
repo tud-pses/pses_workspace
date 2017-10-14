@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package>
-  <name>pses_basis</name>
+  <name>pses_ucbridge</name>
   <version>1.0.4</version>
-  <description>The pses_basis package</description>
+  <description>The pses_ucbridge package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag --> 
   <!-- Example:  -->

@@ -3,9 +3,9 @@
 
 #include <string>
 #include <queue>
-#include <pses_basis/communicationconfig.h>
-#include <pses_basis/communicationthread.h>
-#include <pses_basis/threaddispatcher.h>
+#include <pses_ucbridge/communicationconfig.h>
+#include <pses_ucbridge/communicationthread.h>
+#include <pses_ucbridge/threaddispatcher.h>
 #include <boost/range/algorithm/remove_if.hpp>
 
 class ThreadDispatcher;

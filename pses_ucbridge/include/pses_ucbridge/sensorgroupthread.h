@@ -3,9 +3,9 @@
 
 #include <string>
 #include <queue>
-#include <pses_basis/communicationthread.h>
-#include <pses_basis/threaddispatcher.h>
-#include <pses_basis/sensorgroup.h>
+#include <pses_ucbridge/communicationthread.h>
+#include <pses_ucbridge/threaddispatcher.h>
+#include <pses_ucbridge/sensorgroup.h>
 #include <boost/range/algorithm/remove_if.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <algorithm>

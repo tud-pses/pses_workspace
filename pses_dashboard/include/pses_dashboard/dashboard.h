@@ -24,13 +24,13 @@
 #include <sensor_msgs/MagneticField.h>
 #include <sensor_msgs/Range.h>
 
-#include <pses_basis/GetFirmwareVersion.h>
-#include <pses_basis/GetControllerID.h>
-#include <pses_basis/GetSessionID.h>
-#include <pses_basis/ToggleKinect.h>
-#include <pses_basis/ToggleMotor.h>
-#include <pses_basis/ToggleUS.h>
-#include <pses_basis/ToggleDAQ.h>
+#include <pses_ucbridge/GetFirmwareVersion.h>
+#include <pses_ucbridge/GetControllerID.h>
+#include <pses_ucbridge/GetSessionID.h>
+#include <pses_ucbridge/ToggleKinect.h>
+#include <pses_ucbridge/ToggleMotor.h>
+#include <pses_ucbridge/ToggleUS.h>
+#include <pses_ucbridge/ToggleDAQ.h>
 
 namespace Dash
 {
@@ -45,7 +45,7 @@ typedef std_msgs::Float64 float64_msg;
 typedef std_msgs::UInt8 uint8_msg;
 
 static const std::string DEFAULT_MODE_CONTROL_TOPIC =
-    "/pses_basis/mode_control";
+    "/dasboard/mode_control";
 static const std::string DEFAULT_STEERING_COMMAND_TOPIC =
     "/uc_bridge/set_steering_level_msg";
 static const std::string DEFAULT_MOTOR_COMMAND_TOPIC =
