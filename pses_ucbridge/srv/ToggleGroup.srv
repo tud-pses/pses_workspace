@@ -1,4 +1,0 @@
-uint8 group_number
-bool group_on
----
-bool was_set

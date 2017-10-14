@@ -1,4 +1,0 @@
-uint8 group_number
----
-bool answer_received
-string info
