@@ -7,3 +7,6 @@
 [submodule "pses_dashboard"]
 	path = pses_dashboard
 	url = https://github.com/tud-pses/pses_dashboard.git
+[submodule "pses_simulation"]
+	path = pses_simulation
+	url = https://github.com/tud-pses/pses_simulation.git
