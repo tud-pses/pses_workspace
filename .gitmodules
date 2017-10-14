@@ -3,9 +3,6 @@
 [submodule "pses_ucbridge"]
 	path = pses_ucbridge
 	url = https://github.com/tud-pses/pses_ucbridge.git
-[submodule "pses_dashboard"]
-	path = pses_dashboard
-	url = https://github.com/tud-pses/pses_dashboard.git
 [submodule "pses_helloworld"]
 	path = pses_helloworld
 	url = https://github.com/tud-pses/pses_helloworld.git
