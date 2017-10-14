@@ -344,10 +344,10 @@ int main(int argc, char** argv)
 
   // create control subscribers e.g. steering, motorlevel etc.
   ros::Subscriber motorLevelSubscriber = nh.subscribe<std_msgs::Int16>(
-      "/uc_bridge/set_motor_level_msg", 10,
+      "/uc_bridge/set_motor_level_msg", 1,
       boost::bind(uc_bridge::motorLevelCallback, _1, &com));
   ros::Subscriber steeringLevelSubscriber = nh.subscribe<std_msgs::Int16>(
-      "/uc_bridge/set_steering_level_msg", 10,
+      "/uc_bridge/set_steering_level_msg", 1,
       boost::bind(uc_bridge::steeringLevelCallback, _1, &com));
   // raw mode subscriber
   ros::Subscriber ucBoardMsgSubscriber;

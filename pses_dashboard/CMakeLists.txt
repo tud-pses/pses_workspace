@@ -162,7 +162,7 @@ add_library(dashboard_project
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(pses_dashboard src/pses_dashboard.cpp)
+add_executable(dashboard src/dashboard_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -180,7 +180,7 @@ target_link_libraries(dashboard_project
   ${catkin_LIBRARIES}
   ${QT_LIBRARIES}
 )
-target_link_libraries(pses_dashboard
+target_link_libraries(dashboard
   dashboard_project
   ${catkin_LIBRARIES}
   ${QT_LIBRARIES}

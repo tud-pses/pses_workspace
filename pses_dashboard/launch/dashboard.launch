@@ -1,0 +1,4 @@
+<launch>
+<node pkg="pses_dashboard" type="dashboard" name="dashboard" output="screen">
+</node>
+</launch>

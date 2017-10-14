@@ -4,6 +4,7 @@
 #include <math.h>
 #include <string>
 #include <sstream>
+#include <boost/math/special_functions/sign.hpp>
 
 #include <qt5/QtWidgets/QMainWindow>
 #include <qt5/QtCore/qtimer.h>
@@ -25,12 +26,14 @@
 
 #include <pses_basis/GetFirmwareVersion.h>
 #include <pses_basis/GetControllerID.h>
+#include <pses_basis/GetSessionID.h>
 #include <pses_basis/ToggleKinect.h>
+#include <pses_basis/ToggleMotor.h>
+#include <pses_basis/ToggleUS.h>
+#include <pses_basis/ToggleDAQ.h>
 
-// typedef pses_basis::Command command_data;
-// typedef pses_basis::SensorData sensor_data;
-// typedef pses_basis::CarInfo info_data;
-// typedef nav_msgs::Odometry odometry_data;
+namespace Dash
+{
 typedef std_msgs::String string_msg;
 typedef sensor_msgs::Image image_msg;
 typedef sensor_msgs::Imu imu_msg;
@@ -40,6 +43,48 @@ typedef sensor_msgs::Range range_msg;
 typedef std_msgs::Int16 int16_msg;
 typedef std_msgs::Float64 float64_msg;
 typedef std_msgs::UInt8 uint8_msg;
+
+static const std::string DEFAULT_MODE_CONTROL_TOPIC =
+    "/pses_basis/mode_control";
+static const std::string DEFAULT_STEERING_COMMAND_TOPIC =
+    "/uc_bridge/set_steering_level_msg";
+static const std::string DEFAULT_MOTOR_COMMAND_TOPIC =
+    "/uc_bridge/set_motor_level_msg";
+static const std::string DEFAULT_IMU_TOPIC = "/uc_bridge/imu";
+static const std::string DEFAULT_MAGNETIC_TOPIC = "/uc_bridge/mag";
+static const std::string DEFAULT_USR_TOPIC = "/uc_bridge/usr";
+static const std::string DEFAULT_USF_TOPIC = "/uc_bridge/usf";
+static const std::string DEFAULT_USL_TOPIC = "/uc_bridge/usl";
+static const std::string DEFAULT_HALLCNT_TOPIC = "/uc_bridge/hall_cnt";
+static const std::string DEFAULT_HALLDT_TOPIC = "/uc_bridge/hall_dt";
+static const std::string DEFAULT_HALLDT8_TOPIC = "/uc_bridge/hall_dt8";
+static const std::string DEFAULT_VDBAT_TOPIC = "/uc_bridge/vdbat";
+static const std::string DEFAULT_VSBAT_TOPIC = "/uc_bridge/vsbat";
+static const std::string DEFAULT_GET_FIRMWARE_SERVICE =
+    "/uc_bridge/get_firmware_version";
+static const std::string DEFAULT_GET_CARID_SERVICE =
+    "/uc_bridge/get_controller_id";
+static const std::string DEFAULT_GET_SID_SERVICE = "/uc_bridge/get_session_id";
+static const std::string DEFAULT_IMAGE_COLOR_TOPIC = "kinect2/qhd/image_color";
+static const std::string DEFAULT_IMAGE_DEPTH_TOPIC = "kinect2/sd/image_depth";
+static const std::string DEFAULT_TOGGLE_KINECT_SERVICE =
+    "/uc_bridge/toggle_kinect";
+static const std::string DEFAULT_TOGGLE_MOTOR_SERVICE =
+    "/uc_bridge/toggle_motor";
+static const std::string DEFAULT_TOGGLE_US_SERVICE = "/uc_bridge/toggle_us";
+static const std::string DEFAULT_TOGGLE_DAQ_SERVICE = "/uc_bridge/toggle_daq";
+static const std::string DEFAULT_VIDEO_FEED_MODE = "Off";
+static const int DEFAULT_MAX_FWD_SPEED = 1000;
+static const int DEFAULT_MAX_BWD_SPEED = -500;
+static const int DEFAULT_SPEED_STEP = 50;
+static const int DEFAULT_MAX_LEFT_STEER = -1000;
+static const int DEFAULT_MAX_RIGHT_STEER = 1000;
+static const int DEFAULT_STEER_STEP = 100;
+static const std::string VIDEO_FEED_MODE_COLOR = "Color Image (1280x720)";
+static const std::string VIDEO_FEED_MODE_DEPTH = "Depth Image (640x480)";
+}
+
+using namespace Dash;
 
 namespace Ui
 {
@@ -56,6 +101,15 @@ public:
   void keyPressEvent(QKeyEvent* event);
 
 private:
+  void fetchStartupParameters();
+  void reconfigureSpeedSlider();
+  void registerRosTopics();
+  void callGetFirmwareServide();
+  void callGetCarIdServide();
+  void callGetSidServide();
+  void configureVideoFeed();
+  void connectGuiSignals();
+  void initTopicPollingTimer();
   void imuCallback(const imu_msg::ConstPtr& imu);
   void magneticCallback(const magnetic_msg::ConstPtr& magnetic);
   void usrCallback(const range_msg::ConstPtr& usr);
@@ -71,6 +125,15 @@ private:
 
   Ui::Dashboard* ui;
   ros::NodeHandle* nh;
+  std::string modeControlTopic, steeringCommandTopic, motorCommandTopic,
+      imuTopic, magneticTopic, usrTopic, uslTopic, usfTopic, hallCntTopic,
+      hallDtTopic, hallDt8Topic, vdBatTopic, vsBatTopic, getFirmwareService,
+      getCarIdService, imageColorTopic, imageDepthTopic, toggleKinectService,
+      getSidService, toggleUSService, toggleMotorService, toggleDAQService;
+  int maxForwardSpeed, maxReverseSpeed, speedStep, maxLeftSteering,
+      maxRightSteering, steeringStep;
+  int leftSgn, rightSgn, fwdSgn, bwdSgn;
+  std::string videoFeedMode;
   int16_msg motorMessage;
   int16_msg steeringMessage;
   string_msg mode;
@@ -94,6 +157,9 @@ private:
 
 private slots:
   void toggleKinect();
+  void toggleUS();
+  void toggleMotor();
+  void toggleDAQ();
   void modeSelect(int index);
   void cameraSelect(int index);
   void valueChangedSpeed(int value);
@@ -101,8 +167,8 @@ private slots:
   void maxSpeedClicked();
   void minSpeedClicked();
   void zeroSpeedClicked();
-  void maxSteeringClicked();
-  void minSteeringClicked();
+  void maxRightSteeringClicked();
+  void maxLeftSteeringClicked();
   void centerSteeringClicked();
   void pollNodeHandle();
 };
