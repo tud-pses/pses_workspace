@@ -10,3 +10,6 @@
 [submodule "pses_simulation"]
 	path = pses_simulation
 	url = https://github.com/tud-pses/pses_simulation.git
+[submodule "pses_odometry"]
+	path = pses_odometry
+	url = https://github.com/tud-pses/pses_odometry.git
