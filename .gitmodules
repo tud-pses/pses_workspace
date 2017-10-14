@@ -1,5 +1,3 @@
-[submodule "pses_simulation"]
-	url = https://github.com/tud-pses/pses_simulation.git
 [submodule "pses_helloworld"]
 	path = pses_helloworld
 	url = https://github.com/tud-pses/pses_helloworld.git
