@@ -26,233 +26,233 @@ Dashboard::~Dashboard() { delete ui; }
 
 void Dashboard::fetchStartupParameters()
 {
-  if (nh->hasParam("pses_dashboard/mode_control_topic"))
+  if (nh->hasParam("dashboard/mode_control_topic"))
   {
-    nh->getParam("pses_dashboard/mode_control_topic", modeControlTopic);
+    nh->getParam("dashboard/mode_control_topic", modeControlTopic);
   }
   else
   {
     modeControlTopic = DEFAULT_MODE_CONTROL_TOPIC;
   }
-  if (nh->hasParam("pses_dashboard/steering_command_topic"))
+  if (nh->hasParam("dashboard/steering_command_topic"))
   {
-    nh->getParam("pses_dashboard/steering_command_topic", steeringCommandTopic);
+    nh->getParam("dashboard/steering_command_topic", steeringCommandTopic);
   }
   else
   {
     steeringCommandTopic = DEFAULT_STEERING_COMMAND_TOPIC;
   }
-  if (nh->hasParam("pses_dashboard/motor_command_topic"))
+  if (nh->hasParam("dashboard/motor_command_topic"))
   {
-    nh->getParam("pses_dashboard/motor_command_topic", motorCommandTopic);
+    nh->getParam("dashboard/motor_command_topic", motorCommandTopic);
   }
   else
   {
     motorCommandTopic = DEFAULT_MOTOR_COMMAND_TOPIC;
   }
-  if (nh->hasParam("pses_dashboard/imu_topic"))
+  if (nh->hasParam("dashboard/imu_topic"))
   {
-    nh->getParam("pses_dashboard/imu_topic", imuTopic);
+    nh->getParam("dashboard/imu_topic", imuTopic);
   }
   else
   {
     imuTopic = DEFAULT_IMU_TOPIC;
   }
-  if (nh->hasParam("pses_dashboard/magnetic_topic"))
+  if (nh->hasParam("dashboard/magnetic_topic"))
   {
-    nh->getParam("pses_dashboard/magnetic_topic", magneticTopic);
+    nh->getParam("dashboard/magnetic_topic", magneticTopic);
   }
   else
   {
     magneticTopic = DEFAULT_MAGNETIC_TOPIC;
   }
-  if (nh->hasParam("pses_dashboard/usr_topic"))
+  if (nh->hasParam("dashboard/usr_topic"))
   {
-    nh->getParam("pses_dashboard/usr_topic", usrTopic);
+    nh->getParam("dashboard/usr_topic", usrTopic);
   }
   else
   {
     usrTopic = DEFAULT_USR_TOPIC;
   }
-  if (nh->hasParam("pses_dashboard/usl_topic"))
+  if (nh->hasParam("dashboard/usl_topic"))
   {
-    nh->getParam("pses_dashboard/usl_topic", uslTopic);
+    nh->getParam("dashboard/usl_topic", uslTopic);
   }
   else
   {
     uslTopic = DEFAULT_USL_TOPIC;
   }
-  if (nh->hasParam("pses_dashboard/usf_topic"))
+  if (nh->hasParam("dashboard/usf_topic"))
   {
-    nh->getParam("pses_dashboard/usf_topic", usfTopic);
+    nh->getParam("dashboard/usf_topic", usfTopic);
   }
   else
   {
     usfTopic = DEFAULT_USF_TOPIC;
   }
-  if (nh->hasParam("pses_dashboard/hallcnt_topic"))
+  if (nh->hasParam("dashboard/hallcnt_topic"))
   {
-    nh->getParam("pses_dashboard/hallcnt_topic", hallCntTopic);
+    nh->getParam("dashboard/hallcnt_topic", hallCntTopic);
   }
   else
   {
     hallCntTopic = DEFAULT_HALLCNT_TOPIC;
   }
-  if (nh->hasParam("pses_dashboard/halldt_topic"))
+  if (nh->hasParam("dashboard/halldt_topic"))
   {
-    nh->getParam("pses_dashboard/halldt_topic", hallDtTopic);
+    nh->getParam("dashboard/halldt_topic", hallDtTopic);
   }
   else
   {
     hallDtTopic = DEFAULT_HALLDT_TOPIC;
   }
-  if (nh->hasParam("pses_dashboard/halldt8_topic"))
+  if (nh->hasParam("dashboard/halldt8_topic"))
   {
-    nh->getParam("pses_dashboard/halldt8_topic", hallDt8Topic);
+    nh->getParam("dashboard/halldt8_topic", hallDt8Topic);
   }
   else
   {
     hallDt8Topic = DEFAULT_HALLDT8_TOPIC;
   }
-  if (nh->hasParam("pses_dashboard/sys_bat_topic"))
+  if (nh->hasParam("dashboard/sys_bat_topic"))
   {
-    nh->getParam("pses_dashboard/sys_bat_topic", vsBatTopic);
+    nh->getParam("dashboard/sys_bat_topic", vsBatTopic);
   }
   else
   {
     vsBatTopic = DEFAULT_VSBAT_TOPIC;
   }
-  if (nh->hasParam("pses_dashboard/drv_bat_topic"))
+  if (nh->hasParam("dashboard/drv_bat_topic"))
   {
-    nh->getParam("pses_dashboard/drv_bat_topic", vdBatTopic);
+    nh->getParam("dashboard/drv_bat_topic", vdBatTopic);
   }
   else
   {
     vdBatTopic = DEFAULT_VDBAT_TOPIC;
   }
-  if (nh->hasParam("pses_dashboard/get_car_id_service"))
+  if (nh->hasParam("dashboard/get_car_id_service"))
   {
-    nh->getParam("pses_dashboard/get_car_id_service", getCarIdService);
+    nh->getParam("dashboard/get_car_id_service", getCarIdService);
   }
   else
   {
     getCarIdService = DEFAULT_GET_CARID_SERVICE;
   }
-  if (nh->hasParam("pses_dashboard/get_firmware_service"))
+  if (nh->hasParam("dashboard/get_firmware_service"))
   {
-    nh->getParam("pses_dashboard/get_firmware_service", getFirmwareService);
+    nh->getParam("dashboard/get_firmware_service", getFirmwareService);
   }
   else
   {
     getFirmwareService = DEFAULT_GET_FIRMWARE_SERVICE;
   }
-  if (nh->hasParam("pses_dashboard/get_sid_service"))
+  if (nh->hasParam("dashboard/get_sid_service"))
   {
-    nh->getParam("pses_dashboard/get_sid_service", getSidService);
+    nh->getParam("dashboard/get_sid_service", getSidService);
   }
   else
   {
     getSidService = DEFAULT_GET_SID_SERVICE;
   }
-  if (nh->hasParam("pses_dashboard/image_color_topic"))
+  if (nh->hasParam("dashboard/image_color_topic"))
   {
-    nh->getParam("pses_dashboard/image_color_topic", imageColorTopic);
+    nh->getParam("dashboard/image_color_topic", imageColorTopic);
   }
   else
   {
     imageColorTopic = DEFAULT_IMAGE_COLOR_TOPIC;
   }
-  if (nh->hasParam("pses_dashboard/image_depth_topic"))
+  if (nh->hasParam("dashboard/image_depth_topic"))
   {
-    nh->getParam("pses_dashboard/image_depth_topic", imageDepthTopic);
+    nh->getParam("dashboard/image_depth_topic", imageDepthTopic);
   }
   else
   {
     imageDepthTopic = DEFAULT_IMAGE_DEPTH_TOPIC;
   }
-  if (nh->hasParam("pses_dashboard/toggle_kinect_service"))
+  if (nh->hasParam("dashboard/toggle_kinect_service"))
   {
-    nh->getParam("pses_dashboard/toggle_kinect_service", toggleKinectService);
+    nh->getParam("dashboard/toggle_kinect_service", toggleKinectService);
   }
   else
   {
     toggleKinectService = DEFAULT_TOGGLE_KINECT_SERVICE;
   }
-  if (nh->hasParam("pses_dashboard/toggle_motor_service"))
+  if (nh->hasParam("dashboard/toggle_motor_service"))
   {
-    nh->getParam("pses_dashboard/toggle_motor_service", toggleMotorService);
+    nh->getParam("dashboard/toggle_motor_service", toggleMotorService);
   }
   else
   {
     toggleMotorService = DEFAULT_TOGGLE_MOTOR_SERVICE;
   }
-  if (nh->hasParam("pses_dashboard/toggle_us_service"))
+  if (nh->hasParam("dashboard/toggle_us_service"))
   {
-    nh->getParam("pses_dashboard/toggle_us_service", toggleUSService);
+    nh->getParam("dashboard/toggle_us_service", toggleUSService);
   }
   else
   {
     toggleUSService = DEFAULT_TOGGLE_US_SERVICE;
   }
-  if (nh->hasParam("pses_dashboard/toggle_daq_service"))
+  if (nh->hasParam("dashboard/toggle_daq_service"))
   {
-    nh->getParam("pses_dashboard/toggle_daq_service", toggleDAQService);
+    nh->getParam("dashboard/toggle_daq_service", toggleDAQService);
   }
   else
   {
     toggleDAQService = DEFAULT_TOGGLE_DAQ_SERVICE;
   }
-  if (nh->hasParam("pses_dashboard/video_feed"))
+  if (nh->hasParam("dashboard/video_feed"))
   {
-    nh->getParam("pses_dashboard/video_feed", videoFeedMode);
+    nh->getParam("dashboard/video_feed", videoFeedMode);
   }
   else
   {
     videoFeedMode = DEFAULT_VIDEO_FEED_MODE;
   }
-  if (nh->hasParam("pses_dashboard/max_fwd_speed"))
+  if (nh->hasParam("dashboard/max_fwd_speed"))
   {
-    nh->getParam("pses_dashboard/max_fwd_speed", maxForwardSpeed);
+    nh->getParam("dashboard/max_fwd_speed", maxForwardSpeed);
   }
   else
   {
     maxForwardSpeed = DEFAULT_MAX_FWD_SPEED;
   }
-  if (nh->hasParam("pses_dashboard/max_bwd_speed"))
+  if (nh->hasParam("dashboard/max_bwd_speed"))
   {
-    nh->getParam("pses_dashboard/max_bwd_speed", maxReverseSpeed);
+    nh->getParam("dashboard/max_bwd_speed", maxReverseSpeed);
   }
   else
   {
     maxReverseSpeed = DEFAULT_MAX_BWD_SPEED;
   }
-  if (nh->hasParam("pses_dashboard/max_left_steer"))
+  if (nh->hasParam("dashboard/max_left_steer"))
   {
-    nh->getParam("pses_dashboard/max_left_steer", maxLeftSteering);
+    nh->getParam("dashboard/max_left_steer", maxLeftSteering);
   }
   else
   {
     maxLeftSteering = DEFAULT_MAX_LEFT_STEER;
   }
-  if (nh->hasParam("pses_dashboard/max_right_steer"))
+  if (nh->hasParam("dashboard/max_right_steer"))
   {
-    nh->getParam("pses_dashboard/max_right_steer", maxRightSteering);
+    nh->getParam("dashboard/max_right_steer", maxRightSteering);
   }
   else
   {
     maxRightSteering = DEFAULT_MAX_RIGHT_STEER;
   }
-  if (nh->hasParam("pses_dashboard/steering_step"))
+  if (nh->hasParam("dashboard/steering_step"))
   {
-    nh->getParam("pses_dashboard/steering_step", steeringStep);
+    nh->getParam("dashboard/steering_step", steeringStep);
   }
   else
   {
     steeringStep = DEFAULT_STEER_STEP;
   }
-  if (nh->hasParam("pses_dashboard/speed_step"))
+  if (nh->hasParam("dashboard/speed_step"))
   {
-    nh->getParam("pses_dashboard/speed_step", speedStep);
+    nh->getParam("dashboard/speed_step", speedStep);
   }
   else
   {

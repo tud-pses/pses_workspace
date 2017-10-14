@@ -197,21 +197,21 @@ void publishSensorGroupMessage1(
     usl.min_range = 0.06;
     usl.field_of_view = 0.76;
     usl.radiation_type = 0;
-    usl.header.frame_id = "robot_left_us";
+    usl.header.frame_id = "left_sensor";
     usl.header.stamp = t;
 
     usf.max_range = 3;
     usf.min_range = 0.06;
     usf.field_of_view = 0.76;
     usf.radiation_type = 0;
-    usf.header.frame_id = "robot_front_us";
+    usf.header.frame_id = "front_sensor";
     usf.header.stamp = t;
 
     usr.max_range = 3;
     usr.min_range = 0.06;
     usr.field_of_view = 0.76;
     usr.radiation_type = 0;
-    usr.header.frame_id = "robot_right_us";
+    usr.header.frame_id = "right_sensor";
     usr.header.stamp = t;
 
     pub["USL"]->publish(usl);
