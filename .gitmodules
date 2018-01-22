@@ -13,9 +13,8 @@
 [submodule "pses_odometry"]
 	path = pses_odometry
 	url = https://github.com/tud-pses/pses_odometry.git
-[submodule "pses_kinect_filter"]
-	path = pses_kinect_filter
-	url = https://github.com/tud-pses/pses_kinect_filter.git
 [submodule "pses_docs"]
 	path = pses_docs
 	url = https://github.com/tud-pses/pses_docs.git
+[submodule "pses_kinect_utilities"]
+	url = https://github.com/tud-pses/pses_kinect_utilities.git
