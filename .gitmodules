@@ -17,4 +17,5 @@
 	path = pses_docs
 	url = https://github.com/tud-pses/pses_docs.git
 [submodule "pses_kinect_utilities"]
+	path = pses_kinect_utilities
 	url = https://github.com/tud-pses/pses_kinect_utilities.git
